@@ -18,13 +18,21 @@ export default class UtilBtns extends ImmutablePureComponent {
 		intl: PropTypes.object.isRequired
 	};
 
+	onGojiSubmit = () => {
+
+	}
+
+	onHarukinSubmit = () => {
+
+	}
+
 	render () {
 		const { intl } = this.props;
 		
 		return (
 			<div id="utilBtn">
-				<Button text={intl.formatMessage(messages.goji)} onClick={this.onClick} block />
-				<Button text={intl.formatMessage(messages.harukin)} onClick={this.onClick} block />
+				<Button text={intl.formatMessage(messages.goji)} onClick={this.onGojiSubmit} block />
+				<Button text={intl.formatMessage(messages.harukin)} onClick={this.onHarukinSubmit} block />
 			</div>
 		);
 	}
