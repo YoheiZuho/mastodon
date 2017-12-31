@@ -18,6 +18,7 @@ import { isMobile } from '../../../is_mobile';
 import ImmutablePureComponent from 'react-immutable-pure-component';
 import { length } from 'stringz';
 import { countableText } from '../util/counter';
+import UtilBtns from './UtilBtns_root';
 
 const messages = defineMessages({
 	placeholder: { id: 'compose_form.placeholder', defaultMessage: 'What is on your mind?' },
@@ -54,91 +55,6 @@ export default class ComposeForm extends ImmutablePureComponent {
 
 	static defaultProps = {
 		showSearch: false,
-	};
-
-	static UtilBtns = class UtilBtns {
-		static VERSION = "v3";
-
-		static IDS = {
-			CONTAINER: "utilBtn",
-			
-			TOKENHOLDER: {
-				ROOT: "utilBtn__tokenHolder",
-
-				ACCESSTOKEN: "utilBtn__tokenHolder__input--accessToken",
-				AUTH: "utilBtn__tokenHolder__button--auth"
-			},
-
-			BUTTONS: {
-				GOJI: "utilBtn__button--goji",
-				HARUKIN: "utilBtn__button--harukin",
-				TOOTRATE: "utilBtn__button--tootRate"
-			}
-		}
-
-		static CLASSES = {
-			BUTTON: "utilBtn__button"
-		}
-
-		static TYPE = {
-			GOJI: Symbol("ｺﾞｼﾞﾓﾘｨｨｨｨｨｨ!!!"),
-			HARUKIN: Symbol("はるきん焼却"),
-			TOOTRATE: Symbol("トゥート率投稿")
-		}
-
-
-
-		static saveToken () {
-			localStorage.setItem("com.GenbuProject.UtilBtns.accessToken", document.getElementById(IDS.TOKENHOLDER.ACCESSTOKEN).value);
-		}
-
-		static dispatchGoji () {
-			let contents = document.querySelector("Textarea.autosuggest-textarea__textarea");
-
-			contents.value = [
-				"#誤字に淫夢厨",
-				":goji:"
-			].join("\r\n");
-		}
-
-		static dispatchHarukin () {
-			let contents = document.querySelector("Textarea.autosuggest-textarea__textarea");
-
-			contents.value = [
-				":harukin: :harukin: :harukin: :harukin: :harukin: :harukin:",
-				"🔥 🔥 🔥 🔥 🔥 🔥"
-			].join("\r\n");
-		}
-
-		static dispatchTootRate () {
-			let contents = document.querySelector("Textarea.autosuggest-textarea__textarea");
-
-			let serverInfo = JSON.parse((() => {
-				let c = new XMLHttpRequest();
-					c.open("GET", "/api/v1/instance", false);
-					c.send(null);
-
-				return c.response;
-			})());
-
-			let userInfo = JSON.parse((() => {
-				let c = new XMLHttpRequest();
-					c.open("GET", `/api/v1/accounts/verify_credentials?access_token=${localStorage.getItem("com.GenbuProject.UtilBtns.accessToken")}`, false);
-					c.send(null);
-
-				return c.response;
-			})());
-
-			let serverToots = serverInfo.stats.status_count,
-				userToots = userInfo.statuses_count;
-
-			contents.value = [
-				"《トゥート率》",
-				`@${userInfo.username} さんの`,
-				`トゥート率は${(userToots / serverToots * 100).toFixed(2)}%です！`,
-				`(Tooted from UtilBtns ${UtilBtns.VERSION})`
-			].join("\r\n");
-		}
 	};
 
 	handleChange = (e) => {
@@ -239,27 +155,6 @@ export default class ComposeForm extends ImmutablePureComponent {
 			publishText = this.props.privacy !== 'unlisted' ? intl.formatMessage(messages.publishLoud, { publish: intl.formatMessage(messages.publish) }) : intl.formatMessage(messages.publish);
 		}
 
-		let style = document.createElement("style");
-			style.textContent = [
-				'#utilBtn {',
-				'	Padding-Top: 10px;',
-				'}',
-				'',
-				'#utilBtn > * {',
-				'	Margin-Bottom: 1em;',
-				'}',
-				'',
-				'#utilBtn__tokenHolder {',
-				'	Display: Flex;',
-				'}',
-				'',
-				'#utilBtn__tokenHolder__input--accessToken {',
-				'	Flex: 1;',
-				'}'
-			].join("\r\n");
-			
-		document.head.appendChild(style);
-
 		return (
 			<div className='compose-form'>
 				<WarningContainer />
@@ -309,19 +204,12 @@ export default class ComposeForm extends ImmutablePureComponent {
 				</div>
 
 				<div className='compose-form__publish'>
-					<div className='compose-form__publish-button-wrapper'><Button text={publishText} onClick={this.handleSubmit} disabled={disabled || this.props.is_uploading || length(text) > 500 || (text.length !== 0 && text.trim().length === 0)} block /></div>
+					<div className='compose-form__publish-button-wrapper'>
+						<Button text={publishText} onClick={this.handleSubmit} disabled={disabled || this.props.is_uploading || length(text) > 500 || (text.length !== 0 && text.trim().length === 0)} block />
+					</div>
 				</div>
 
-				<div id="utilBtn">
-					<div id="utilBtn__tokenHolder">
-						<input id="utilBtn__tokenHolder__input--accessToken" class="search__input" type="Text" value="" placeholder="アクセストークン" />
-						<button id="utilBtn__tokenHolder__button--auth" class="button utilBtn__button" onClick={ComposeForm.UtilBtns.saveToken}>認証</button>
-					</div>
-					
-					<button id="utilBtn__button--goji" class="button button--block utilBtn__button" onClick={ComposeForm.UtilBtns.dispatchGoji}>ｺﾞｼﾞﾓﾘｨｨｨｨｨｨ!!!</button>
-					<button id="utilBtn__button--harukin" class="button button--block utilBtn__button" onClick={ComposeForm.UtilBtns.dispatchHarukin}>はるきん焼却</button>
-					<button id="utilBtn__button--tootRate" class="button button--block utilBtn__button" onClick={ComposeForm.UtilBtns.dispatchTootRate}>トゥート率投稿</button>
-				</div>
+				<UtilBtns textarea={this.autosuggestTextarea.textarea} />
 			</div>
 		);
 	}
