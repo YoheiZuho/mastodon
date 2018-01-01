@@ -7,7 +7,6 @@ import Button from '../../../components/button';
 
 
 const messages = defineMessages({
-	risa: { id: 'compose_form.UtilBtns_risa', defaultMessage: 'RISA' },
 	goji: { id: 'compose_form.UtilBtns_goji', defaultMessage: 'Typo!!!' },
 	harukin: { id: 'compose_form.UtilBtns_harukin', defaultMessage: 'Burn Harukin' }
 });
