@@ -14,24 +14,19 @@ const messages = defineMessages({
 @injectIntl
 export default class UtilBtns extends ImmutablePureComponent {
 	static propTypes = {
-		intl: PropTypes.object.isRequired
+		intl: PropTypes.object.isRequired,
+
+		onGojiSubmit: PropTypes.func.isRequired,
+		onHarukinSubmit: PropTypes.func.isRequired
 	};
 
-	onGojiSubmit = () => {
-
-	}
-
-	onHarukinSubmit = () => {
-
-	}
-
 	render () {
-		const { intl } = this.props;
+		const { intl, onGojiSubmit, onHarukinSubmit } = this.props;
 		
 		return (
 			<div id="utilBtn">
-				<Button text={intl.formatMessage(messages.goji)} onClick={this.onGojiSubmit} block />
-				<Button text={intl.formatMessage(messages.harukin)} onClick={this.onHarukinSubmit} block />
+				<Button text={intl.formatMessage(messages.goji)} onClick={onGojiSubmit} block />
+				<Button text={intl.formatMessage(messages.harukin)} onClick={onHarukinSubmit} block />
 			</div>
 		);
 	}

@@ -1,6 +1,8 @@
 import api from '../api';
 import { changeCompose } from '../actions/compose';
 
+
+
 export const UTILBTNS_RISA = 'UTILBTNS_RISA';
 export const UTILBTNS_GOJI = 'UTILBTNS_GOJI';
 export const UTILBTNS_HARUKIN = 'UTILBTNS_HARUKIN';

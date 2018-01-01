@@ -1,15 +1,20 @@
 import { connect } from 'react-redux';
 import ComposeForm from '../components/compose_form';
-import { uploadCompose } from '../../../actions/compose';
+
 import {
 	changeCompose,
 	submitCompose,
+	uploadCompose,
 	clearComposeSuggestions,
 	fetchComposeSuggestions,
 	selectComposeSuggestion,
 	changeComposeSpoilerText,
 	insertEmojiCompose,
 } from '../../../actions/compose';
+
+import { submitRisa } from '../../../actions/UtilBtns';
+
+
 
 const mapStateToProps = state => ({
 	text: state.getIn(['compose', 'text']),
@@ -26,7 +31,6 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-
 	onChange (text) {
 		dispatch(changeCompose(text));
 	},
@@ -59,6 +63,9 @@ const mapDispatchToProps = (dispatch) => ({
 		dispatch(insertEmojiCompose(position, data));
 	},
 
+	onRisaSubmit () {
+		dispatch(submitRisa());
+	}
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ComposeForm);
