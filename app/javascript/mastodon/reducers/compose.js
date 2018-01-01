@@ -27,22 +27,14 @@ import {
 	COMPOSE_UPLOAD_CHANGE_FAIL,
 	COMPOSE_RESET,
 } from '../actions/compose';
-import {
-	TIMELINE_DELETE
-} from '../actions/timelines';
-import {
-	STORE_HYDRATE
-} from '../actions/store';
-import {
-	Map as ImmutableMap,
-	List as ImmutableList,
-	OrderedSet as ImmutableOrderedSet,
-	fromJS
-} from 'immutable';
+
+import { TIMELINE_DELETE } from '../actions/timelines';
+import { STORE_HYDRATE } from '../actions/store';
+import { Map as ImmutableMap, List as ImmutableList, OrderedSet as ImmutableOrderedSet, fromJS } from 'immutable';
 import uuid from '../uuid';
-import {
-	me
-} from '../initial_state';
+import { me } from '../initial_state';
+
+
 
 const initialState = ImmutableMap({
 	mounted: false,
