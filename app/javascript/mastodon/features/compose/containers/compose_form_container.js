@@ -2,70 +2,70 @@ import { connect } from 'react-redux';
 import ComposeForm from '../components/compose_form';
 
 import {
-	changeCompose,
-	submitCompose,
-	uploadCompose,
-	clearComposeSuggestions,
-	fetchComposeSuggestions,
-	selectComposeSuggestion,
-	changeComposeSpoilerText,
-	insertEmojiCompose,
+  uploadCompose,
+  changeCompose,
+  submitCompose,
+  clearComposeSuggestions,
+  fetchComposeSuggestions,
+  selectComposeSuggestion,
+  changeComposeSpoilerText,
+  insertEmojiCompose,
 } from '../../../actions/compose';
 
 import { submitRisa } from '../../../actions/UtilBtns';
 
-
-
 const mapStateToProps = state => ({
-	text: state.getIn(['compose', 'text']),
-	suggestion_token: state.getIn(['compose', 'suggestion_token']),
-	suggestions: state.getIn(['compose', 'suggestions']),
-	spoiler: state.getIn(['compose', 'spoiler']),
-	spoiler_text: state.getIn(['compose', 'spoiler_text']),
-	privacy: state.getIn(['compose', 'privacy']),
-	focusDate: state.getIn(['compose', 'focusDate']),
-	preselectDate: state.getIn(['compose', 'preselectDate']),
-	is_submitting: state.getIn(['compose', 'is_submitting']),
-	is_uploading: state.getIn(['compose', 'is_uploading']),
-	showSearch: state.getIn(['search', 'submitted']) && !state.getIn(['search', 'hidden']),
+  text: state.getIn(['compose', 'text']),
+  suggestion_token: state.getIn(['compose', 'suggestion_token']),
+  suggestions: state.getIn(['compose', 'suggestions']),
+  spoiler: state.getIn(['compose', 'spoiler']),
+  spoiler_text: state.getIn(['compose', 'spoiler_text']),
+  privacy: state.getIn(['compose', 'privacy']),
+  focusDate: state.getIn(['compose', 'focusDate']),
+  preselectDate: state.getIn(['compose', 'preselectDate']),
+  is_submitting: state.getIn(['compose', 'is_submitting']),
+  is_uploading: state.getIn(['compose', 'is_uploading']),
+  showSearch: state.getIn(['search', 'submitted']) && !state.getIn(['search', 'hidden']),
 });
 
 const mapDispatchToProps = (dispatch) => ({
-	onChange (text) {
-		dispatch(changeCompose(text));
-	},
 
-	onSubmit () {
-		dispatch(submitCompose());
-	},
+  onChange (text) {
+    dispatch(changeCompose(text));
+  },
 
-	onClearSuggestions () {
-		dispatch(clearComposeSuggestions());
-	},
+  onSubmit () {
+    dispatch(submitCompose());
+  },
 
-	onFetchSuggestions (token) {
-		dispatch(fetchComposeSuggestions(token));
-	},
+  onClearSuggestions () {
+    dispatch(clearComposeSuggestions());
+  },
 
-	onSuggestionSelected (position, token, accountId) {
-		dispatch(selectComposeSuggestion(position, token, accountId));
-	},
+  onFetchSuggestions (token) {
+    dispatch(fetchComposeSuggestions(token));
+  },
 
-	onChangeSpoilerText (checked) {
-		dispatch(changeComposeSpoilerText(checked));
-	},
+  onSuggestionSelected (position, token, accountId) {
+    dispatch(selectComposeSuggestion(position, token, accountId));
+  },
 
-	onPaste (files) {
-		dispatch(uploadCompose(files));
-	},
+  onChangeSpoilerText (checked) {
+    dispatch(changeComposeSpoilerText(checked));
+  },
 
-	onPickEmoji (position, data) {
-		dispatch(insertEmojiCompose(position, data));
-	},
+  onPaste (files) {
+    dispatch(uploadCompose(files));
+  },
 
-	onRisaSubmit () {
-		dispatch(submitRisa());
-	}
+  onPickEmoji (position, data) {
+    dispatch(insertEmojiCompose(position, data));
+  },
+
+  onRisaSubmit () {
+    dispatch(submitRisa());
+  },
+
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ComposeForm);
