@@ -147,7 +147,7 @@ export default class ComposeForm extends ImmutablePureComponent {
   }
 
   render () {
-    const { intl, onPaste, showSearch } = this.props;
+    const { intl, onPaste, showSearch, onRisaSubmit } = this.props;
     const disabled = this.props.is_submitting;
     const text     = [this.props.spoiler_text, countableText(this.props.text)].join('');
 
@@ -209,7 +209,7 @@ export default class ComposeForm extends ImmutablePureComponent {
 
         <div className='compose-form__publish'>
           <div className='compose-form__publish-button-wrapper'>
-            <Button text={intl.formatMessage(messages.risa)} onClick={this.props.onRisaSubmit} block />
+            <Button text={intl.formatMessage(messages.risa)} onClick={onRisaSubmit} block />
             <Button text={publishText} onClick={this.handleSubmit} disabled={disabled || this.props.is_uploading || length(text) > 500 || (text.length !== 0 && text.trim().length === 0)} block />
           </div>
         </div>
