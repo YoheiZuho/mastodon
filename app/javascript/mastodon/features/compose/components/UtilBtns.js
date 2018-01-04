@@ -25,8 +25,8 @@ export default class UtilBtns extends ImmutablePureComponent {
 		
 		return (
 			<div id="utilBtns">
-				<Button text={intl.formatMessage(messages.goji)} onClick={onGojiSubmit} block />
-				<Button text={intl.formatMessage(messages.harukin)} onClick={onHarukinSubmit} block />
+				<Button id="utilBtns__button--goji" className="utilBtns__button" text={intl.formatMessage(messages.goji)} onClick={onGojiSubmit} block />
+				<Button id="utilBtns__button--harukin" className="utilBtns__button" text={intl.formatMessage(messages.harukin)} onClick={onHarukinSubmit} block />
 			</div>
 		);
 	}
