@@ -1,4 +1,3 @@
-import api from '../api';
 import { changeCompose } from '../actions/compose';
 
 
