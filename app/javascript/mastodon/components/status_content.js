@@ -137,6 +137,10 @@ export default class StatusContent extends React.PureComponent {
     if (isRtl(status.get('search_index'))) {
       directionStyle.direction = 'rtl';
     }
+    
+    [ content, spoilerContent ].forEach(text => {
+      text.__html = text.__html.replace(/- ([^-]*) -/g, "<s>$1</s>").replace(/- (<a.*<\/a>) -/, "<s>$1</s>");
+    });
 
     if (status.get('spoiler_text').length > 0) {
       let mentionsPlaceholder = '';
