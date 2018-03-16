@@ -180,7 +180,7 @@ class Status < ApplicationRecord
     end
 
     def as_home_timeline(account)
-      where(account: [account] + account.following).where(visibility: [:public, :unlisted, :private])
+      where(account: [account] + account.followers).where(visibility: [:public, :unlisted, :private])
     end
 
     def as_public_timeline(account = nil, local_only = false)
@@ -247,7 +247,7 @@ class Status < ApplicationRecord
       else
         # followers can see followers-only stuff, but also things they are mentioned in.
         # non-followers can see everything that isn't private/direct, but can see stuff they are mentioned in.
-        visibility.push(:private) if target_account.following?(account)
+        visibility.push(:private) if account.followed_by?(target_account)
 
         where(visibility: visibility).or(where(id: account.mentions.select(:status_id)))
       end
