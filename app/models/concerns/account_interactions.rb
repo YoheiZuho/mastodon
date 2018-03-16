@@ -133,7 +133,7 @@ module AccountInteractions
   end
 
   def followed_by?(other_account)
-    passive_relationships.where(target_account: other_account).exists?
+    passive_relationships.where(account: other_account).exists?
   end
 
   def blocking?(other_account)
