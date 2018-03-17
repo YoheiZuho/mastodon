@@ -71,7 +71,7 @@ class FanOutOnWriteService < BaseService
 
     status.mentions.includes(:account).each do |mention|
       mentioned_account = mention.account
-      next if !mentioned_account.local? || !mentioned_account.following?(status.account) || FeedManager.instance.filter?(:home, status, mention.account_id)
+      next if !mentioned_account.local? || !mentioned_account.followed_by?(status.account) || FeedManager.instance.filter?(:home, status, mention.account_id)
       FeedManager.instance.push_to_home(mentioned_account, status)
     end
   end
