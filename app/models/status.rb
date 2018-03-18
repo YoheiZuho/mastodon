@@ -245,10 +245,10 @@ class Status < ApplicationRecord
       elsif account.id == target_account.id # author can see own stuff
         all
       else
-        # followers can see followers-only stuff, but also things they are mentioned in.
-        # non-followers can see everything that isn't private/direct, but can see stuff they are mentioned in.
+        # followed people can see private stuff, but also things they are mentioned in.
+        # non-followed people can see everything that isn't private/direct, but can see stuff they are mentioned in.
         visibility.push(:private) if account.followed_by?(target_account)
-
+        
         where(visibility: visibility).or(where(id: account.mentions.select(:status_id)))
       end
     end
