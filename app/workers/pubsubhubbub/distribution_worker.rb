@@ -9,6 +9,7 @@ class Pubsubhubbub::DistributionWorker
     stream_entries = StreamEntry.where(id: stream_entry_ids).includes(:status).reject { |e| e.status.nil? || e.status.hidden? }
 
     return if stream_entries.empty?
+    return if stream_entries.first.private_visibility?
 
     @account       = stream_entries.first.account
     @subscriptions = active_subscriptions.to_a
