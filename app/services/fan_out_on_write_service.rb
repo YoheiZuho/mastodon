@@ -13,7 +13,11 @@ class FanOutOnWriteService < BaseService
     if status.direct_visibility?
       deliver_to_mentioned_followers(status)
     elsif status.private_visibility?
-      deliver_to_following(status)
+      if status.reply? && status.in_reply_to_account_id != status.account_id
+        deliver_to_followings_of_repliee(status)
+      else
+        deliver_to_followings(status)
+      end
     else
       deliver_to_followers(status)
       deliver_to_lists(status)
@@ -46,11 +50,21 @@ class FanOutOnWriteService < BaseService
     end
   end
 
-  def deliver_to_following(status)
-    Rails.logger.debug "Delivering status #{status.id} to following"
+  def deliver_to_followings(status)
+    Rails.logger.debug "Delivering status #{status.id} to followings"
 
-    status.account.following.where(domain: nil).joins(:user).where('users.current_sign_in_at > ?', 14.days.ago).select(:id).reorder(nil).find_in_batches do |following|
-      FeedInsertWorker.push_bulk(following) do |following|
+    status.account.following.where(domain: nil).joins(:user).where('users.current_sign_in_at > ?', 14.days.ago).select(:id).reorder(nil).find_in_batches do |followings|
+      FeedInsertWorker.push_bulk(followings) do |following|
+        [status.id, following.id, :home]
+      end
+    end
+  end
+
+  def deliver_to_followings_of_repliee(status)
+    Rails.logger.debug "Delivering status #{status.id} to followings of repliee"
+
+    status.in_reply_to_account.following.where(domain: nil).joins(:user).where('users.current_sign_in_at > ?', 14.days.ago).select(:id).reorder(nil).find_in_batches do |followings|
+      FeedInsertWorker.push_bulk(followings) do |following|
         [status.id, following.id, :home]
       end
     end
