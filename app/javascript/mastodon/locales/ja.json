@@ -203,7 +203,7 @@
   "privacy.change": "投稿のプライバシーを変更",
   "privacy.direct.long": "メンションしたユーザーだけに公開",
   "privacy.direct.short": "ダイレクト",
-  "privacy.private.long": "フォロワーだけに公開",
+  "privacy.private.long": "フォロー中の人に公開",
   "privacy.private.short": "非公開",
   "privacy.public.long": "公開TLに投稿する",
   "privacy.public.short": "公開",
