@@ -132,6 +132,10 @@ module AccountInteractions
     active_relationships.where(target_account: other_account).exists?
   end
 
+  def followed_by?(other_account)
+    passive_relationships.where(account: other_account).exists?
+  end
+
   def blocking?(other_account)
     block_relationships.where(target_account: other_account).exists?
   end
