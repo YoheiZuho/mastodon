@@ -612,6 +612,18 @@
       {
         "defaultMessage": "{publish}!",
         "id": "compose_form.publish_loud"
+      },
+      {
+        "defaultMessage": "RISA",
+        "id": "compose_form.utilBtns_risa"
+      },
+      {
+        "defaultMessage": "Typo!!!",
+        "id": "compose_form.utilBtns_goji"
+      },
+      {
+        "defaultMessage": "Burn Harukin",
+        "id": "compose_form.utilBtns_harukin"
       }
     ],
     "path": "app/javascript/mastodon/features/compose/components/compose_form.json"
@@ -1039,6 +1051,10 @@
       {
         "defaultMessage": "Keyboard shortcuts",
         "id": "navigation_bar.keyboard_shortcuts"
+      },
+      {
+        "defaultMessage": "Announcements from Admin",
+        "id": "navigation_bar.announcements"
       },
       {
         "defaultMessage": "FAQ",

@@ -44,6 +44,7 @@ export default class ScrollableList extends PureComponent {
     if (this.node) {
       const { scrollTop, scrollHeight, clientHeight } = this.node;
       const offset = scrollHeight - scrollTop - clientHeight;
+      this._oldScrollPosition = scrollHeight - scrollTop;
 
       if (400 > offset && this.props.onLoadMore && !this.props.isLoading) {
         this.props.onLoadMore();
@@ -59,6 +60,14 @@ export default class ScrollableList extends PureComponent {
     trailing: true,
   });
 
+  handleMouseMove = throttle(() => {
+    this._lastMouseMove = new Date();
+  }, 300);
+
+  handleMouseLeave = () => {
+    this._lastMouseMove = null;
+  }
+
   componentDidMount () {
     this.attachScrollListener();
     this.attachIntersectionObserver();
@@ -68,7 +77,7 @@ export default class ScrollableList extends PureComponent {
     this.handleScroll();
   }
 
-  getSnapshotBeforeUpdate (prevProps) {
+  componentDidUpdate (prevProps) {
     const someItemInserted = React.Children.count(prevProps.children) > 0 &&
       React.Children.count(prevProps.children) < React.Children.count(this.props.children) &&
       this.getFirstChildKey(prevProps) !== this.getFirstChildKey(this.props);
@@ -79,15 +88,16 @@ export default class ScrollableList extends PureComponent {
     }
   }
 
-  componentDidUpdate (prevProps, prevState, snapshot) {
     // Reset the scroll position when a new child comes in in order not to
     // jerk the scrollbar around if you're already scrolled down the page.
-    if (snapshot !== null) {
-      const newScrollTop = this.node.scrollHeight - snapshot;
+    if (someItemInserted && this._oldScrollPosition && this.node.scrollTop > 0) {
+      const newScrollTop = this.node.scrollHeight - this._oldScrollPosition;
 
       if (this.node.scrollTop !== newScrollTop) {
         this.node.scrollTop = newScrollTop;
       }
+    } else {
+      this._oldScrollPosition = this.node.scrollHeight - this.node.scrollTop;
     }
   }
 
@@ -140,12 +150,16 @@ export default class ScrollableList extends PureComponent {
     this.props.onLoadMore();
   }
 
+
   handleMouseEnter = () => {
     this.setState({ mouseOver: true });
   }
 
   handleMouseLeave = () => {
     this.setState({ mouseOver: false });
+    
+  _recentlyMoved () {
+    return this._lastMouseMove !== null && ((new Date()) - this._lastMouseMove < 600);
   }
 
   render () {
