@@ -74,7 +74,7 @@ class Account < ApplicationRecord
   validates_with UniqueUsernameValidator, if: -> { local? && will_save_change_to_username? }
   validates_with UnreservedUsernameValidator, if: -> { local? && will_save_change_to_username? }
   validates :display_name, length: { maximum: 32 }, if: -> { local? && will_save_change_to_display_name? }
-  validates :note, length: { maximum: 256 }, if: -> { local? && will_save_change_to_note? }
+  validates :note, length: { maximum: 256}, if: -> { local? && will_save_change_to_note? }
   validates :fields, length: { maximum: 4 }, if: -> { local? && will_save_change_to_fields? }
 
   # Timelines
