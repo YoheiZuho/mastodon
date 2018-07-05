@@ -33,12 +33,12 @@ module Mastodon
     end
 
     def source_base_url
-      'https://github.com/lindwurm/mastodon'
+      'https://github.com/YoheiZuho/mastodon'
     end
 
     # specify git tag or commit hash here
     def source_tag
-      "hota/master"
+      "mild-master"
     end
 
     def source_url
