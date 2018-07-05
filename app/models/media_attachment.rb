@@ -32,7 +32,7 @@ class MediaAttachment < ApplicationRecord
 
   IMAGE_STYLES = {
     original: {
-      geometry: '1280x1280>',
+      geometry: '1920x1920>',
       file_geometry_parser: FastGeometryParser,
     },
 
@@ -112,7 +112,8 @@ class MediaAttachment < ApplicationRecord
 
   before_create :prepare_description, unless: :local?
   before_create :set_shortcode
-  before_post_process :set_type_and_extension
+  before_post_process :set_type
+  after_post_process :set_file_extensions
   before_save :set_meta
 
   class << self
@@ -149,6 +150,8 @@ class MediaAttachment < ApplicationRecord
     def file_processors(f)
       if f.file_content_type == 'image/gif'
         [:gif_transcoder]
+      elsif f.file_content_type == 'image/png'
+        [:img_converter, :thumbnail]
       elsif VIDEO_MIME_TYPES.include? f.file_content_type
         [:video_transcoder]
       else
@@ -174,7 +177,7 @@ class MediaAttachment < ApplicationRecord
     self.description = description.strip[0...420] unless description.nil?
   end
 
-  def set_type_and_extension
+  def set_type
     self.type = VIDEO_MIME_TYPES.include?(file_content_type) ? :video : :image
   end
 

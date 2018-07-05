@@ -1128,7 +1128,7 @@ a .account__avatar {
   }
 
   & > div {
-    background: rgba(lighten($ui-base-color, 4%), 0.9);
+    background: rgba(lighten($ui-base-color, 4%), 0.7);
     padding: 20px 10px;
   }
 
@@ -2548,7 +2548,7 @@ a.status-card {
   }
 
   &__figure {
-    background: url('../images/elephant_ui_working.svg') no-repeat center 0;
+    background: url('../images/ui_thinking.png') no-repeat center 0;
     width: 100%;
     height: 160px;
     background-size: contain;
@@ -2562,7 +2562,7 @@ a.status-card {
     padding-top: 20px + 48px;
 
     .regeneration-indicator__figure {
-      background-image: url('../images/elephant_ui_disappointed.svg');
+      background-image: url('../images/ui_disappointed.png');
     }
   }
 
