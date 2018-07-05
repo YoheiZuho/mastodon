@@ -107,7 +107,7 @@ function main() {
     const nameCounter = document.querySelector('.name-counter');
 
     if (nameCounter) {
-      nameCounter.textContent = 70 - length(target.value);
+      nameCounter.textContent = 32 - length(target.value);
     }
   });
 
@@ -115,7 +115,7 @@ function main() {
     const noteCounter = document.querySelector('.note-counter');
 
     if (noteCounter) {
-      noteCounter.textContent = 300 - length(target.value);
+      noteCounter.textContent = 256 - length(target.value);
     }
   });
 
