@@ -9,11 +9,15 @@ class ImportWorker
 
   attr_reader :import
 
+  IMPORT_LIMIT = 5000
+
   def perform(import_id)
     @import = Import.find(import_id)
 
-    Import::RelationshipWorker.push_bulk(import_rows) do |row|
-      [@import.account_id, row.first, relationship_type]
+    if import_rows.size <= IMPORT_LIMIT
+      Import::RelationshipWorker.push_bulk(import_rows) do |row|
+        [@import.account_id, row.first, relationship_type]
+      end
     end
 
     @import.destroy
