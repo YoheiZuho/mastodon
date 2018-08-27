@@ -9,7 +9,7 @@ class ImportWorker
 
   attr_reader :import
 
-  IMPORT_LIMIT = 5000
+  IMPORT_LIMIT = 500
 
   def perform(import_id)
     @import = Import.find(import_id)
