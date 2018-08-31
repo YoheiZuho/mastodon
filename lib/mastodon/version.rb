@@ -33,7 +33,7 @@ module Mastodon
     end
 
     def repository
-      'tootsuite/mastodon'
+      'YoheiZuho/mastodon'
     end
 
     def source_base_url
@@ -42,7 +42,7 @@ module Mastodon
 
     # specify git tag or commit hash here
     def source_tag
-      nil
+      "copy-mild-master"
     end
 
     def source_url

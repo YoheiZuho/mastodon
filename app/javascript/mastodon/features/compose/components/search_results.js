@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { FormattedMessage } from 'react-intl';
 import AccountContainer from '../../../containers/account_container';
@@ -10,13 +11,35 @@ export default class SearchResults extends ImmutablePureComponent {
 
   static propTypes = {
     results: ImmutablePropTypes.map.isRequired,
+    trends: ImmutablePropTypes.list,
+    fetchTrends: PropTypes.func.isRequired,
   };
 
+  componentDidMount () {
+    const { fetchTrends } = this.props;
+    fetchTrends();
+  }
+
   render () {
-    const { results } = this.props;
+    const { results, trends } = this.props;
 
     let accounts, statuses, hashtags;
     let count = 0;
+
+    if (results.isEmpty()) {
+      return (
+        <div className='search-results'>
+          <div className='trends'>
+            <div className='trends__header'>
+              <i className='fa fa-fire fa-fw' />
+              <FormattedMessage id='trends.header' defaultMessage='Trending now' />
+            </div>
+
+            {trends && trends.map(hashtag => <Hashtag key={hashtag.get('name')} hashtag={hashtag} />)}
+          </div>
+        </div>
+      );
+    }
 
     if (results.get('accounts') && results.get('accounts').size > 0) {
       count   += results.get('accounts').size;

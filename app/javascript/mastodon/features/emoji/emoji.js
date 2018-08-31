@@ -70,7 +70,6 @@ const emojify = (str, customEmojis = {}) => {
 };
 
 export default emojify;
-
 export const buildCustomEmojis = (customEmojis) => {
   const emojis = [];
 
