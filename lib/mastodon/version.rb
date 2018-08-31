@@ -42,7 +42,7 @@ module Mastodon
 
     # specify git tag or commit hash here
     def source_tag
-      "copy-mild-master"
+      "mild-master"
     end
 
     def source_url
