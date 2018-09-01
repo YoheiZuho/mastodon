@@ -135,7 +135,7 @@ export default class GettingStarted extends ImmutablePureComponent {
 
           {multiColumn && <TrendsContainer />}
 
-          {!multiColumn && <div className='flex-spacer' />}
+          {multiColumn && <div className='flex-spacer' />}
 
           <div className='getting-started__footer'>
             <ul>
