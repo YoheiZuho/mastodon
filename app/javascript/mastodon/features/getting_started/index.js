@@ -88,6 +88,7 @@ export default class GettingStarted extends ImmutablePureComponent {
         <ColumnLink key={i++} icon='users' text={intl.formatMessage(messages.community_timeline)} to='/timelines/public/local' />,
         <ColumnLink key={i++} icon='globe' text={intl.formatMessage(messages.public_timeline)} to='/timelines/public' />,
         <ColumnSubheading key={i++} text={intl.formatMessage(messages.personal)} />
+        <ColumnLink key={i++} icon='info-circle' text={intl.formatMessage(messages.announcements)} to='/timelines/tag/Yづドンインフォ' />);
       );
 
       height += 34*2 + 48*2;
