@@ -449,6 +449,11 @@ const startWorker = (workerId) => {
     });
   };
 
+  const httpNotFound = res => {
+    res.writeHead(404, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Not found' }));
+  };
+
   app.use(setRequestId);
   app.use(setRemoteAddress);
   app.use(allowCrossDomain);
@@ -485,15 +490,30 @@ const startWorker = (workerId) => {
   });
 
   app.get('/api/v1/streaming/direct', (req, res) => {
-    streamFrom(`timeline:direct:${req.accountId}`, req, streamToHttp(req, res), streamHttpEnd(req), true);
+    const channel = `timeline:direct:${req.accountId}`;
+    streamFrom(channel, req, streamToHttp(req, res), streamHttpEnd(req, subscriptionHeartbeat(channel)), true);
   });
 
   app.get('/api/v1/streaming/hashtag', (req, res) => {
-    streamFrom(`timeline:hashtag:${req.query.tag.toLowerCase()}`, req, streamToHttp(req, res), streamHttpEnd(req), true);
+    const { tag } = req.query;
+
+    if (!tag || tag.length === 0) {
+      httpNotFound(res);
+      return;
+    }
+
+    streamFrom(`timeline:hashtag:${tag.toLowerCase()}`, req, streamToHttp(req, res), streamHttpEnd(req), true);
   });
 
   app.get('/api/v1/streaming/hashtag/local', (req, res) => {
-    streamFrom(`timeline:hashtag:${req.query.tag.toLowerCase()}:local`, req, streamToHttp(req, res), streamHttpEnd(req), true);
+    const { tag } = req.query;
+
+    if (!tag || tag.length === 0) {
+      httpNotFound(res);
+      return;
+    }
+
+    streamFrom(`timeline:hashtag:${tag.toLowerCase()}:local`, req, streamToHttp(req, res), streamHttpEnd(req), true);
   });
 
   app.get('/api/v1/streaming/list', (req, res) => {
@@ -501,8 +521,7 @@ const startWorker = (workerId) => {
 
     authorizeListAccess(listId, req, authorized => {
       if (!authorized) {
-        res.writeHead(404, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Not found' }));
+        httpNotFound(res);
         return;
       }
 
@@ -525,9 +544,11 @@ const startWorker = (workerId) => {
       ws.isAlive = true;
     });
 
+    let channel;
+
     switch(location.query.stream) {
     case 'user':
-      const channel = `timeline:${req.accountId}`;
+      channel = `timeline:${req.accountId}`;
       streamFrom(channel, req, streamToWs(req, ws), streamWsEnd(req, ws, subscriptionHeartbeat(channel)));
       break;
     case 'user:notification':
@@ -546,12 +567,23 @@ const startWorker = (workerId) => {
       streamFrom('timeline:public:local:media', req, streamToWs(req, ws), streamWsEnd(req, ws), true);
       break;
     case 'direct':
-      streamFrom(`timeline:direct:${req.accountId}`, req, streamToWs(req, ws), streamWsEnd(req, ws), true);
+      channel = `timeline:direct:${req.accountId}`;
+      streamFrom(channel, req, streamToWs(req, ws), streamWsEnd(req, ws, subscriptionHeartbeat(channel)), true);
       break;
     case 'hashtag':
+      if (!location.query.tag || location.query.tag.length === 0) {
+        ws.close();
+        return;
+      }
+
       streamFrom(`timeline:hashtag:${location.query.tag.toLowerCase()}`, req, streamToWs(req, ws), streamWsEnd(req, ws), true);
       break;
     case 'hashtag:local':
+      if (!location.query.tag || location.query.tag.length === 0) {
+        ws.close();
+        return;
+      }
+
       streamFrom(`timeline:hashtag:${location.query.tag.toLowerCase()}:local`, req, streamToWs(req, ws), streamWsEnd(req, ws), true);
       break;
     case 'list':
@@ -563,7 +595,7 @@ const startWorker = (workerId) => {
           return;
         }
 
-        const channel = `timeline:list:${listId}`;
+        channel = `timeline:list:${listId}`;
         streamFrom(channel, req, streamToWs(req, ws), streamWsEnd(req, ws, subscriptionHeartbeat(channel)));
       });
       break;
