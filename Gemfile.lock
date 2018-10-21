@@ -357,7 +357,7 @@ GEM
       concurrent-ruby (~> 1.0.0)
       sidekiq (>= 3.5.0)
       statsd-ruby (~> 1.2.0)
-    oj (3.6.11)
+    oj (3.6.12)
     omniauth (1.8.1)
       hashie (>= 3.4.6, < 3.6.0)
       rack (>= 1.6.2, < 3)
@@ -470,6 +470,8 @@ GEM
       link_header (~> 0.0, >= 0.0.8)
     rdf-normalize (0.3.3)
       rdf (>= 2.2, < 4.0)
+    redcarpet (3.4.0)
+    redis (4.0.2)
     redcarpet (3.4.0)
     redis (4.0.2)
     redis-actionpack (5.0.2)
@@ -585,7 +587,7 @@ GEM
     stoplight (2.1.3)
     streamio-ffmpeg (3.0.2)
       multi_json (~> 1.8)
-    strong_migrations (0.3.0)
+    strong_migrations (0.3.1)
       activerecord (>= 3.2.0)
     temple (0.8.0)
     terminal-table (1.8.0)
@@ -616,7 +618,7 @@ GEM
       unf (~> 0.1.0)
     tzinfo (1.2.5)
       thread_safe (~> 0.1)
-    tzinfo-data (1.2018.5)
+    tzinfo-data (1.2018.6)
       tzinfo (>= 1.0.0)
     unf (0.1.4)
       unf_ext
@@ -765,7 +767,7 @@ DEPENDENCIES
   webpush
 
 RUBY VERSION
-   ruby 2.5.0p0
+   ruby 2.5.3p105
 
 BUNDLED WITH
    1.16.5
