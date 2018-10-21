@@ -27,6 +27,7 @@ import custom_emojis from './custom_emojis';
 import lists from './lists';
 import listEditor from './list_editor';
 import filters from './filters';
+import conversations from './conversations';
 import trends from './trends';
 
 const reducers = {
@@ -58,6 +59,7 @@ const reducers = {
   lists,
   listEditor,
   filters,
+  conversations,
   trends,
 };
 
