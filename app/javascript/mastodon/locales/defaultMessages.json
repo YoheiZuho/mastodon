@@ -570,6 +570,10 @@
         "id": "navigation_bar.mutes"
       },
       {
+        "defaultMessage": "Generate QRCode of your account",
+        "id": "navigation_bar.generate_qrcode"
+      },
+      {
         "defaultMessage": "Feature on profile",
         "id": "account.endorse"
       },
@@ -746,6 +750,18 @@
       {
         "defaultMessage": "{publish}!",
         "id": "compose_form.publish_loud"
+      },
+      {
+        "defaultMessage": "RISA",
+        "id": "compose_form.utilBtns_risa"
+      },
+      {
+        "defaultMessage": "Typo!!!",
+        "id": "compose_form.utilBtns_goji"
+      },
+      {
+        "defaultMessage": "Burn Harukin",
+        "id": "compose_form.utilBtns_harukin"
       }
     ],
     "path": "app/javascript/mastodon/features/compose/components/compose_form.json"
@@ -2027,6 +2043,15 @@
       }
     ],
     "path": "app/javascript/mastodon/features/ui/components/onboarding_modal.json"
+  },
+  {
+    "descriptors": [
+      {
+        "defaultMessage": "View your account easily by scanning QRCode.",
+        "id": "qr_modal.description"
+      }
+    ],
+    "path": "app/javascript/mastodon/features/ui/components/qrcode_modal.json"
   },
   {
     "descriptors": [
