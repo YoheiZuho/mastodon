@@ -28,6 +28,7 @@ import lists from './lists';
 import listEditor from './list_editor';
 import filters from './filters';
 import conversations from './conversations';
+import suggestions from './suggestions';
 import trends from './trends';
 
 const reducers = {
@@ -60,6 +61,7 @@ const reducers = {
   listEditor,
   filters,
   conversations,
+  suggestions,
   trends,
 };
 
