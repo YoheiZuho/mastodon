@@ -6,8 +6,8 @@
 
   .fields-row
     .fields-row__column.fields-group.fields-row__column-6
-      = f.input :display_name, wrapper: :with_label, hint: t('simple_form.hints.defaults.display_name', count: 30 - @account.display_name.size).html_safe
-      = f.input :note, wrapper: :with_label, hint: t('simple_form.hints.defaults.note', count: 160 - @account.note.size).html_safe
+      = f.input :display_name, wrapper: :with_label, hint: t('simple_form.hints.defaults.display_name', count: 70 - @account.display_name.size).html_safe
+      = f.input :note, wrapper: :with_label, hint: t('simple_form.hints.defaults.note', count: 300 - @account.note.size).html_safe
 
   .fields-row
     .fields-row__column.fields-row__column-6
