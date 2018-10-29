@@ -28,6 +28,7 @@ import listEditor from './list_editor';
 import filters from './filters';
 import conversations from './conversations';
 import suggestions from './suggestions';
+import trends from './trends';
 
 const reducers = {
   dropdown_menu,
@@ -59,6 +60,7 @@ const reducers = {
   filters,
   conversations,
   suggestions,
+  trends,
 };
 
 export default combineReducers(reducers);
