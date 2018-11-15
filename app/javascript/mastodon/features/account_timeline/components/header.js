@@ -23,6 +23,7 @@ export default class Header extends ImmutablePureComponent {
     onBlockDomain: PropTypes.func.isRequired,
     onUnblockDomain: PropTypes.func.isRequired,
     onEndorseToggle: PropTypes.func.isRequired,
+    onAddToList: PropTypes.func.isRequired,
     onGenerateQrcode: PropTypes.func.isRequired,
     hideTabs: PropTypes.bool,
   };
@@ -79,6 +80,9 @@ export default class Header extends ImmutablePureComponent {
     this.props.onEndorseToggle(this.props.account);
   }
 
+  handleAddToList = () => {
+    this.props.onAddToList(this.props.account);
+
   handleGenerateQrcode = () => {
     this.props.onGenerateQrcode(this.props.account);
   }
@@ -111,6 +115,7 @@ export default class Header extends ImmutablePureComponent {
           onBlockDomain={this.handleBlockDomain}
           onUnblockDomain={this.handleUnblockDomain}
           onEndorseToggle={this.handleEndorseToggle}
+          onAddToList={this.handleAddToList}
           onGenerateQrcode={this.handleGenerateQrcode}
         />
 

@@ -16,6 +16,7 @@ import {
   ReportModal,
   EmbedModal,
   ListEditor,
+  ListAdder,
   QrcodeModal,
 } from '../../../features/ui/util/async-components';
 
@@ -32,6 +33,7 @@ const MODAL_COMPONENTS = {
   'QRCODE': QrcodeModal,
   'LIST_EDITOR': ListEditor,
   'FOCAL_POINT': () => Promise.resolve({ default: FocalPointModal }),
+  'LIST_ADDER':ListAdder,
 };
 
 export default class ModalRoot extends React.PureComponent {

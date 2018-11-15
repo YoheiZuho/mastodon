@@ -116,6 +116,11 @@ const mapDispatchToProps = (dispatch, { intl }) => ({
     dispatch(unblockDomain(domain));
   },
 
+  onAddToList(account){
+    dispatch(openModal('LIST_ADDER', {
+      accountId: account.get('id'),
+    }));
+
   onGenerateQrcode (account) {
     dispatch(openModal('QRCODE', { account: account }));
   },
