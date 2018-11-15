@@ -120,6 +120,7 @@ const mapDispatchToProps = (dispatch, { intl }) => ({
     dispatch(openModal('LIST_ADDER', {
       accountId: account.get('id'),
     }));
+  },
 
   onGenerateQrcode (account) {
     dispatch(openModal('QRCODE', { account: account }));
