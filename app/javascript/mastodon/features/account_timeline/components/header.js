@@ -82,6 +82,7 @@ export default class Header extends ImmutablePureComponent {
 
   handleAddToList = () => {
     this.props.onAddToList(this.props.account);
+  }
 
   handleGenerateQrcode = () => {
     this.props.onGenerateQrcode(this.props.account);
