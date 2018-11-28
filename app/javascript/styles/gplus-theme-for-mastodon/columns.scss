@@ -1,7 +1,7 @@
 @charset "UTF-8";
 
-@import '_variables.scss';
-@import '_mixins.scss';
+@import 'variables';
+@import 'mixins';
 
 
 
@@ -140,6 +140,10 @@
 				}
 			}
 		}
+
+		div[tabindex="-1"] {
+			margin-bottom: 1em;
+		}
 	}
 
 	.column-subheading {
@@ -169,7 +173,7 @@
 			margin-bottom: 1em;
 
 			background: none center / contain no-repeat;
-			background-image: url("https://ssl.gstatic.com/s2/oz/images/notifications/jingles_eb4e5306b38f83915d82034fa93390d9/desktop_anim_2x.gif");
+			background-image: url("https://raw.githubusercontent.com/GenbuProject/GPlusTheme-for-Mastodon/asset/notification-jingle_2x.gif");
 		}
 	}
 }
