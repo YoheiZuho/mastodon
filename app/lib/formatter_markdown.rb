@@ -88,30 +88,31 @@ class Formatter_Markdown
             %(<h#{header_level}>#{encode(mdContentsRemoved)}</h#{header_level}>\n)
         end
 
-        def block_code(code, language) 
-            %(<br>#{code.strip}) 
+        def block_code(code, language)
+            %(<br>#{code.strip})
         end
 
         def codespan(code)
             urlRemoved = "#{remove_url(code)}"
             escapedCode = "#{escape_bbcode(urlRemoved)}"
-            %(<code>#{encode(escapedCode)}</code>)
+            encoded = "#{encode(escapedCode)}"
+            %(<code>#{code_contents(encoded)}</code>)
         end
 
         def list(contents, list_type)
             if list_type == :unordered
-                %(<ul>#{contents.strip}</ul>)
+                %(<ul class='md-contents'>#{contents.strip}</ul>)
             elsif list_type == :ordered
-                %(<ol>#{contents.strip}</ol>)
+                %(<ol class='md-contents'>#{contents.strip}</ol>)
             else
-                %(<#{list_type}>#{contents.strip}</#{list_type}>)
+                %(<#{list_type} class='md-contents'>#{contents.strip}</#{list_type}>)
             end
         end
 
         def list_item(text, list_type)
             urlRemoved = "#{remove_url(text)}"
             mdContentsRemoved = "#{markdown_escape(urlRemoved)}"
-            %(<li>#{encode(mdContentsRemoved)}</li>)
+            %(<li class='md-contents'>#{encode(mdContentsRemoved)}</li>)
         end
 
         def emphasis(text)
@@ -174,7 +175,7 @@ class Formatter_Markdown
             if imgcheck !~ /\Ahttps:\/\/[^<>"\[\] 　]+\z/
                 %(#{encode(alt_text)})
             else
-                %(<img src="#{URI.encode_www_form_component(link)}">)
+                %(<span class="img_FTL">画像が添付されています。</span><img src="#{URI.encode_www_form_component(link)}">)
             end
         end
 
@@ -210,7 +211,7 @@ class Formatter_Markdown
 
         #前々から要望があったcode内でBBCodeを無効化するための奴
         def escape_bbcode(string)
-            string.gsub(/\[/){ "［" }
+            string.gsub(/\[/){ "&#091;" }
         end
 
         #markdownの中でmarkdownを展開させないためのエスケープする奴
@@ -223,6 +224,27 @@ class Formatter_Markdown
         #blockquoteコンテンツ内でblockquoteタグだけを許可するためのエスケープ
         def blockquote_markdown_escape(string)
             string.gsub(/<([\/]?a[^>]*|[\/]?img[^>]*|[\/]?code[^>]*|[\/]?h[1-6][^>]*|[\/]?sup[^>]*|[\/]?sub[^>]*|[\/]?small[^>]*|[\/]?ul[^>]*|[\/]?ol[^>]*|[\/]?li[^>]*|[\/]?hr[^>]*|[\/]?s[^>]*|[\/]?u[^>]*|[\/]?mark[^>]*)>/) { "" }
+        end
+
+        #code内の一部を色分けするための変更
+        def code_contents(string)
+            simple = string.gsub(/(true|error|false|failed|def|puts|end|fn|let|mut|use|String|println!)/ ,
+                "true" => "<span class='positive'>#{:true}</span>",
+                "error" => "<span class='negative'>#{:error}</span>",
+                "false" => "<span class='negative'>#{:false}</span>",
+                "failed" => "<span class='negative'>#{:failed}</span>",
+                "def" => "<span class='ruby-func'>#{:def}</span>",
+                "puts" => "<span class='ruby-func'>#{:puts}</span>",
+                "end" => "<span class='ruby-func'>#{:end}</span>",
+                "fn" => "<span class='rust-fanc'>#{:fn}</span>",
+                "let" => "<span class='rust-fanc'>#{:let}</span>",
+                "mut" => "<span class='rust-fanc'>#{:mut}</span>",
+                "use" => "<span class='rust-fanc'>#{:use}</span>",
+                "String" => "<span class='rust-macro'>#{:String}</span>",
+                "println!" => "<span class='rust-macro'>#{:println!}</span>",
+            )
+            simple.gsub(/(&quot;[a-zA-Z0-9_ ,]+&quot;)/){ "<span class='contents'>#{$1}</span>" }
+#                "" => "<span class=''>#{:}</span>",
         end
 
         #テストで書きなぐった奴
@@ -284,7 +306,8 @@ class MDExtractor
             extractByHTMLTagName("br", false, true),
             extractByHTMLTagName("a"),
             extractByHTMLTagName("img", false, true),
-            extractByHTMLTagName("s")
+            extractByHTMLTagName("s"),
+            extractByHTMLTagName("span")
         ].flatten.compact
     end
 
