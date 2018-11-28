@@ -32,8 +32,12 @@ const messages = defineMessages({
   utilBtns_harukin: { id: 'compose_form.utilBtns_harukin', defaultMessage: 'Burn Harukin' }
 });
 
-@injectIntl
-export default class ComposeForm extends ImmutablePureComponent {
+export default @injectIntl
+class ComposeForm extends ImmutablePureComponent {
+
+  static contextTypes = {
+    router: PropTypes.object,
+  };
 
   static propTypes = {
     intl: PropTypes.object.isRequired,
@@ -93,7 +97,7 @@ export default class ComposeForm extends ImmutablePureComponent {
       return;
     }
 
-    this.props.onSubmit();
+    this.props.onSubmit(this.context.router ? this.context.router.history : null);
   }
 
   onSuggestionsClearRequested = () => {

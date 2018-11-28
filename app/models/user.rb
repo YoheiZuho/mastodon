@@ -83,7 +83,6 @@ class User < ApplicationRecord
   scope :inactive, -> { where(arel_table[:current_sign_in_at].lt(ACTIVE_DURATION.ago)) }
   scope :active, -> { confirmed.where(arel_table[:current_sign_in_at].gteq(ACTIVE_DURATION.ago)).joins(:account).where(accounts: { suspended: false }) }
   scope :matches_email, ->(value) { where(arel_table[:email].matches("#{value}%")) }
-  scope :with_recent_ip_address, ->(value) { where(arel_table[:current_sign_in_ip].eq(value).or(arel_table[:last_sign_in_ip].eq(value))) }
 
   before_validation :sanitize_languages
 
@@ -95,10 +94,10 @@ class User < ApplicationRecord
   has_many :session_activations, dependent: :destroy
 
   delegate :auto_play_gif, :default_sensitive, :unfollow_modal, :boost_modal, :delete_modal,
-           :reduce_motion, :system_font_ui, :noindex, :theme, :display_sensitive_media, :hide_network,
-           :default_language, to: :settings, prefix: :setting, allow_nil: false
+           :reduce_motion, :system_font_ui, :noindex, :theme, :display_media, :hide_network,
+           :expand_spoilers, :default_language, to: :settings, prefix: :setting, allow_nil: false
 
-  attr_accessor :invite_code
+  attr_reader :invite_code
 
   def pam_conflict(_)
     # block pam login tries on traditional account
@@ -224,6 +223,10 @@ class User < ApplicationRecord
     settings.notification_emails['digest']
   end
 
+  def allows_report_emails?
+    settings.notification_emails['report']
+  end
+
   def hides_network?
     @hides_network ||= settings.hide_network
   end
@@ -258,7 +261,7 @@ class User < ApplicationRecord
   end
 
   def invite_code=(code)
-    self.invite  = Invite.find_by(code: code) unless code.blank?
+    self.invite  = Invite.find_by(code: code) if code.present?
     @invite_code = code
   end
 
@@ -310,6 +313,14 @@ class User < ApplicationRecord
   def self.authenticate_with_pam(attributes = {})
     return nil unless Devise.pam_authentication
     super
+  end
+
+  def show_all_media?
+    setting_display_media == 'show_all'
+  end
+
+  def hide_all_media?
+    setting_display_media == 'hide_all'
   end
 
   protected

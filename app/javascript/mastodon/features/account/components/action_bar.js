@@ -2,7 +2,7 @@ import React from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import PropTypes from 'prop-types';
 import DropdownMenuContainer from '../../../containers/dropdown_menu_container';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import { me } from '../../../initial_state';
 import { shortNumberFormat } from '../../../utils/numbers';
@@ -34,10 +34,12 @@ const messages = defineMessages({
   mutes: { id: 'navigation_bar.mutes', defaultMessage: 'Muted users' },
   endorse: { id: 'account.endorse', defaultMessage: 'Feature on profile' },
   unendorse: { id: 'account.unendorse', defaultMessage: 'Don\'t feature on profile' },
+  add_or_remove_from_list: { id: 'account.add_or_remove_from_list', defaultMessage: 'Add or Remove from lists' },
+  generateQrcode: { id: 'navigation_bar.generate_qrcode', defaultMessage: 'Generate QRCode of your account' },
 });
 
-@injectIntl
-export default class ActionBar extends React.PureComponent {
+export default @injectIntl
+class ActionBar extends React.PureComponent {
 
   static propTypes = {
     account: ImmutablePropTypes.map.isRequired,
@@ -51,6 +53,8 @@ export default class ActionBar extends React.PureComponent {
     onBlockDomain: PropTypes.func.isRequired,
     onUnblockDomain: PropTypes.func.isRequired,
     onEndorseToggle: PropTypes.func.isRequired,
+    onAddToList: PropTypes.func.isRequired,
+    onGenerateQrcode: PropTypes.func.isRequired,
     intl: PropTypes.object.isRequired,
   };
 
@@ -58,6 +62,13 @@ export default class ActionBar extends React.PureComponent {
     navigator.share({
       url: this.props.account.get('url'),
     });
+  }
+
+  isStatusesPageActive = (match, location) => {
+    if (!match) {
+      return false;
+    }
+    return !location.pathname.match(/\/(followers|following)\/?$/);
   }
 
   render () {
@@ -81,6 +92,7 @@ export default class ActionBar extends React.PureComponent {
       menu.push({ text: intl.formatMessage(messages.edit_profile), href: '/settings/profile' });
       menu.push({ text: intl.formatMessage(messages.preferences), href: '/settings/preferences' });
       menu.push({ text: intl.formatMessage(messages.pins), to: '/pinned' });
+      menu.push({ text: intl.formatMessage(messages.generateQrcode), action: this.props.onGenerateQrcode });
       menu.push(null);
       menu.push({ text: intl.formatMessage(messages.follow_requests), to: '/follow_requests' });
       menu.push({ text: intl.formatMessage(messages.favourites), to: '/favourites' });
@@ -98,6 +110,7 @@ export default class ActionBar extends React.PureComponent {
         }
 
         menu.push({ text: intl.formatMessage(account.getIn(['relationship', 'endorsed']) ? messages.unendorse : messages.endorse), action: this.props.onEndorseToggle });
+        menu.push({ text: intl.formatMessage(messages.add_or_remove_from_list), action: this.props.onAddToList });
         menu.push(null);
       }
 
@@ -147,20 +160,20 @@ export default class ActionBar extends React.PureComponent {
 
         <div className='account__action-bar'>
           <div className='account__action-bar-links'>
-            <Link className='account__action-bar__tab' to={`/accounts/${account.get('id')}`} title={intl.formatNumber(account.get('statuses_count'))}>
+            <NavLink isActive={this.isStatusesPageActive} activeClassName='active' className='account__action-bar__tab' to={`/accounts/${account.get('id')}`} title={intl.formatNumber(account.get('statuses_count'))}>
               <FormattedMessage id='account.posts' defaultMessage='Toots' />
               <strong>{shortNumberFormat(account.get('statuses_count'))}</strong>
-            </Link>
+            </NavLink>
 
-            <Link className='account__action-bar__tab' to={`/accounts/${account.get('id')}/following`} title={intl.formatNumber(account.get('following_count'))}>
+            <NavLink exact activeClassName='active' className='account__action-bar__tab' to={`/accounts/${account.get('id')}/following`} title={intl.formatNumber(account.get('following_count'))}>
               <FormattedMessage id='account.follows' defaultMessage='Follows' />
               <strong>{shortNumberFormat(account.get('following_count'))}</strong>
-            </Link>
+            </NavLink>
 
-            <Link className='account__action-bar__tab' to={`/accounts/${account.get('id')}/followers`} title={intl.formatNumber(account.get('followers_count'))}>
+            <NavLink exact activeClassName='active' className='account__action-bar__tab' to={`/accounts/${account.get('id')}/followers`} title={intl.formatNumber(account.get('followers_count'))}>
               <FormattedMessage id='account.followers' defaultMessage='Followers' />
               <strong>{shortNumberFormat(account.get('followers_count'))}</strong>
-            </Link>
+            </NavLink>
           </div>
 
           <div className='account__action-bar-dropdown'>

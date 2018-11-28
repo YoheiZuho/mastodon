@@ -309,6 +309,10 @@
   {
     "descriptors": [
       {
+        "defaultMessage": "Read more",
+        "id": "status.read_more"
+      },
+      {
         "defaultMessage": "Show more",
         "id": "status.show_more"
       },
@@ -345,6 +349,10 @@
       {
         "defaultMessage": "{name} boosted",
         "id": "status.reblogged_by"
+      },
+      {
+        "defaultMessage": "Show thread",
+        "id": "status.show_thread"
       }
     ],
     "path": "app/javascript/mastodon/components/status.json"
@@ -390,12 +398,20 @@
         "id": "confirmations.redraft.confirm"
       },
       {
-        "defaultMessage": "Are you sure you want to delete this status and re-draft it? You will lose all replies, boosts and favourites to it.",
+        "defaultMessage": "Are you sure you want to delete this status and re-draft it? Favourites and boosts will be lost, and replies to the original post will be orphaned.",
         "id": "confirmations.redraft.message"
       },
       {
         "defaultMessage": "Block",
         "id": "confirmations.block.confirm"
+      },
+      {
+        "defaultMessage": "Reply",
+        "id": "confirmations.reply.confirm"
+      },
+      {
+        "defaultMessage": "Replying now will overwrite the message you are currently composing. Are you sure you want to proceed?",
+        "id": "confirmations.reply.message"
       },
       {
         "defaultMessage": "Are you sure you want to block {name}?",
@@ -458,6 +474,15 @@
       }
     ],
     "path": "app/javascript/mastodon/features/account_timeline/containers/header_container.json"
+  },
+  {
+    "descriptors": [
+      {
+        "defaultMessage": "No toots here!",
+        "id": "empty_column.account_timeline"
+      }
+    ],
+    "path": "app/javascript/mastodon/features/account_timeline/index.json"
   },
   {
     "descriptors": [
@@ -558,12 +583,20 @@
         "id": "navigation_bar.mutes"
       },
       {
+        "defaultMessage": "Generate QRCode of your account",
+        "id": "navigation_bar.generate_qrcode"
+      },
+      {
         "defaultMessage": "Feature on profile",
         "id": "account.endorse"
       },
       {
         "defaultMessage": "Don't feature on profile",
         "id": "account.unendorse"
+      },
+      {
+        "defaultMessage": "Add or Remove from lists",
+        "id": "account.add_or_remove_from_list"
       },
       {
         "defaultMessage": "Information below may reflect the user's profile incompletely.",
@@ -611,6 +644,10 @@
         "id": "account.edit_profile"
       },
       {
+        "defaultMessage": "Ownership of this link was checked on {date}",
+        "id": "account.link_verified_on"
+      },
+      {
         "defaultMessage": "Follows you",
         "id": "account.follows_you"
       },
@@ -638,6 +675,10 @@
       {
         "defaultMessage": "Blocked users",
         "id": "column.blocks"
+      },
+      {
+        "defaultMessage": "You haven't blocked any users yet.",
+        "id": "empty_column.blocks"
       }
     ],
     "path": "app/javascript/mastodon/features/blocks/index.json"
@@ -865,6 +906,14 @@
   {
     "descriptors": [
       {
+        "defaultMessage": "Dismiss suggestion",
+        "id": "suggestions.dismiss"
+      },
+      {
+        "defaultMessage": "You might be interested in…",
+        "id": "suggestions.header"
+      },
+      {
         "defaultMessage": "People",
         "id": "search_results.accounts"
       },
@@ -919,7 +968,7 @@
   {
     "descriptors": [
       {
-        "defaultMessage": "Add media",
+        "defaultMessage": "Add media (JPEG, PNG, GIF, WebM, MP4, MOV)",
         "id": "upload_button.label"
       }
     ],
@@ -1031,6 +1080,10 @@
       {
         "defaultMessage": "Logout",
         "id": "navigation_bar.logout"
+      },
+      {
+        "defaultMessage": "Compose new toot",
+        "id": "navigation_bar.compose"
       }
     ],
     "path": "app/javascript/mastodon/features/compose/index.json"
@@ -1057,6 +1110,10 @@
       {
         "defaultMessage": "Unhide {domain}",
         "id": "account.unblock_domain"
+      },
+      {
+        "defaultMessage": "There are no hidden domains yet.",
+        "id": "empty_column.domain_blocks"
       }
     ],
     "path": "app/javascript/mastodon/features/domain_blocks/index.json"
@@ -1066,9 +1123,22 @@
       {
         "defaultMessage": "Favourites",
         "id": "column.favourites"
+      },
+      {
+        "defaultMessage": "You don't have any favourite toots yet. When you favourite one, it will show up here.",
+        "id": "empty_column.favourited_statuses"
       }
     ],
     "path": "app/javascript/mastodon/features/favourited_statuses/index.json"
+  },
+  {
+    "descriptors": [
+      {
+        "defaultMessage": "No one has favourited this toot yet. When someone does, they will show up here.",
+        "id": "empty_column.favourites"
+      }
+    ],
+    "path": "app/javascript/mastodon/features/favourites/index.json"
   },
   {
     "descriptors": [
@@ -1088,9 +1158,31 @@
       {
         "defaultMessage": "Follow requests",
         "id": "column.follow_requests"
+      },
+      {
+        "defaultMessage": "You don't have any follow requests yet. When you receive one, it will show up here.",
+        "id": "empty_column.follow_requests"
       }
     ],
     "path": "app/javascript/mastodon/features/follow_requests/index.json"
+  },
+  {
+    "descriptors": [
+      {
+        "defaultMessage": "No one follows this user yet.",
+        "id": "account.followers.empty"
+      }
+    ],
+    "path": "app/javascript/mastodon/features/followers/index.json"
+  },
+  {
+    "descriptors": [
+      {
+        "defaultMessage": "This user doesn't follow anyone yet.",
+        "id": "account.follows.empty"
+      }
+    ],
+    "path": "app/javascript/mastodon/features/following/index.json"
   },
   {
     "descriptors": [
@@ -1216,6 +1308,39 @@
   {
     "descriptors": [
       {
+        "defaultMessage": "Any of these",
+        "id": "hashtag.column_settings.tag_mode.any"
+      },
+      {
+        "defaultMessage": "All of these",
+        "id": "hashtag.column_settings.tag_mode.all"
+      },
+      {
+        "defaultMessage": "None of these",
+        "id": "hashtag.column_settings.tag_mode.none"
+      },
+      {
+        "defaultMessage": "Include additional tags in this column",
+        "id": "hashtag.column_settings.tag_toggle"
+      }
+    ],
+    "path": "app/javascript/mastodon/features/hashtag_timeline/components/column_settings.json"
+  },
+  {
+    "descriptors": [
+      {
+        "defaultMessage": "or {additional}",
+        "id": "hashtag.column_header.tag_mode.any"
+      },
+      {
+        "defaultMessage": "and {additional}",
+        "id": "hashtag.column_header.tag_mode.all"
+      },
+      {
+        "defaultMessage": "without {additional}",
+        "id": "hashtag.column_header.tag_mode.none"
+      },
+      {
         "defaultMessage": "There is nothing in this hashtag yet.",
         "id": "empty_column.hashtag"
       }
@@ -1331,11 +1456,72 @@
         "id": "keyboard_shortcuts.unfocus"
       },
       {
+        "defaultMessage": "to open home timeline",
+        "id": "keyboard_shortcuts.home"
+      },
+      {
+        "defaultMessage": "to open notifications column",
+        "id": "keyboard_shortcuts.notifications"
+      },
+      {
+        "defaultMessage": "to open local timeline",
+        "id": "keyboard_shortcuts.local"
+      },
+      {
+        "defaultMessage": "to open federated timeline",
+        "id": "keyboard_shortcuts.federated"
+      },
+      {
+        "defaultMessage": "to open direct messages column",
+        "id": "keyboard_shortcuts.direct"
+      },
+      {
+        "defaultMessage": "to open \"get started\" column",
+        "id": "keyboard_shortcuts.start"
+      },
+      {
+        "defaultMessage": "to open favourites list",
+        "id": "keyboard_shortcuts.favourites"
+      },
+      {
+        "defaultMessage": "to open pinned toots list",
+        "id": "keyboard_shortcuts.pinned"
+      },
+      {
+        "defaultMessage": "to open your profile",
+        "id": "keyboard_shortcuts.my_profile"
+      },
+      {
+        "defaultMessage": "to open blocked users list",
+        "id": "keyboard_shortcuts.blocked"
+      },
+      {
+        "defaultMessage": "to open muted users list",
+        "id": "keyboard_shortcuts.muted"
+      },
+      {
+        "defaultMessage": "to open follow requests list",
+        "id": "keyboard_shortcuts.requests"
+      },
+      {
         "defaultMessage": "to display this legend",
         "id": "keyboard_shortcuts.legend"
       }
     ],
     "path": "app/javascript/mastodon/features/keyboard_shortcuts/index.json"
+  },
+  {
+    "descriptors": [
+      {
+        "defaultMessage": "Remove from list",
+        "id": "lists.account.remove"
+      },
+      {
+        "defaultMessage": "Add to list",
+        "id": "lists.account.add"
+      }
+    ],
+    "path": "app/javascript/mastodon/features/list_adder/components/list.json"
   },
   {
     "descriptors": [
@@ -1406,6 +1592,10 @@
       {
         "defaultMessage": "Your lists",
         "id": "lists.subheading"
+      },
+      {
+        "defaultMessage": "You don't have any lists yet. When you create one, it will show up here.",
+        "id": "empty_column.lists"
       }
     ],
     "path": "app/javascript/mastodon/features/lists/index.json"
@@ -1415,6 +1605,10 @@
       {
         "defaultMessage": "Muted users",
         "id": "column.mutes"
+      },
+      {
+        "defaultMessage": "You haven't muted any users yet.",
+        "id": "empty_column.mutes"
       }
     ],
     "path": "app/javascript/mastodon/features/mutes/index.json"
@@ -1445,10 +1639,6 @@
       {
         "defaultMessage": "Push notifications",
         "id": "notifications.column_settings.push"
-      },
-      {
-        "defaultMessage": "This device",
-        "id": "notifications.column_settings.push_meta"
       },
       {
         "defaultMessage": "New followers:",
@@ -1533,6 +1723,15 @@
       }
     ],
     "path": "app/javascript/mastodon/features/public_timeline/index.json"
+  },
+  {
+    "descriptors": [
+      {
+        "defaultMessage": "No one has boosted this toot yet. When someone does, they will show up here.",
+        "id": "status.reblogs.empty"
+      }
+    ],
+    "path": "app/javascript/mastodon/features/reblogs/index.json"
   },
   {
     "descriptors": [
@@ -1648,7 +1847,7 @@
         "id": "confirmations.redraft.confirm"
       },
       {
-        "defaultMessage": "Are you sure you want to delete this status and re-draft it? You will lose all replies, boosts and favourites to it.",
+        "defaultMessage": "Are you sure you want to delete this status and re-draft it? Favourites and boosts will be lost, and replies to the original post will be orphaned.",
         "id": "confirmations.redraft.message"
       },
       {
@@ -1662,6 +1861,18 @@
       {
         "defaultMessage": "Show less for all",
         "id": "status.show_less_all"
+      },
+      {
+        "defaultMessage": "Detailed conversation view",
+        "id": "status.detailed_status"
+      },
+      {
+        "defaultMessage": "Reply",
+        "id": "confirmations.reply.confirm"
+      },
+      {
+        "defaultMessage": "Replying now will overwrite the message you are currently composing. Are you sure you want to proceed?",
+        "id": "confirmations.reply.message"
       },
       {
         "defaultMessage": "Are you sure you want to block {name}?",
@@ -1716,6 +1927,15 @@
       }
     ],
     "path": "app/javascript/mastodon/features/ui/components/bundle_modal_error.json"
+  },
+  {
+    "descriptors": [
+      {
+        "defaultMessage": "Toot",
+        "id": "compose_form.publish"
+      }
+    ],
+    "path": "app/javascript/mastodon/features/ui/components/columns_area.json"
   },
   {
     "descriptors": [
@@ -1889,6 +2109,15 @@
   {
     "descriptors": [
       {
+        "defaultMessage": "View your account easily by scanning QRCode.",
+        "id": "qr_modal.description"
+      }
+    ],
+    "path": "app/javascript/mastodon/features/ui/components/qrcode_modal.json"
+  },
+  {
+    "descriptors": [
+      {
         "defaultMessage": "Close",
         "id": "lightbox.close"
       },
@@ -2003,6 +2232,10 @@
       {
         "defaultMessage": "Sensitive content",
         "id": "status.sensitive_warning"
+      },
+      {
+        "defaultMessage": "Media hidden",
+        "id": "status.media_hidden"
       },
       {
         "defaultMessage": "Click to view",

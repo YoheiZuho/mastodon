@@ -30,18 +30,25 @@ el:
     other_instances: Λίστα κόμβων
     privacy_policy: Πολιτική απορρήτου
     source_code: Πηγαίος κώδικας
-    status_count_after: καταστάσεις
+    status_count_after:
+      one: δημοσίευση
+      other: δημοσιεύσεις
     status_count_before: Που έγραψαν
     terms: Όροι χρήσης
-    user_count_after: χρήστες
+    user_count_after:
+      one: χρήστης
+      other: χρήστες
     user_count_before: Σπίτι για
     what_is_mastodon: Τι είναι το Mastodon;
   accounts:
     choices_html: 'Επιλογές του/της %{name}:'
     follow: Ακολούθησε
-    followers: Ακόλουθοι
+    followers:
+      one: Ακόλουθος
+      other: Ακόλουθοι
     following: Ακολουθεί
     joined: Εγγράφηκε στις %{date}
+    link_verified_on: Η κυριότητα αυτού του συνδέσμου ελέγχθηκε στις %{date}
     media: Πολυμέσα
     moved_html: 'Ο/Η %{name} μετακόμισε στο %{new_profile_link}:'
     network_hidden: Αυτή η πληροφορία δεν είναι διαθέσιμη
@@ -50,7 +57,10 @@ el:
     people_who_follow: Χρήστες που ακολουθούν τον/την %{name}
     pin_errors:
       following: Πρέπει ήδη να ακολουθείς το άτομο που θέλεις να επιδοκιμάσεις
-    posts: Τουτ
+    posts:
+      one: Τουτ
+      other: Τουτ
+    posts_tab_heading: Τουτ
     posts_with_replies: Τουτ και απαντήσεις
     reserved_username: Το όνομα χρήστη είναι κατειλημμένο
     roles:
@@ -111,11 +121,8 @@ el:
       moderation_notes: Σημειώσεις μεσολάβησης
       most_recent_activity: Πιο πρόσφατη δραστηριότητα
       most_recent_ip: Πιο πρόσφατη IP
+      no_limits_imposed: Χωρίς όρια
       not_subscribed: Άνευ συνδρομής
-      order:
-        alphabetic: Αλφαβητικά
-        most_recent: Πιο πρόσφατα
-        title: Ταξινόμηση
       outbox_url: URL εξερχομένων
       perform_full_suspension: Κάνε πλήρη αναστολή
       profile_url: URL προφίλ
@@ -146,8 +153,10 @@ el:
         report: καταγγελία
         targeted_reports: Αναφορές για αυτόν το λογαριασμό
       silence: Αποσιώπησε
+      silenced: Αποσιωπημένοι
       statuses: Καταστάσεις
       subscribe: Εγγραφή
+      suspended: Σε αναστολή
       title: Λογαριασμοί
       unconfirmed_email: Ανεπιβεβαίωτο email
       undo_silenced: Αναίρεση αποσιώπησης
@@ -164,6 +173,7 @@ el:
         create_domain_block: Ο/Η %{name} μπλόκαρε τον τομέα %{target}
         create_email_domain_block: Ο/Η %{name} έβαλε τον τομέα email %{target} σε μαύρη λίστα
         demote_user: Ο/Η %{name} υποβίβασε το χρήστη %{target}
+        destroy_custom_emoji: Ο/Η %{name} κατέστρεψε το emoji %{target}
         destroy_domain_block: Ο/Η %{name} ξεμπλόκαρε τον τομέα %{target}
         destroy_email_domain_block: Ο/Η %{name} έβαλε τον τομέα email %{target} σε λευκή λίστα
         destroy_status: Ο/Η %{name} αφαίρεσε την κατάσταση του/της %{target}
@@ -249,6 +259,8 @@ el:
         title: Αποκλεισμός νέου τομέα
       reject_media: Απόρριψη πολυμέσων
       reject_media_hint: Αφαιρεί τα τοπικά αποθηκευμένα αρχεία πολυμέσων και αποτρέπει τη λήψη άλλων στο μέλλον. Δεν έχει σημασία για τις αναστολές
+      reject_reports: Απόρριψη καταγγελιών
+      reject_reports_hint: Αγνόηση όσων καταγγελιών προέρχονται από αυτό τον τομέα. Δεν σχετίζεται με τις παύσεις
       severities:
         noop: Κανένα
         silence: Αποσιώπηση
@@ -291,9 +303,16 @@ el:
       title: Προσκλήσεις
     relays:
       add_new: Πρόσθεσε νέο ανταποκριτή (relay)
+      delete: Διαγραφή
       description_html: Ο <strong>ομοσπονδιακός ανταποκριτής</strong> είναι ένας ενδιάμεσος εξυπηρετητής (server) που ανταλλάσσει μεγάλους όγκους δημόσιων τουτ μεταξύ εξυπηρετητών που εγγράφονται και δημοσιεύουν σε αυτόν. <strong>Βοηθάει μικρούς και μεσαίους εξυπηρετητές να ανακαλύψουν περιεχόμενο στο fediverse</strong>, που υπό άλλες συνθήκες θα χρειαζόταν κάποιους τοπικούς χρήστες που να ακολουθούν χρήστες σε απομακρυσμένους εξυπηρετητές.
+      disable: Απενεργοποίηση
+      disabled: Απενεργοποιημένο
+      enable: Ενεργοποίηση
       enable_hint: Μόλις ενεργοποιηθεί, ο εξυπηρετητής (server) σου θα εγγραφεί σε όλα τα δημόσια τουτ αυτού του ανταποκριτή (relay) και θα αρχίσει να προωθεί τα δικά του δημόσια τουτ σε αυτόν.
+      enabled: Ενεργοποιημένο
       inbox_url: URL ανταποκριτή
+      pending: Περιμένοντας την έγκριση του ανταποκριτή
+      save_and_enable: Αποθήκευση και ενεργοποίηση
       setup: Όρισε μια σύνδεση ανταπόκρισης
       status: Κατάσταση
       title: Ανταποκριτές
@@ -311,7 +330,6 @@ el:
       comment:
         none: Κανένα
       created_at: Αναφέρθηκε
-      id: ID
       mark_as_resolved: Σημειωμένο ως επιλυμένο
       mark_as_unresolved: Σημειωμένο ως ανεπίλυτο
       notes:
@@ -322,20 +340,15 @@ el:
         placeholder: Περιέγραψε τις ενέργειες που έγιναν, ή οποιαδήποτε άλλη ενημέρωση...
       reopen: Ξανάνοιξε την καταγγελία
       report: 'Καταγγελία #%{id}'
-      report_contents: Περιεχόμενα
       reported_account: Αναφερόμενος λογαριασμός
       reported_by: Αναφέρθηκε από
       resolved: Επιλύθηκε
       resolved_msg: Η καταγγελία επιλύθηκε επιτυχώς!
-      silence_account: Αποσιώπηση λογαριασμού
       status: Κατάσταση
-      suspend_account: Ανέστειλε λογαριασμό
-      target: Αποδέκτης
       title: Αναφορές
       unassign: Αποσύνδεση
       unresolved: Άλυτη
       updated_at: Ενημερωμένη
-      view: Εμφάνιση
     settings:
       activity_api_enabled:
         desc_html: Καταμέτρηση τοπικών δημοσιεύσεων, ενεργών χρηστών και νέων εγγραφών σε εβδομαδιαίες ομαδοποιήσεις
@@ -346,9 +359,15 @@ el:
       contact_information:
         email: Επαγγελματικό email
         username: Όνομα χρήστη επικοινωνίας
+      custom_css:
+        desc_html: Τροποποίηση της εμφάνισης μέσω CSS που φορτώνεται σε κάθε σελίδα
+        title: Προσαρμοσμένο CSS
       hero:
         desc_html: Εμφανίζεται στην μπροστινή σελίδα. Συνίσταται τουλάχιστον 600x100px. Όταν λείπει, χρησιμοποιείται η μικρογραφία του κόμβου
         title: Εικόνα ήρωα
+      mascot:
+        desc_html: Εμφάνιση σε πολλαπλές σελίδες. Προτεινόμενο 293x205px τουλάχιστον. Αν δεν έχει οριστεί, χρησιμοποιεί την προεπιλεγμένη μασκότ
+        title: Εικόνα μασκότ
       peers_api_enabled:
         desc_html: Ονόματα τομέων που αυτός ο κόμβος έχει ήδη συναντήσει στο fediverse
         title: Δημοσίευση λίστας κόμβων που έχουν ανακαλυφθεί
@@ -414,6 +433,12 @@ el:
       last_delivery: Τελευταία παράδοση
       title: WebSub
       topic: Θέμα
+    suspensions:
+      bad_acct_msg: Η τιμή επιβεβαίωσης δεν ταιριάζει. Σίγουρα αναστέλλεις το σωστό λογαριασμό;
+      hint_html: 'Για να επιβεβαιώσεις την αναστολή του λογαριασμού, γράψε %{value} στο ακόλουθο πεδίο:'
+      proceed: Συνέχεια
+      title: Αναστολή %{acct}
+      warning_html: 'Αναστέλλοντας αυτό το λογαριασμό θα διαγραφούν <strong>αμετάκλητα</strong> δεδομένα του, μεταξύ των οποίων:'
     title: Διαχείριση
   admin_mailer:
     new_report:
@@ -503,7 +528,7 @@ el:
     '500':
       content: Λυπούμαστε, κάτι πήγε στραβά από τη δική μας μεριά.
       title: Η σελίδα αυτή δεν είναι σωστή
-    noscript_html: Για να χρησιμοποιήσετε τη δικτυακή εφαρμογή του Mastodon, ενεργοποίησε την Javascript. Εναλλακτικά, δοκίμασε μια από τις <a href="https://github.com/tootsuite/documentation/blob/master/Using-Mastodon/Apps.md">εφαρμογές</a> για το Mastodon στην πλατφόρμα σου.
+    noscript_html: Για να χρησιμοποιήσετε τη δικτυακή εφαρμογή του Mastodon, ενεργοποίησε την Javascript. Εναλλακτικά, δοκίμασε μια από τις <a href="%{apps_path}">εφαρμογές</a> για το Mastodon στην πλατφόρμα σου.
   exports:
     archive_takeout:
       date: Ημερομηνία
@@ -551,6 +576,7 @@ el:
     resources: Πόροι
   generic:
     changes_saved_msg: Οι αλλαγές αποθηκεύτηκαν!
+    copy: Αντιγραφή
     save_changes: Αποθήκευσε τις αλλαγές
     validation_errors:
       one: Κάτι δεν είναι εντάξει ακόμα! Για κοίταξε το παρακάτω σφάλμα
@@ -891,8 +917,12 @@ el:
       tips: Συμβουλές
       title: Καλώς όρισες, %{name}!
   users:
+    follow_limit_reached: Δεν μπορείς να ακολουθήσεις περισσότερα από %{limit} άτομα
     invalid_email: Η διεύθυνση email είναι άκυρη
     invalid_otp_token: Άκυρος κωδικός πιστοποίησης 2 παραγόντων (2FA)
     otp_lost_help_html: Αν χάσεις και τα δύο, μπορείς να επικοινωνήσεις με τον/την %{email}
     seamless_external_login: Επειδή έχεις συνδεθεί μέσω τρίτης υπηρεσίας, οι ρυθμίσεις συνθηματικού και email δεν είναι διαθέσιμες.
     signed_in_as: 'Έχεις συνδεθεί ως:'
+  verification:
+    explanation_html: 'Μπορείς να <strong>πιστοποιήσεις τον εαυτό σου ως ιδιοκτήτη των συνδέσμων που εμφανίζεις στα μεταδεδομένα του προφίλ σου</strong>. Για να συμβεί αυτό, ο συνδεδεμένος ιστότοπος πρέπει να περιέχει ένα σύνδεσμο που να επιστρέφει προς το προφίλ σου στο Mastodon. Ο σύνδεσμος επιστροφής <strong>πρέπει</strong> περιέχει την ιδιότητα (attribute) <code>rel="me"</code>. Το περιεχόμενο του κειμένου δεν έχει σημασία. Για παράδειγμα:'
+    verification: Πιστοποίηση

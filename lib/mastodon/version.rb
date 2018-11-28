@@ -9,11 +9,11 @@ module Mastodon
     end
 
     def minor
-      5
+      6
     end
 
     def patch
-      0
+      2
     end
 
     def pre
@@ -21,7 +21,7 @@ module Mastodon
     end
 
     def flags
-      'rc1'
+      ''
     end
 
     def to_a
@@ -42,7 +42,7 @@ module Mastodon
 
     # specify git tag or commit hash here
     def source_tag
-      "copy-mild-master"
+      "mild-master"
     end
 
     def source_url

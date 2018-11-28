@@ -67,7 +67,7 @@ RSpec.describe User, type: :model do
     describe 'confirmed' do
       it 'returns an array of users who are confirmed' do
         user_1 = Fabricate(:user, confirmed_at: nil)
-        user_2 = Fabricate(:user, confirmed_at: Time.now)
+        user_2 = Fabricate(:user, confirmed_at: Time.zone.now)
         expect(User.confirmed).to match_array([user_2])
       end
     end
@@ -87,18 +87,6 @@ RSpec.describe User, type: :model do
         Fabricate(:user, email: 'unspecified@spec')
 
         expect(User.matches_email('specified')).to match_array([specified])
-      end
-    end
-
-    describe 'with_recent_ip_address' do
-      it 'returns a relation of users who is, or was at last time, online with the given IP address' do
-        specifieds = [
-          Fabricate(:user, current_sign_in_ip: '0.0.0.42', last_sign_in_ip: '0.0.0.0'),
-          Fabricate(:user, current_sign_in_ip: nil, last_sign_in_ip: '0.0.0.42')
-        ]
-        Fabricate(:user, current_sign_in_ip: '0.0.0.0', last_sign_in_ip: '0.0.0.0')
-
-        expect(User.with_recent_ip_address('0.0.0.42')).to match_array(specifieds)
       end
     end
   end
@@ -254,7 +242,7 @@ RSpec.describe User, type: :model do
 
   it_behaves_like 'Settings-extended' do
     def create!
-      User.create!(account: Fabricate(:account), email: 'foo@mastodon.space', password: 'abcd1234' )
+      User.create!(account: Fabricate(:account), email: 'foo@mastodon.space', password: 'abcd1234')
     end
 
     def fabricate

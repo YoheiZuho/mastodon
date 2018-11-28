@@ -5,7 +5,7 @@ import { fromJS } from 'immutable';
 import { throttle } from 'lodash';
 import classNames from 'classnames';
 import { isFullscreen, requestFullscreen, exitFullscreen } from '../ui/util/fullscreen';
-import { displaySensitiveMedia } from '../../initial_state';
+import { displayMedia } from '../../initial_state';
 
 const messages = defineMessages({
   play: { id: 'video.play', defaultMessage: 'Play' },
@@ -84,8 +84,8 @@ export const getPointerPosition = (el, event) => {
   return position;
 };
 
-@injectIntl
-export default class Video extends React.PureComponent {
+export default @injectIntl
+class Video extends React.PureComponent {
 
   static propTypes = {
     preview: PropTypes.string,
@@ -105,14 +105,24 @@ export default class Video extends React.PureComponent {
   state = {
     currentTime: 0,
     duration: 0,
+    volume: 0.5,
     paused: true,
     dragging: false,
     containerWidth: false,
     fullscreen: false,
     hovered: false,
     muted: false,
-    revealed: !this.props.sensitive || displaySensitiveMedia,
+    revealed: displayMedia !== 'hide_all' && !this.props.sensitive || displayMedia === 'show_all',
   };
+
+  // hard coded in components.scss
+  // any way to get ::before values programatically?
+  volWidth = 50;
+  volOffset = 70;
+  volHandleOffset = v => {
+    const offset = v * this.volWidth + this.volOffset;
+    return (offset > 110) ? 110 : offset;
+  }
 
   setPlayerRef = c => {
     this.player = c;
@@ -132,6 +142,10 @@ export default class Video extends React.PureComponent {
     this.seek = c;
   }
 
+  setVolumeRef = c => {
+    this.volume = c;
+  }
+
   handleClickRoot = e => e.stopPropagation();
 
   handlePlay = () => {
@@ -148,6 +162,43 @@ export default class Video extends React.PureComponent {
       duration: Math.floor(this.video.duration),
     });
   }
+
+  handleVolumeMouseDown = e => {
+
+    document.addEventListener('mousemove', this.handleMouseVolSlide, true);
+    document.addEventListener('mouseup', this.handleVolumeMouseUp, true);
+    document.addEventListener('touchmove', this.handleMouseVolSlide, true);
+    document.addEventListener('touchend', this.handleVolumeMouseUp, true);
+
+    this.handleMouseVolSlide(e);
+
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  handleVolumeMouseUp = () => {
+    document.removeEventListener('mousemove', this.handleMouseVolSlide, true);
+    document.removeEventListener('mouseup', this.handleVolumeMouseUp, true);
+    document.removeEventListener('touchmove', this.handleMouseVolSlide, true);
+    document.removeEventListener('touchend', this.handleVolumeMouseUp, true);
+  }
+
+  handleMouseVolSlide = throttle(e => {
+
+    const rect = this.volume.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / this.volWidth; //x position within the element.
+
+    if(!isNaN(x)) {
+      var slideamt = x;
+      if(x > 1) {
+        slideamt = 1;
+      } else if(x < 0) {
+        slideamt = 0;
+      }
+      this.video.volume = slideamt;
+      this.setState({ volume: slideamt });
+    }
+  }, 60);
 
   handleMouseDown = e => {
     document.addEventListener('mousemove', this.handleMouseMove, true);
@@ -252,11 +303,12 @@ export default class Video extends React.PureComponent {
   }
 
   handleOpenVideo = () => {
-    const { src, preview, width, height } = this.props;
+    const { src, preview, width, height, alt } = this.props;
     const media = fromJS({
       type: 'video',
       url: src,
       preview_url: preview,
+      description: alt,
       width,
       height,
     });
@@ -271,9 +323,12 @@ export default class Video extends React.PureComponent {
   }
 
   render () {
-    const { preview, src, inline, startTime, onOpenVideo, onCloseVideo, intl, alt, detailed } = this.props;
-    const { containerWidth, currentTime, duration, buffer, dragging, paused, fullscreen, hovered, muted, revealed } = this.state;
+    const { preview, src, inline, startTime, onOpenVideo, onCloseVideo, intl, alt, detailed, sensitive } = this.props;
+    const { containerWidth, currentTime, duration, volume, buffer, dragging, paused, fullscreen, hovered, muted, revealed } = this.state;
     const progress = (currentTime / duration) * 100;
+
+    const volumeWidth = (muted) ? 0 : volume * this.volWidth;
+    const volumeHandleLoc = (muted) ? this.volHandleOffset(0) : this.volHandleOffset(volume);
     const playerStyle = {};
 
     let { width, height } = this.props;
@@ -293,6 +348,13 @@ export default class Video extends React.PureComponent {
       preload = 'metadata';
     } else {
       preload = 'none';
+    }
+
+    let warning;
+    if (sensitive) {
+      warning = <FormattedMessage id='status.sensitive_warning' defaultMessage='Sensitive content' />;
+    } else {
+      warning = <FormattedMessage id='status.media_hidden' defaultMessage='Media hidden' />;
     }
 
     return (
@@ -315,8 +377,10 @@ export default class Video extends React.PureComponent {
           role='button'
           tabIndex='0'
           aria-label={alt}
+          title={alt}
           width={width}
           height={height}
+          volume={volume}
           onClick={this.togglePlay}
           onPlay={this.handlePlay}
           onPause={this.handlePause}
@@ -326,7 +390,7 @@ export default class Video extends React.PureComponent {
         />
 
         <button type='button' className={classNames('video-player__spoiler', { active: !revealed })} onClick={this.toggleReveal}>
-          <span className='video-player__spoiler__title'><FormattedMessage id='status.sensitive_warning' defaultMessage='Sensitive content' /></span>
+          <span className='video-player__spoiler__title'>{warning}</span>
           <span className='video-player__spoiler__subtitle'><FormattedMessage id='status.sensitive_toggle' defaultMessage='Click to view' /></span>
         </button>
 
@@ -345,9 +409,15 @@ export default class Video extends React.PureComponent {
           <div className='video-player__buttons-bar'>
             <div className='video-player__buttons left'>
               <button type='button' aria-label={intl.formatMessage(paused ? messages.play : messages.pause)} onClick={this.togglePlay}><i className={classNames('fa fa-fw', { 'fa-play': paused, 'fa-pause': !paused })} /></button>
-              <button type='button' aria-label={intl.formatMessage(muted ? messages.unmute : messages.mute)} onClick={this.toggleMute}><i className={classNames('fa fa-fw', { 'fa-volume-off': muted, 'fa-volume-up': !muted })} /></button>
-
-              {!onCloseVideo && <button type='button' aria-label={intl.formatMessage(messages.hide)} onClick={this.toggleReveal}><i className='fa fa-fw fa-eye' /></button>}
+              <button type='button' aria-label={intl.formatMessage(muted ? messages.unmute : messages.mute)} onMouseEnter={this.volumeSlider} onMouseLeave={this.volumeSlider} onClick={this.toggleMute}><i className={classNames('fa fa-fw', { 'fa-volume-off': muted, 'fa-volume-up': !muted })} /></button>
+              <div className='video-player__volume' onMouseDown={this.handleVolumeMouseDown} ref={this.setVolumeRef}>
+                <div className='video-player__volume__current' style={{ width: `${volumeWidth}px` }} />
+                <span
+                  className={classNames('video-player__volume__handle')}
+                  tabIndex='0'
+                  style={{ left: `${volumeHandleLoc}px` }}
+                />
+              </div>
 
               {(detailed || fullscreen) &&
                 <span>
@@ -359,6 +429,7 @@ export default class Video extends React.PureComponent {
             </div>
 
             <div className='video-player__buttons right'>
+              {!onCloseVideo && <button type='button' aria-label={intl.formatMessage(messages.hide)} onClick={this.toggleReveal}><i className='fa fa-fw fa-eye' /></button>}
               {(!fullscreen && onOpenVideo) && <button type='button' aria-label={intl.formatMessage(messages.expand)} onClick={this.handleOpenVideo}><i className='fa fa-fw fa-expand' /></button>}
               {onCloseVideo && <button type='button' aria-label={intl.formatMessage(messages.close)} onClick={this.handleCloseVideo}><i className='fa fa-fw fa-compress' /></button>}
               <button type='button' aria-label={intl.formatMessage(fullscreen ? messages.exit_fullscreen : messages.fullscreen)} onClick={this.toggleFullscreen}><i className={classNames('fa fa-fw', { 'fa-arrows-alt': !fullscreen, 'fa-compress': fullscreen })} /></button>

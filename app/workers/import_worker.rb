@@ -9,11 +9,15 @@ class ImportWorker
 
   attr_reader :import
 
+  IMPORT_LIMIT = 500
+
   def perform(import_id)
     @import = Import.find(import_id)
 
-    Import::RelationshipWorker.push_bulk(import_rows) do |row|
-      [@import.account_id, row.first, relationship_type]
+    if import_rows.size <= IMPORT_LIMIT
+      Import::RelationshipWorker.push_bulk(import_rows) do |row|
+        [@import.account_id, row.first, relationship_type]
+      end
     end
 
     @import.destroy
@@ -37,6 +41,8 @@ class ImportWorker
   end
 
   def import_rows
-    CSV.new(import_contents).reject(&:blank?)
+    rows = CSV.new(import_contents).reject(&:blank?)
+    rows = rows.take(FollowLimitValidator.limit_for_account(@import.account)) if @import.type == 'following'
+    rows
   end
 end

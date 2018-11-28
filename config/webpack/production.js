@@ -23,8 +23,8 @@ try {
 let attachmentHost;
 
 if (process.env.S3_ENABLED === 'true') {
-  if (process.env.S3_CLOUDFRONT_HOST) {
-    attachmentHost = process.env.S3_CLOUDFRONT_HOST;
+  if (process.env.S3_ALIAS_HOST || process.env.S3_CLOUDFRONT_HOST) {
+    attachmentHost = process.env.S3_ALIAS_HOST || process.env.S3_CLOUDFRONT_HOST;
   } else {
     attachmentHost = process.env.S3_HOSTNAME || `s3-${process.env.S3_REGION || 'us-east-1'}.amazonaws.com`;
   }
@@ -50,11 +50,11 @@ module.exports = merge(sharedConfig, {
     minimize: true,
     minimizer: [
       new UglifyJsPlugin({
+        cache: true,
+        parallel: true,
         sourceMap: true,
 
         uglifyOptions: {
-          mangle: true,
-
           compress: {
             warnings: false,
           },
@@ -69,7 +69,6 @@ module.exports = merge(sharedConfig, {
 
   plugins: [
     new CompressionPlugin({
-      asset: '[path].gz[query]',
       algorithm: compressionAlgorithm,
       test: /\.(js|css|html|json|ico|svg|eot|otf|ttf)$/,
     }),

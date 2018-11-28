@@ -4,6 +4,7 @@ class Settings::NotificationsController < ApplicationController
   layout 'admin'
 
   before_action :authenticate_user!
+  before_action :set_body_classes
 
   def show; end
 
@@ -25,8 +26,12 @@ class Settings::NotificationsController < ApplicationController
 
   def user_settings_params
     params.require(:user).permit(
-      notification_emails: %i(follow follow_request reblog favourite mention digest),
+      notification_emails: %i(follow follow_request reblog favourite mention digest report),
       interactions: %i(must_be_follower must_be_following must_be_following_dm)
     )
+  end
+
+  def set_body_classes
+    @body_classes = 'admin'
   end
 end

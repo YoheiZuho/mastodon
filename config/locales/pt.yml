@@ -92,10 +92,6 @@ pt:
       most_recent_activity: Actividade mais recente
       most_recent_ip: IP mais recente
       not_subscribed: Não inscrito
-      order:
-        alphabetic: Alfabética
-        most_recent: Mais recente
-        title: Ordem
       outbox_url: URL da caixa de saída
       perform_full_suspension: Fazer suspensão completa
       profile_url: URL do perfil
@@ -150,7 +146,7 @@ pt:
         enable_user: "%{name} ativou o acesso para o utilizador %{target}"
         memorialize_account: "%{name} transformou a conta de %{target} em um memorial"
         promote_user: "%{name} promoveu o utilizador %{target}"
-        reset_password_user: "%{name} restabeleceu a palavra-passe do utilizador %{target"
+        reset_password_user: "%{name} restabeleceu a palavra-passe do utilizador %{target}"
         resolve_report: "%{name} recusou o relatório %{target}"
         silence_account: "%{name} silenciou a conta de %{target}"
         suspend_account: "%{name} suspendeu a conta de %{target}"
@@ -244,20 +240,14 @@ pt:
       are_you_sure: Tens a certeza?
       comment:
         none: Nenhum
-      id: ID
       mark_as_resolved: Marcar como resolvido
       report: 'Denúncia #%{id}'
-      report_contents: Conteúdos
       reported_account: Conta denunciada
       reported_by: Denúnciada por
       resolved: Resolvido
-      silence_account: Conta silenciada
       status: Estado
-      suspend_account: Conta suspensa
-      target: Alvo
       title: Denúncias
       unresolved: Por resolver
-      view: Ver
     settings:
       activity_api_enabled:
         desc_html: Contagem semanais de publicações locais, utilizadores activos e novos registos
@@ -405,7 +395,7 @@ pt:
     '500':
       content: Desculpe, mas algo correu mal.
       title: Esta página não está correta
-    noscript_html: Para usar o aplicativo web do Mastodon, por favor ativa o JavaScript. Alternativamente, experimenta um dos <a href="https://github.com/tootsuite/documentation/blob/master/Using-Mastodon/Apps.md">apps nativos</a> para o Mastodon na sua plataforma.
+    noscript_html: Para usar o aplicativo web do Mastodon, por favor ativa o JavaScript. Alternativamente, experimenta um dos <a href="%{apps_path}">apps nativos</a> para o Mastodon na sua plataforma.
   exports:
     blocks: Bloqueaste
     csv: CSV

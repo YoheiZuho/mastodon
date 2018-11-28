@@ -19,6 +19,10 @@ class StatusesController < ApplicationController
   before_action :set_referrer_policy_header, only: [:show]
   before_action :set_cache_headers
 
+  content_security_policy only: :embed do |p|
+    p.frame_ancestors(false)
+  end
+
   def show
     respond_to do |format|
       format.html do
@@ -54,6 +58,7 @@ class StatusesController < ApplicationController
     skip_session!
     expires_in 180, public: true
     response.headers['X-Frame-Options'] = 'ALLOWALL'
+    @autoplay = ActiveModel::Type::Boolean.new.cast(params[:autoplay])
 
     render 'stream_entries/embed', layout: 'embedded'
   end
