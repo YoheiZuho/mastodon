@@ -133,7 +133,6 @@ function main() {
 
   delegate(document, '#account_display_name', 'input', ({ target }) => {
     const name = document.querySelector('.card .display-name strong');
-
     if (name) {
       name.innerHTML = emojify(target.value);
     }
