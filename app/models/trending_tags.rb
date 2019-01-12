@@ -24,6 +24,19 @@ class TrendingTags
 
     private
 
+    def increment_vote!(tag_id, at_time)
+      expected = redis.pfcount("activity:tags:#{tag_id}:#{(at_time - 1.day).beginning_of_day.to_i}:accounts").to_f
+      expected = 1.0 if expected.zero?
+      observed = redis.pfcount("activity:tags:#{tag_id}:#{at_time.beginning_of_day.to_i}:accounts").to_f
+
+      if expected > observed || observed < THRESHOLD
+        redis.zrem(KEY, tag_id.to_s)
+      else
+        score = ((observed - expected)**2) / expected
+        redis.zadd(KEY, score, tag_id.to_s)
+      end
+    end
+
     def increment_historical_use!(tag_id, at_time)
       key = "activity:tags:#{tag_id}:#{at_time.beginning_of_day.to_i}"
       redis.incrby(key, 1)

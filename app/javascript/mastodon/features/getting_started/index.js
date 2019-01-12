@@ -12,6 +12,7 @@ import { fetchFollowRequests } from '../../actions/accounts';
 import { List as ImmutableList } from 'immutable';
 import { Link } from 'react-router-dom';
 import NavigationBar from '../compose/components/navigation_bar';
+import TrendsContainer from './containers/trends_container';
 
 const messages = defineMessages({
   home_timeline: { id: 'tabs_bar.home', defaultMessage: 'Home' },
@@ -152,7 +153,9 @@ class GettingStarted extends ImmutablePureComponent {
             {navItems}
           </div>
 
-          {!multiColumn && <div className='flex-spacer' />}
+          <TrendsContainer />
+
+          <div className='flex-spacer' />
 
           <div className='getting-started__footer'>
             <ul>

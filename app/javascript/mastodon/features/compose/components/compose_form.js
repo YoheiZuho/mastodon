@@ -17,6 +17,7 @@ import { isMobile } from '../../../is_mobile';
 import ImmutablePureComponent from 'react-immutable-pure-component';
 import { length } from 'stringz';
 import { countableText } from '../util/counter';
+import { UserCounter } from './user_counter';
 
 const allowedAroundShortCode = '><\u0085\u0020\u00a0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029\u0009\u000a\u000b\u000c\u000d';
 
@@ -25,6 +26,10 @@ const messages = defineMessages({
   spoiler_placeholder: { id: 'compose_form.spoiler_placeholder', defaultMessage: 'Write your warning here' },
   publish: { id: 'compose_form.publish', defaultMessage: 'Toot' },
   publishLoud: { id: 'compose_form.publish_loud', defaultMessage: '{publish}!' },
+
+  utilBtns_risa: { id: 'compose_form.utilBtns_risa', defaultMessage: 'RISA' },
+  utilBtns_goji: { id: 'compose_form.utilBtns_goji', defaultMessage: 'Typo!!!' },
+  utilBtns_harukin: { id: 'compose_form.utilBtns_harukin', defaultMessage: 'Burn Harukin' }
 });
 
 export default @injectIntl
@@ -58,6 +63,10 @@ class ComposeForm extends ImmutablePureComponent {
     onPickEmoji: PropTypes.func.isRequired,
     showSearch: PropTypes.bool,
     anyMedia: PropTypes.bool,
+
+    onRisaSubmit: PropTypes.func.isRequired,
+    onGojiSubmit: PropTypes.func.isRequired,
+    onHarukinSubmit: PropTypes.func.isRequired
   };
 
   static defaultProps = {
@@ -85,7 +94,7 @@ class ComposeForm extends ImmutablePureComponent {
     const { is_submitting, is_changing_upload, is_uploading, anyMedia } = this.props;
     const fulltext = [this.props.spoiler_text, countableText(this.props.text)].join('');
 
-    if (is_submitting || is_uploading || is_changing_upload || length(fulltext) > 500 || (fulltext.length !== 0 && fulltext.trim().length === 0 && !anyMedia)) {
+    if (is_submitting || is_uploading || is_changing_upload || length(fulltext) > 2048 || (fulltext.length !== 0 && fulltext.trim().length === 0 && !anyMedia)) {
       return;
     }
 
@@ -157,11 +166,15 @@ class ComposeForm extends ImmutablePureComponent {
     this.props.onPickEmoji(position, data, needsSpace);
   }
 
+  handleOnRisaSubmit = () => this.props.onRisaSubmit(this.autosuggestTextarea.textarea);
+  handleOnGojiSubmit = () => this.props.onGojiSubmit(this.autosuggestTextarea.textarea);
+  handleOnHarukinSubmit = () => this.props.onHarukinSubmit(this.autosuggestTextarea.textarea);
+
   render () {
     const { intl, onPaste, showSearch, anyMedia } = this.props;
     const disabled = this.props.is_submitting;
     const text     = [this.props.spoiler_text, countableText(this.props.text)].join('');
-    const disabledButton = disabled || this.props.is_uploading || this.props.is_changing_upload || length(text) > 500 || (text.length !== 0 && text.trim().length === 0 && !anyMedia);
+    const disabledButton = disabled || this.props.is_uploading || this.props.is_changing_upload || length(text) > 2048 || (text.length !== 0 && text.trim().length === 0 && !anyMedia);
     let publishText = '';
 
     if (this.props.privacy === 'private' || this.props.privacy === 'direct') {
@@ -213,11 +226,21 @@ class ComposeForm extends ImmutablePureComponent {
             <SensitiveButtonContainer />
             <SpoilerButtonContainer />
           </div>
-          <div className='character-counter__wrapper'><CharacterCounter max={500} text={text} /></div>
+          <div className='character-counter__wrapper'><CharacterCounter max={2048} text={text} /></div>
         </div>
 
         <div className='compose-form__publish'>
-          <div className='compose-form__publish-button-wrapper'><Button text={publishText} onClick={this.handleSubmit} disabled={disabledButton} block /></div>
+          <div className='compose-form__publish-button-wrapper'>
+            <Button className="compose-form__utilBtns-risa" text={intl.formatMessage(messages.utilBtns_risa)} onClick={this.handleOnRisaSubmit} />
+            <Button text={publishText} onClick={this.handleSubmit} disabled={disabledButton} block>
+              <span className="fa fa-send">{publishText}</span>
+            </Button>
+          </div>
+        </div>
+
+        <div className="compose-form__utilBtns">
+          <Button className="compose-form__utilBtns-goji" text={intl.formatMessage(messages.utilBtns_goji)} onClick={this.handleOnGojiSubmit} block />
+          <Button className="compose-form__utilBtns-harukin" text={intl.formatMessage(messages.utilBtns_harukin)} onClick={this.handleOnHarukinSubmit} block />
         </div>
       </div>
     );
