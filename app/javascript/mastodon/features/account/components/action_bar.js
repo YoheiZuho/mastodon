@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import DropdownMenuContainer from '../../../containers/dropdown_menu_container';
 import { NavLink } from 'react-router-dom';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
-import { me } from '../../../initial_state';
+import { me, isStaff  } from '../../../initial_state';
 import { shortNumberFormat } from '../../../utils/numbers';
 
 const messages = defineMessages({
@@ -35,7 +35,9 @@ const messages = defineMessages({
   endorse: { id: 'account.endorse', defaultMessage: 'Feature on profile' },
   unendorse: { id: 'account.unendorse', defaultMessage: 'Don\'t feature on profile' },
   add_or_remove_from_list: { id: 'account.add_or_remove_from_list', defaultMessage: 'Add or Remove from lists' },
+  admin_account: { id: 'status.admin_account', defaultMessage: 'Open moderation interface for @{name}' },
   generateQrcode: { id: 'navigation_bar.generate_qrcode', defaultMessage: 'Generate QRCode of your account' },
+
 });
 
 export default @injectIntl
@@ -152,6 +154,11 @@ class ActionBar extends React.PureComponent {
       } else {
         menu.push({ text: intl.formatMessage(messages.blockDomain, { domain }), action: this.props.onBlockDomain });
       }
+    }
+
+    if (account.get('id') !== me && isStaff) {
+      menu.push(null);
+      menu.push({ text: intl.formatMessage(messages.admin_account, { name: account.get('username') }), href: `/admin/accounts/${account.get('id')}` });
     }
 
     return (

@@ -11,7 +11,6 @@ import BoostModal from './boost_modal';
 import ConfirmationModal from './confirmation_modal';
 import FocalPointModal from './focal_point_modal';
 import {
-  OnboardingModal,
   MuteModal,
   ReportModal,
   EmbedModal,
@@ -22,7 +21,6 @@ import {
 
 const MODAL_COMPONENTS = {
   'MEDIA': () => Promise.resolve({ default: MediaModal }),
-  'ONBOARDING': OnboardingModal,
   'VIDEO': () => Promise.resolve({ default: VideoModal }),
   'BOOST': () => Promise.resolve({ default: BoostModal }),
   'CONFIRM': () => Promise.resolve({ default: ConfirmationModal }),
