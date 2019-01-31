@@ -240,6 +240,8 @@
   "navigation_bar.public_timeline": "連合タイムライン",
   "navigation_bar.security": "セキュリティ",
   "navigation_bar.announcements": "運営からのお知らせ",
+  "navigation_bar.trends": "トレンド",
+  "navigation_bar.bookmarks": "ブックマーク",
   "notification.favourite": "{name}さんがあなたのトゥートに╰( ^o^)╮-=ﾆ=一＝三★しました",
   "notification.follow": "{name}さんにフォローされました",
   "notification.mention": "{name}さんがあなたに返信しました",
