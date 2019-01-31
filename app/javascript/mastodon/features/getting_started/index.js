@@ -22,6 +22,7 @@ const messages = defineMessages({
   community_timeline: { id: 'navigation_bar.community_timeline', defaultMessage: 'Local timeline' },
   direct: { id: 'navigation_bar.direct', defaultMessage: 'Direct messages' },
   bookmarks: { id: 'navigation_bar.bookmarks', defaultMessage: 'Bookmarks' },
+  Trends: { id: 'navigation_bar.trends', defaultMessage: 'Trends' },
   preferences: { id: 'navigation_bar.preferences', defaultMessage: 'Preferences' },
   follow_requests: { id: 'navigation_bar.follow_requests', defaultMessage: 'Follow requests' },
   favourites: { id: 'navigation_bar.favourites', defaultMessage: 'Favourites' },
@@ -118,6 +119,7 @@ class GettingStarted extends ImmutablePureComponent {
     navItems.push(
       <ColumnLink key={i++} icon='envelope' text={intl.formatMessage(messages.direct)} to='/timelines/direct' />,
       <ColumnLink key={i++} icon='bookmark' text={intl.formatMessage(messages.bookmarks)} to='/bookmarks' />,
+      <ColumnLink key={i++} icon='fire' text={intl.formatMessage(messages.trends)} to='/trends' />,
       <ColumnLink key={i++} icon='star' text={intl.formatMessage(messages.favourites)} to='/favourites' />,
       <ColumnLink key={i++} icon='list-ul' text={intl.formatMessage(messages.lists)} to='/lists' />
     );
@@ -155,9 +157,7 @@ class GettingStarted extends ImmutablePureComponent {
             {navItems}
           </div>
 
-          <TrendsContainer />
-
-          <div className='flex-spacer' />
+          {!multiColumn && <div className='flex-spacer' />}
 
           <div className='getting-started__footer'>
             <ul>
