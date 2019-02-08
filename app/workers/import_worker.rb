@@ -1,48 +1,31 @@
 # frozen_string_literal: true
 
-require 'csv'
-
-class ImportWorker
+class Import::RelationshipWorker
   include Sidekiq::Worker
 
-  sidekiq_options queue: 'pull', retry: false
+  sidekiq_options queue: 'pull', retry: 8, dead: false
 
-  attr_reader :import
+  def perform(account_id, target_account_uri, relationship)
+    from_account   = Account.find(account_id)
+    target_account = ResolveAccountService.new.call(target_account_uri)
 
-  IMPORT_LIMIT = 500
+    return if target_account.nil?
 
-  def perform(import_id)
-    @import = Import.find(import_id)
-
-    if import_rows.size <= IMPORT_LIMIT
-      Import::RelationshipWorker.push_bulk(import_rows) do |row|
-        [@import.account_id, row.first, relationship_type]
-      end
+    case relationship
+    when 'follow'
+      FollowService.new.call(from_account, target_account)
+    when 'unfollow'
+      UnfollowService.new.call(from_account, target_account)
+    when 'block'
+      BlockService.new.call(from_account, target_account)
+    when 'unblock'
+      UnblockService.new.call(from_account, target_account)
+    when 'mute'
+      MuteService.new.call(from_account, target_account)
+    when 'unmute'
+      UnmuteService.new.call(from_account, target_account)
     end
-
-    @import.destroy
-  end
-
-  private
-
-  def import_contents
-    Paperclip.io_adapters.for(@import.data).read
-  end
-
-  def relationship_type
-    case @import.type
-    when 'following'
-      'follow'
-    when 'blocking'
-      'block'
-    when 'muting'
-      'mute'
-    end
-  end
-
-  def import_rows
-    rows = CSV.new(import_contents).reject(&:blank?)
-    rows = rows.take(FollowLimitValidator.limit_for_account(@import.account)) if @import.type == 'following'
-    rows
+  rescue ActiveRecord::RecordNotFound
+    true
   end
 end
