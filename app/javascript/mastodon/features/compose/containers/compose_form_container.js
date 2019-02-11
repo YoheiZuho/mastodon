@@ -13,7 +13,6 @@ import {
 } from '../../../actions/compose';
 
 import {
-  submitRisa,
   submitGoji,
   submitHarukin
 } from '../../../actions/UtilBtns';

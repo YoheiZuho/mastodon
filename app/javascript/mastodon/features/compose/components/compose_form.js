@@ -28,7 +28,7 @@ const messages = defineMessages({
   publish: { id: 'compose_form.publish', defaultMessage: 'Toot' },
   publishLoud: { id: 'compose_form.publish_loud', defaultMessage: '{publish}!' },
 
-  utilBtns_risa: { id: 'compose_form.utilBtns_risa', defaultMessage: 'RISA' },
+  
   utilBtns_goji: { id: 'compose_form.utilBtns_goji', defaultMessage: 'Typo!!!' },
   utilBtns_harukin: { id: 'compose_form.utilBtns_harukin', defaultMessage: 'Burn Harukin' }
 });
@@ -65,7 +65,7 @@ class ComposeForm extends ImmutablePureComponent {
     showSearch: PropTypes.bool,
     anyMedia: PropTypes.bool,
 
-    onRisaSubmit: PropTypes.func.isRequired,
+  
     onGojiSubmit: PropTypes.func.isRequired,
     onHarukinSubmit: PropTypes.func.isRequired
   };
@@ -167,7 +167,7 @@ class ComposeForm extends ImmutablePureComponent {
     this.props.onPickEmoji(position, data, needsSpace);
   }
 
-  handleOnRisaSubmit = () => this.props.onRisaSubmit(this.autosuggestTextarea.textarea);
+  
   handleOnGojiSubmit = () => this.props.onGojiSubmit(this.autosuggestTextarea.textarea);
   handleOnHarukinSubmit = () => this.props.onHarukinSubmit(this.autosuggestTextarea.textarea);
 
@@ -232,7 +232,7 @@ class ComposeForm extends ImmutablePureComponent {
 
         <div className='compose-form__publish'>
           <div className='compose-form__publish-button-wrapper'>
-            <Button className="compose-form__utilBtns-risa" text={intl.formatMessage(messages.utilBtns_risa)} onClick={this.handleOnRisaSubmit} />
+            
             <Button text={publishText} onClick={this.handleSubmit} disabled={disabledButton} block>
               <span className="fa fa-send">{publishText}</span>
             </Button>
@@ -240,6 +240,7 @@ class ComposeForm extends ImmutablePureComponent {
         </div>
 
         <div className="compose-form__utilBtns">
+
           <Button className="compose-form__utilBtns-goji" text={intl.formatMessage(messages.utilBtns_goji)} onClick={this.handleOnGojiSubmit} block />
           <Button className="compose-form__utilBtns-harukin" text={intl.formatMessage(messages.utilBtns_harukin)} onClick={this.handleOnHarukinSubmit} block />
         </div>
