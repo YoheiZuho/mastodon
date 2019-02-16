@@ -10,8 +10,10 @@ import {
 import {
   reblog,
   favourite,
+  bookmark,
   unreblog,
   unfavourite,
+  unbookmark,
   pin,
   unpin,
 } from '../actions/interactions';
@@ -88,6 +90,14 @@ const mapDispatchToProps = (dispatch, { intl }) => ({
       dispatch(unfavourite(status));
     } else {
       dispatch(favourite(status));
+    }
+  },
+
+  onBookmark (status) {
+    if (status.get('bookmarked')) {
+      dispatch(unbookmark(status));
+    } else {
+      dispatch(bookmark(status));
     }
   },
 
