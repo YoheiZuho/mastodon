@@ -114,7 +114,8 @@ class StatusActionBar extends ImmutablePureComponent {
 
   _openInteractionDialog = type => {
     window.open(`/interact/${this.props.status.get('id')}?type=${type}`, 'mastodon-intent', 'width=445,height=600,resizable=no,menubar=no,status=no,scrollbars=yes');
-
+  }
+  
   handleBookmarkClick = () => {
     this.props.onBookmark(this.props.status);
   }
