@@ -2355,6 +2355,7 @@ a.account__display-name {
 
 .getting-started {
   color: $dark-text-color;
+  overflow: auto;
 
   &__footer {
     flex: 0 0 auto;
