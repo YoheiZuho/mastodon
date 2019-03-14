@@ -1,0 +1,36 @@
+@charset "UTF-8";
+
+@import 'variables';
+@import 'mixins';
+
+
+
+body {
+	&,
+	.ui {
+		color: $primary-text-color;
+		background: $base-color;
+	}
+}
+
+.focusable {
+	&:focus {
+		background: inherit;
+
+		.status {
+			@include status-focus-shadow;
+
+			&.status-direct {
+				background: $status-direct-color;
+			}
+		}
+
+		.detailed-status {
+			background: $status-color;
+		}
+		
+		.detailed-status__action-bar {
+			background: $status-actionbar-color;
+		}
+	}
+}

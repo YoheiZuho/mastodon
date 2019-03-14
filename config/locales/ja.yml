@@ -956,6 +956,7 @@ ja:
     contrast: Mastodon (ハイコントラスト)
     default: Mastodon (ダーク)
     mastodon-light: Mastodon (ライト)
+    google-plus: Google+
   time:
     formats:
       default: "%Y年%m月%d日 %H:%M"
