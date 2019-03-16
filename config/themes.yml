@@ -3,3 +3,4 @@ contrast: styles/contrast.scss
 mastodon-light: styles/mastodon-light.scss
 google-plus: styles/gplus-theme-for-mastodon.scss
 zuiho: styles/application_zuiho.scss
+google-plus-dev: styles/gplus-theme-for-mastodon-dev.scss
