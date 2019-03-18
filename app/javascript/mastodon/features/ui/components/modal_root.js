@@ -16,6 +16,7 @@ import {
   EmbedModal,
   ListEditor,
   ListAdder,
+  QrcodeModal,
 } from '../../../features/ui/util/async-components';
 
 const MODAL_COMPONENTS = {
@@ -27,6 +28,7 @@ const MODAL_COMPONENTS = {
   'REPORT': ReportModal,
   'ACTIONS': () => Promise.resolve({ default: ActionsModal }),
   'EMBED': EmbedModal,
+  'QRCODE': QrcodeModal,
   'LIST_EDITOR': ListEditor,
   'FOCAL_POINT': () => Promise.resolve({ default: FocalPointModal }),
   'LIST_ADDER':ListAdder,

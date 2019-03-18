@@ -971,6 +971,8 @@ en:
     contrast: Mastodon (High contrast)
     default: Mastodon (Dark)
     mastodon-light: Mastodon (Light)
+    google-plus: Google+
+    google-plus-dev: Google+ Dev (Unstable)
   time:
     formats:
       default: "%b %d, %Y, %H:%M"
