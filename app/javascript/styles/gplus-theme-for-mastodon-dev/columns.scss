@@ -114,9 +114,14 @@
 			color: $icon-color;
 			vertical-align: top;
 			font-size: 22px;
-			line-height: normal;
-			padding: 12px 0 12px 12px;
-			margin-right: 10px;
+			padding: 12px 0 12px 0;
+			margin-right: 12px;
+			vertical-align: sub;
+		}
+
+		.column-header>button {
+			font-size: 20px;
+			padding: 0 16px;
 		}
 
 		.column-header__buttons {
@@ -124,11 +129,6 @@
 				.column-back-button__icon {
 					vertical-align: unset;
 				}
-			}
-
-			.column-header__button {
-				font-size: 20px;
-				padding: 0 16px;
 
 				&.active {
 					color: $icon-active-color;
@@ -258,4 +258,9 @@
 
 .load-gap {
 	border: 0;
+}
+
+//mobile
+.tabs-bar__link .fa {
+	font-size: 24px;
 }
