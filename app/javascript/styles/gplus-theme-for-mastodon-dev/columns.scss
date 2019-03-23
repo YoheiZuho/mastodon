@@ -18,6 +18,12 @@
 	}
 }
 
+.search {
+	.search__input {
+		@include card-radius;
+	}
+}
+
 .drawer {
 	.drawer__header {
 		@include column-shadow;
@@ -26,12 +32,6 @@
 		.drawer__tab {
 			color: $icon-color;
 			font-size: 22px;
-		}
-
-		.search {
-			.search__input {
-				border-radius: 2px;
-			}
 		}
 
 		a {
@@ -43,6 +43,7 @@
 
 	.drawer__pager {
 		@include status-shadow;
+		@include card-radius;
 		
 		.drawer__inner {
 			background: $column-header-color;
@@ -77,6 +78,10 @@
 	.compose-form__publish {
 		border-top: 1px solid $base-separation-color;
 	}
+}
+
+.button {
+	@include button-shadow;
 }
 
 .column {
