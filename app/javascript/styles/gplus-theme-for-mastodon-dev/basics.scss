@@ -19,7 +19,7 @@ body {
 
 		.status {
 			@include status-focus-shadow;
-			border-radius: 2px;
+			@include card-radius;
 
 			&.status-direct {
 				background: $status-direct-color;

@@ -64,13 +64,20 @@
 .fa {
 	&.fa-users,
 	&.fa-globe,
+	&.fa-sign-out,
+	&.fa-mail-reply,
+	&.fa-retweet,
 	&.fa-star,
+	&.fa-bookmark,
+	&.fa-ellipsis-h,
 	&.fa-thumb-tack,
 	&.fa-cog,
 	&.fa-home,
+	&.fa-sliders,
 	&.fa-bell,
 	&.fa-lock,
-	&.fa-eraser {
+	&.fa-eraser,
+	&.fa-ellipsis-v {
 		font-family: "Material Icons Extended";
 	}
 
