@@ -36,6 +36,8 @@ const messages = defineMessages({
   unendorse: { id: 'account.unendorse', defaultMessage: 'Don\'t feature on profile' },
   add_or_remove_from_list: { id: 'account.add_or_remove_from_list', defaultMessage: 'Add or Remove from lists' },
   admin_account: { id: 'status.admin_account', defaultMessage: 'Open moderation interface for @{name}' },
+  generateQrcode: { id: 'navigation_bar.generate_qrcode', defaultMessage: 'Generate QRCode of your account' },
+
 });
 
 export default @injectIntl
@@ -54,6 +56,7 @@ class ActionBar extends React.PureComponent {
     onUnblockDomain: PropTypes.func.isRequired,
     onEndorseToggle: PropTypes.func.isRequired,
     onAddToList: PropTypes.func.isRequired,
+    onGenerateQrcode: PropTypes.func.isRequired,
     intl: PropTypes.object.isRequired,
   };
 
@@ -91,6 +94,7 @@ class ActionBar extends React.PureComponent {
       menu.push({ text: intl.formatMessage(messages.edit_profile), href: '/settings/profile' });
       menu.push({ text: intl.formatMessage(messages.preferences), href: '/settings/preferences' });
       menu.push({ text: intl.formatMessage(messages.pins), to: '/pinned' });
+      menu.push({ text: intl.formatMessage(messages.generateQrcode), action: this.props.onGenerateQrcode });
       menu.push(null);
       menu.push({ text: intl.formatMessage(messages.follow_requests), to: '/follow_requests' });
       menu.push({ text: intl.formatMessage(messages.favourites), to: '/favourites' });
