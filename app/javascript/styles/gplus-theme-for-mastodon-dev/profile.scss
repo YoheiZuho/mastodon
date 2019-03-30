@@ -21,13 +21,9 @@
 
 	.logo-button {
 		svg path {
-			&:not(#Mastodon):not(#Itabashi) {
-				fill: $secondary-text-color !important;
-			}
-
-			&:last-child {
-				fill: $base-lighter1-color !important;
-			}
+			/* Only for Itabashi-don */
+			&:not(#Mastodon):not(#Itabashi) { fill: $secondary-text-color !important }
+			&:last-child { fill: $base-lighter1-color !important }
 		}
 	}
 
@@ -37,9 +33,7 @@
 		&__image {
 			background: $base-lighter1-color;
 
-			@media screen and (min-width: 600px) {
-				height: 500px;
-			}
+			@media screen and (min-width: 600px) { height: 500px }
 
 			&::after {
 				position: absolute;
@@ -65,13 +59,9 @@
 				background: $base-color;
 			}
 			
-			@media screen and (min-width: 600px) {
-				margin-top: -140px;
-			}
+			@media screen and (min-width: 600px) { margin-top: -140px }
 
-			&::before {
-				background: $base-lighter1-color;
-			}
+			&::before { background: $base-lighter1-color }
 
 			.avatar {
 				@media screen and (max-width: 600px) {
@@ -105,9 +95,7 @@
 					h1 {
 						color: $primary-text-color;
 
-						small {
-							color: $primary-lighter1-text-color;
-						}
+						small { color: $primary-lighter1-text-color }
 					}
 				}
 
@@ -115,22 +103,16 @@
 					justify-content: center;
 					flex: auto;
 
-					.spacer {
-						display: none;
-					}
+					.spacer { display: none }
 
 					a.button.logo-button {
-						color: $base-lighter1-color;
+						color: $light-text-color;
 						background: $secondary-text-color;
 
 						svg path {
-							&:not(#Mastodon):not(#Itabashi) {
-								fill: $base-lighter1-color !important;
-							}
-				
-							&:last-child {
-								fill: $secondary-text-color !important;
-							}
+							/* Only for Itabashi-don */
+							&:not(#Mastodon):not(#Itabashi) { fill: $base-lighter1-color !important }
+							&:last-child { fill: $secondary-text-color !important }
 						}
 					}
 				}
@@ -138,17 +120,13 @@
 
 			.details-counters {
 				.counter {
-					color: $base-lighter1-color;
+					color: $light-text-color;
 					border-right: 0;
 
-					&::after {
-						border-bottom-color: $base-color;
-					}
+					&::after { border-bottom-color: $base-color }
 
 					&.active {
-						&::after {
-							border-bottom-color: $active-color;
-						}
+						&::after { border-bottom-color: $active-color }
 					}
 				}
 			}
@@ -156,19 +134,14 @@
 
 		&__extra {
 			.public-account-bio {
-				.account__header__content {
-					text-align: center;
-				}
+				.account__header__content { text-align: center }
 			}
 
 			&__links {
 				color: $primary-text-color;
 
 				a {
-					&,
-					strong {
-						color: $primary-text-color;
-					}
+					&, strong { color: $primary-text-color }
 				}
 			}
 		}
@@ -178,13 +151,8 @@
 		@include column-shadow;
 		background: $base-lighter1-color;
 		
-		.account__header__content {
-			color: $primary-text-color;
-		}
-
-		&__extra {
-			color: $primary-lighter1-text-color;
-		}
+		.account__header__content { color: $primary-text-color }
+		&__extra { color: $primary-lighter1-text-color }
 	}
 
 	.endorsements-widget {
@@ -202,17 +170,12 @@
 	.hero-widget {
 		@include column-shadow;
 
-		&__img {
-			background: $base-color;
-		}
-
+		&__img { background: $base-color }
 		&__text {
 			background: $base-lighter1-color;
 
-			&,
-			em {
-				color: $primary-lighter2-text-color;
-			}
+			&, em { color: $primary-lighter2-text-color }
+			a { color: $secondary-text-color }
 		}
 	}
 
@@ -226,13 +189,8 @@
 			&.active {
 				color: $primary-lighter2-text-color;
 
-				&::before {
-					border-color: transparent transparent $base-separation-color;
-				}
-
-				&::after {
-					border-color: transparent transparent $status-color;
-				}
+				&::before { border-color: transparent transparent $base-separation-color }
+				&::after { border-color: transparent transparent $status-color }
 			}
 		}
 	}
@@ -244,9 +202,7 @@
 			margin: 1em 0;
 			background: transparent;
 
-			&:first-of-type {
-				margin: 0;
-			}
+			&:first-of-type { margin: 0 }
 		}
 	}
 
@@ -258,25 +214,17 @@
 	}
 
 	.footer {
-		h4 {
-			color: $primary-lighter1-text-color;
-		}
+		h4 { color: $primary-lighter1-text-color }
 
 		ul {
-			a {
-				color: $primary-lighter2-text-color;
-			}
+			a { color: $primary-lighter2-text-color }
 		}
 
 		.brand {
 			svg path {
-				&:not(#Mastodon):not(#Itabashi) {
-					fill: $secondary-text-color !important;
-				}
-	
-				&:last-child {
-					fill: $base-lighter1-color !important;
-				}
+				/* Only for Itabashi-don */
+				&:not(#Mastodon):not(#Itabashi) { fill: $secondary-text-color !important }
+				&:last-child { fill: $base-lighter1-color !important }
 			}
 		}
 	}

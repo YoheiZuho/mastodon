@@ -9,11 +9,11 @@
 	background: $account-color;
 	border-color: $base-separation-color;
 
-	&__display-name {
-		color: $secondary-text-color;
-
-		strong {
-			color: $primary-text-color;
+	.account {
+		&__display-name {
+			color: $secondary-text-color;
+	
+			strong { color: $primary-text-color }
 		}
 	}
 }
@@ -29,69 +29,52 @@
 	.account__header {
 		background-color: $account-foreground-color;
 
-		> div {
-			background-color: inherit;
-		}
+		> div { background-color: inherit }
 
-		&__username {
-			color: $secondary-lighter1-text-color;
-		}
-
-		&__fields {
-			@extend .account__header__fields;
+		.account__header {
+			&__username { color: $secondary-lighter1-text-color }
+			&__fields { @extend .account__header__fields; }
 		}
 
 		.account--action-button {
 			.icon-button:not(.active) {
-				color: darken($column-header-color, 7%);
+				color: darken($light-text-color, 7%);
 
 				&:active,
 				&:focus,
 				&:hover {
-					color: $column-header-color;
+					color: $light-text-color;
 				}
 			}
 		}
 	}
 
-	.account__disclaimer {
-		background: $column-header-color;
-		border-color: $base-separation-color;
-	}
-
-	.account__action-bar {
-		background: $column-header-color;
-		border-color: $base-separation-color;
-
-		&__tab {
+	.account {
+		&__disclaimer,
+		&__action-bar,
+		&__section-headline {
+			background: $column-header-color;
 			border-color: $base-separation-color;
+		}
 
-			&.active {
-				border-bottom-color: $active-color;
-			}
-
-			> span {
-				color: $primary-lighter1-text-color;
+		&__action-bar {
+			&__tab {
+				border-color: $base-separation-color;
+				&.active { border-bottom-color: $active-color }
+	
+				> span { color: $primary-lighter1-text-color }
 			}
 		}
-	}
-
-	.account__section-headline {
-		background: $column-header-color;
-		border-color: $base-separation-color;
-
-		a {
-			color: $primary-text-color;
-
-			&.active {
-				color: $primary-lighter1-text-color;
-
-				&::before {
-					border-color: transparent transparent $base-separation-color;
-				}
-
-				&::after {
-					border-color: transparent transparent $status-color;
+	
+		&__section-headline {
+			a {
+				color: $primary-text-color;
+	
+				&.active {
+					color: $primary-lighter1-text-color;
+	
+					&::before { border-color: transparent transparent $base-separation-color }
+					&::after { border-color: transparent transparent $status-color }
 				}
 			}
 		}
@@ -107,15 +90,20 @@
 			color: $primary-text-color;
 			background: $column-header-color;
 		}
+
+		dd {
+			&.verified {
+				border-color: transparentize($valid-color, 0.5);
+				background: transparentize($valid-color, 0.75);
+
+				a { color: lighten($verified-color, 20%) }
+			}
+		}
 	}
 
-	a {
-		color: $secondary-text-color;
-	}
+	a { color: $secondary-text-color }
 }
 
 .account__action-bar__tab {
-	strong {
-		color: $primary-text-color;
-	}
+	strong { color: $primary-text-color }
 }
