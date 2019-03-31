@@ -6,13 +6,20 @@
 
 
 .tabs-bar {
+	@include column-shadow;
 	margin: 0;
 	background: $column-header-color;
 
 	.tabs-bar {
 		&__link {
 			color: $icon-color;
+			border-bottom: 0px;
+			padding: 15px 10px 11px 10px;
 			
+			&.active {
+				border-bottom: 4px; 
+			}
+
 			.fa { vertical-align: top }
 		}
 	}
@@ -24,7 +31,10 @@
 			@include column-shadow;
 			background: $column-header-color;
 	
-			.drawer__tab { color: $icon-color }
+			.drawer__tab {
+				color: $icon-color;
+				font-size: 20px;
+			}
 	
 			a {
 				&:hover { background: $column-header-hover-color }
@@ -55,6 +65,7 @@
 	}
 }
 
+
 .compose-form {
 	.compose-form {
 		&__buttons-wrapper { background: $column-header-color }
@@ -79,6 +90,11 @@
 		&__icon {
 			color: $icon-color;
 			vertical-align: top;
+		}
+
+		.column-header__icon {
+			font-size: 20px;
+			margin-right: 8px;
 		}
 
 		&__buttons {
