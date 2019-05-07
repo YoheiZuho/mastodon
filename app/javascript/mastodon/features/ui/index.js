@@ -49,7 +49,8 @@ import {
   Trends,
 } from './util/async-components';
 import { me } from '../../initial_state';
-import { previewState } from './components/media_modal';
+import { previewState as previewMediaState } from './components/media_modal';
+import { previewState as previewVideoState } from './components/video_modal';
 
 // Dummy import, to make sure that <Status /> ends up in the application bundle.
 // Without this it ends up in ~8 very commonly used bundles.
@@ -123,7 +124,7 @@ class SwitchingColumnsArea extends React.PureComponent {
   }
 
   shouldUpdateScroll (_, { location }) {
-    return location.state !== previewState;
+    return location.state !== previewMediaState && location.state !== previewVideoState;
   }
 
   handleResize = debounce(() => {
