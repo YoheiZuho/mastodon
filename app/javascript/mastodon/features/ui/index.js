@@ -39,12 +39,14 @@ import {
   FollowRequests,
   GenericNotFound,
   FavouritedStatuses,
+  BookmarkedStatuses,
   ListTimeline,
   Blocks,
   DomainBlocks,
   Mutes,
   PinnedStatuses,
   Lists,
+  Trends,
 } from './util/async-components';
 import { me } from '../../initial_state';
 import { previewState as previewMediaState } from './components/media_modal';
@@ -158,9 +160,11 @@ class SwitchingColumnsArea extends React.PureComponent {
 
           <WrappedRoute path='/notifications' component={Notifications} content={children} componentParams={{ shouldUpdateScroll: this.shouldUpdateScroll }} />
           <WrappedRoute path='/favourites' component={FavouritedStatuses} content={children} componentParams={{ shouldUpdateScroll: this.shouldUpdateScroll }} />
+          <WrappedRoute path='/bookmarks' component={BookmarkedStatuses} content={children} />
           <WrappedRoute path='/pinned' component={PinnedStatuses} content={children} componentParams={{ shouldUpdateScroll: this.shouldUpdateScroll }} />
 
           <WrappedRoute path='/search' component={Compose} content={children} componentParams={{ isSearchPage: true }} />
+          <WrappedRoute path='/trends' component={Trends} content={children} />
 
           <WrappedRoute path='/statuses/new' component={Compose} content={children} />
           <WrappedRoute path='/statuses/:statusId' exact component={Status} content={children} componentParams={{ shouldUpdateScroll: this.shouldUpdateScroll }} />
