@@ -5,12 +5,14 @@
 base_host     = Rails.configuration.x.web_domain
 assets_host   = Rails.configuration.action_controller.asset_host
 assets_host ||= "http#{Rails.configuration.x.use_https ? 's' : ''}://#{base_host}"
+google_font_host = "https://fonts.gstatic.com"
+gplus_theme_host = "https://raw.githubusercontent.com"
 
 Rails.application.config.content_security_policy do |p|
   p.base_uri        :none
   p.default_src     :none
   p.frame_ancestors :none
-  p.font_src        :self, assets_host
+  p.font_src        :self, assets_host, google_font_host
   p.img_src         :self, :https, :data, :blob, assets_host
   p.style_src       :self, :unsafe_inline, assets_host
   p.media_src       :self, :https, :data, assets_host
