@@ -1,0 +1,27 @@
+@charset "UTF-8";
+
+@import 'variables';
+
+
+
+.notification {
+	&.notification-favourite {
+		.status {
+			&.status-direct { background: transparent }
+		}
+	}
+
+	> .notification__message {
+		color: $primary-lighter2-text-color;
+		font-size: 13px;
+		padding: 8px 0;
+
+		.notification__display-name {
+			&:hover { color: inherit }
+		}
+
+		.notification__favourite-icon-wrapper {
+			.star-icon { color: $icon-active-color }
+		}
+	}
+}
