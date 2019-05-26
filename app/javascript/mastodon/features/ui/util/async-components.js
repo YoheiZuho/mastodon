@@ -138,6 +138,10 @@ export function ListAdder () {
   return import(/*webpackChunkName: "features/list_adder" */'../../list_adder');
 }
 
+export function Search () {
+  return import(/*webpackChunkName: "features/search" */'../../search');
+}
+
 export function Trends () {
   return import(/* webpackChunkName: "features/trends" */'../../trends');
 }
