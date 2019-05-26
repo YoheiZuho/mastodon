@@ -1,0 +1,38 @@
+@charset "UTF-8";
+
+@import 'variables';
+
+
+
+.card {
+	//border: 1px solid $base-separation-color;
+	//不要(?)
+
+	> a {
+		@include status-shadow;
+
+		&:hover,
+		&:focus,
+		&:active {
+			.card__bar {
+				background: initial;
+
+				.display-name strong { color: $secondary-text-color }
+			}
+		}
+
+		.card__img { background: $card-image-color }
+		.card__bar {
+			background: $card-color;
+	
+			.avatar {
+				img { background: transparent }
+			}
+	
+			.display-name {
+				strong { color: $primary-text-color }
+				span { color: $primary-lighter2-text-color }
+			}
+		}
+	}
+}

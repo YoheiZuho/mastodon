@@ -1,0 +1,197 @@
+@charset "UTF-8";
+
+@import 'variables';
+@import 'mixins';
+
+
+
+.tabs-bar {
+	margin: 0;
+	background: $column-header-color;
+
+	.tabs-bar {
+		&__link {
+			color: $icon-color;
+			
+			.fa { vertical-align: top }
+		}
+	}
+}
+
+.drawer {
+	.drawer {
+		&__header {
+			@include column-shadow;
+			background: $column-header-color;
+	
+			.drawer__tab { color: $icon-color }
+	
+			a {
+				&:hover { background: $column-header-hover-color }
+			}
+		}
+	
+		&__pager {
+			@include status-shadow;
+			
+			.drawer__inner {
+				background: $column-header-color;
+		
+				&__mastodon { display: none }
+			}
+		}
+	}
+}
+
+.navigation-bar {
+	color: $secondary-text-color;
+	background: $column-header-color;
+
+	.navigation-bar {
+		&__profile {
+			strong { color: $primary-text-color }
+			&-edit { color: $secondary-text-color }
+		}
+	}
+}
+
+.compose-form {
+	.compose-form {
+		&__buttons-wrapper { background: $column-header-color }
+		&__publish { border-top: 1px solid $base-separation-color }
+	}
+}
+
+.column {
+	.column-header {
+		@include column-shadow;
+		background: $column-header-color;
+
+		&.active {
+			.column-header__icon {
+				color: $icon-active-color;
+				text-shadow: 0 0 10px change-color($color: $icon-active-color, $alpha: 0.4);
+			}
+		}
+
+		* { background: inherit }
+
+		&__icon {
+			color: $icon-color;
+			vertical-align: top;
+		}
+
+		&__buttons {
+			.column-header {
+				&__back-button {
+					.column-back-button__icon { vertical-align: unset }
+				}
+	
+				&__button {
+					&.active {
+						color: $icon-active-color;
+						background: inherit;
+					}
+		
+					.fa { vertical-align: unset }
+				}
+			}
+		}
+
+		&__collapsible {
+			color: $secondary-text-color;
+			border-bottom: 1px solid $base-separation-color;
+	
+			&-inner { background: $column-header-color }
+		}
+	}
+
+	.column-back-button {
+		&__icon { vertical-align: unset }
+	}
+
+	.column {
+		&-subheading { background: darken($base-color, 10%) }
+	
+		&-link {
+			color: $primary-text-color;
+			background: $base-color;
+	
+			&__icon {
+				color: $icon-color;
+				vertical-align: top;
+			}
+		}
+	}
+
+	.scrollable {
+		background: transparent;
+
+		*[role="feed"] {
+			article {
+				margin: 1em 0;
+				&:first-of-type { margin: 0 }
+			}
+		}
+
+		div[tabindex="-1"] { margin-bottom: 1em }
+	}
+
+	.notification__filter-bar {
+		background: $column-header-color;
+		border-bottom-color: $base-separation-color;
+
+		button {
+			color: $icon-color;
+			background: $column-header-color;
+
+			&.active {
+				color: $icon-active-color;
+
+				&::before { border-color: transparent transparent $base-separation-color }
+				&::after { border-color: transparent transparent $column-header-color }
+			}
+		}
+	}
+
+	.empty-column-indicator {
+		flex-direction: column;
+		background: $base-color;
+
+		&::before {
+			content: "";
+			display: block;
+
+			width: 100px;
+			height: 100px;
+			margin-bottom: 1em;
+
+			background: none center / contain no-repeat;
+			background-image: url("https://raw.githubusercontent.com/GenbuProject/GPlusTheme-for-Mastodon/asset/notification-jingle_2x.gif");
+		}
+	}
+}
+
+.getting-started {
+	&__wrapper,
+	& {
+		background: $base-color;
+	}
+
+	& {
+		border-top: 1px solid $base-separation-color;
+
+		a { color: $primary-text-color }
+	}
+}
+
+.load {
+	&-more,
+	&-gap {
+		background: transparent;
+
+		&:hover { background: darken($column-header-color, 10%) }
+	}
+
+	&-gap { border: 0 }
+}
