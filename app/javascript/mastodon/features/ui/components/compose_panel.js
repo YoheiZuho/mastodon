@@ -5,14 +5,12 @@ import NavigationContainer from 'mastodon/features/compose/containers/navigation
 import { invitesEnabled, version, repository, source_url } from 'mastodon/initial_state';
 import { Link } from 'react-router-dom';
 import { FormattedMessage } from 'react-intl';
-import AnnouncementsContainer from 'mastodon/features/compose/containers/announcements_container';
 
 const ComposePanel = () => (
   <div className='compose-panel'>
     <SearchContainer openInRoute />
     <NavigationContainer />
     <ComposeFormContainer />
-    <AnnouncementsContainer />
 
     <div className='flex-spacer' />
 
