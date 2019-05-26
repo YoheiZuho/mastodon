@@ -7,7 +7,6 @@ import { Redirect, withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import NotificationsContainer from './containers/notifications_container';
 import LoadingBarContainer from './containers/loading_bar_container';
-import TabsBar from './components/tabs_bar';
 import ModalContainer from './containers/modal_container';
 import { isMobile } from '../../is_mobile';
 import { debounce } from 'lodash';
@@ -46,9 +45,10 @@ import {
   Mutes,
   PinnedStatuses,
   Lists,
+  Search,
   Trends,
 } from './util/async-components';
-import { me } from '../../initial_state';
+import { me, forceSingleColumn } from '../../initial_state';
 import { previewState as previewMediaState } from './components/media_modal';
 import { previewState as previewVideoState } from './components/video_modal';
 
@@ -95,6 +95,7 @@ const keyMap = {
   goToMuted: 'g m',
   goToRequests: 'g r',
   toggleHidden: 'x',
+  toggleSensitive: 'h',
 };
 
 class SwitchingColumnsArea extends React.PureComponent {
@@ -143,10 +144,11 @@ class SwitchingColumnsArea extends React.PureComponent {
   render () {
     const { children } = this.props;
     const { mobile } = this.state;
-    const redirect = mobile ? <Redirect from='/' to='/timelines/home' exact /> : <Redirect from='/' to='/getting-started' exact />;
+    const singleColumn = forceSingleColumn || mobile;
+    const redirect = singleColumn ? <Redirect from='/' to='/timelines/home' exact /> : <Redirect from='/' to='/getting-started' exact />;
 
     return (
-      <ColumnsAreaContainer ref={this.setRef} singleColumn={mobile}>
+      <ColumnsAreaContainer ref={this.setRef} singleColumn={singleColumn}>
         <WrappedSwitch>
           {redirect}
           <WrappedRoute path='/getting-started' component={GettingStarted} content={children} />
@@ -483,8 +485,6 @@ class UI extends React.PureComponent {
     return (
       <HotKeys keyMap={keyMap} handlers={handlers} ref={this.setHotkeysRef} attach={window} focused>
         <div className={classNames('ui', { 'is-composing': isComposing })} ref={this.setRef} style={{ pointerEvents: dropdownMenuIsOpen ? 'none' : null }}>
-          <TabsBar />
-
           <SwitchingColumnsArea location={location} onLayoutChange={this.handleLayoutChange}>
             {children}
           </SwitchingColumnsArea>
