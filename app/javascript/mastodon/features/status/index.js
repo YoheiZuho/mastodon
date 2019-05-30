@@ -12,6 +12,8 @@ import Column from '../ui/components/column';
 import {
   favourite,
   unfavourite,
+  bookmark,
+  unbookmark,
   reblog,
   unreblog,
   pin,
@@ -200,6 +202,14 @@ class Status extends ImmutablePureComponent {
       } else {
         this.props.dispatch(openModal('BOOST', { status, onReblog: this.handleModalReblog }));
       }
+    }
+  }
+
+  handleBookmarkClick = (status) => {
+    if (status.get('bookmarked')) {
+      this.props.dispatch(unbookmark(status));
+    } else {
+      this.props.dispatch(bookmark(status));
     }
   }
 
@@ -479,6 +489,7 @@ class Status extends ImmutablePureComponent {
                   onReply={this.handleReplyClick}
                   onFavourite={this.handleFavouriteClick}
                   onReblog={this.handleReblogClick}
+                  onBookmark={this.handleBookmarkClick}
                   onDelete={this.handleDeleteClick}
                   onDirect={this.handleDirectClick}
                   onMention={this.handleMentionClick}
