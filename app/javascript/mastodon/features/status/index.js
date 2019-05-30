@@ -134,6 +134,7 @@ class Status extends ImmutablePureComponent {
   state = {
     fullscreen: false,
     showMedia: defaultMediaVisibility(this.props.status),
+    loadedStatusId: undefined,
   };
 
   componentWillMount () {
@@ -150,8 +151,8 @@ class Status extends ImmutablePureComponent {
       this.props.dispatch(fetchStatus(nextProps.params.statusId));
     }
 
-    if (!Immutable.is(nextProps.status, this.props.status) && nextProps.status) {
-      this.setState({ showMedia: defaultMediaVisibility(nextProps.status) });
+    if (nextProps.status && nextProps.status.get('id') !== this.state.loadedStatusId) {
+      this.setState({ showMedia: defaultMediaVisibility(nextProps.status), loadedStatusId: nextProps.status.get('id') });
     }
   }
 

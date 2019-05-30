@@ -1372,46 +1372,6 @@
       {
         "defaultMessage": "Profile directory",
         "id": "getting_started.directory"
-      },
-      {
-        "defaultMessage": "Invite people",
-        "id": "getting_started.invite"
-      },
-      {
-        "defaultMessage": "Hotkeys",
-        "id": "navigation_bar.keyboard_shortcuts"
-      },
-      {
-        "defaultMessage": "Security",
-        "id": "getting_started.security"
-      },
-      {
-        "defaultMessage": "About this server",
-        "id": "navigation_bar.info"
-      },
-      {
-        "defaultMessage": "Mobile apps",
-        "id": "navigation_bar.apps"
-      },
-      {
-        "defaultMessage": "Terms of service",
-        "id": "getting_started.terms"
-      },
-      {
-        "defaultMessage": "Developers",
-        "id": "getting_started.developers"
-      },
-      {
-        "defaultMessage": "Documentation",
-        "id": "getting_started.documentation"
-      },
-      {
-        "defaultMessage": "Logout",
-        "id": "navigation_bar.logout"
-      },
-      {
-        "defaultMessage": "Mastodon is open source software. You can contribute or report issues on GitHub at {github}.",
-        "id": "getting_started.open_source_notice"
       }
     ],
     "path": "app/javascript/mastodon/features/getting_started/index.json"
@@ -1614,6 +1574,10 @@
       {
         "defaultMessage": "to show/hide text behind CW",
         "id": "keyboard_shortcuts.toggle_hidden"
+      },
+      {
+        "defaultMessage": "to show/hide media",
+        "id": "keyboard_shortcuts.toggle_sensitivity"
       },
       {
         "defaultMessage": "to move up in the list",
@@ -2259,6 +2223,60 @@
   {
     "descriptors": [
       {
+        "defaultMessage": "Follow requests",
+        "id": "navigation_bar.follow_requests"
+      }
+    ],
+    "path": "app/javascript/mastodon/features/ui/components/follow_requests_nav_link.json"
+  },
+  {
+    "descriptors": [
+      {
+        "defaultMessage": "Invite people",
+        "id": "getting_started.invite"
+      },
+      {
+        "defaultMessage": "Hotkeys",
+        "id": "navigation_bar.keyboard_shortcuts"
+      },
+      {
+        "defaultMessage": "Security",
+        "id": "getting_started.security"
+      },
+      {
+        "defaultMessage": "About this server",
+        "id": "navigation_bar.info"
+      },
+      {
+        "defaultMessage": "Mobile apps",
+        "id": "navigation_bar.apps"
+      },
+      {
+        "defaultMessage": "Terms of service",
+        "id": "getting_started.terms"
+      },
+      {
+        "defaultMessage": "Developers",
+        "id": "getting_started.developers"
+      },
+      {
+        "defaultMessage": "Documentation",
+        "id": "getting_started.documentation"
+      },
+      {
+        "defaultMessage": "Logout",
+        "id": "navigation_bar.logout"
+      },
+      {
+        "defaultMessage": "Mastodon is open source software. You can contribute or report issues on GitHub at {github}.",
+        "id": "getting_started.open_source_notice"
+      }
+    ],
+    "path": "app/javascript/mastodon/features/ui/components/link_footer.json"
+  },
+  {
+    "descriptors": [
+      {
         "defaultMessage": "Close",
         "id": "lightbox.close"
       },
@@ -2302,107 +2320,42 @@
     "descriptors": [
       {
         "defaultMessage": "Home",
-        "id": "column.home"
+        "id": "tabs_bar.home"
       },
       {
         "defaultMessage": "Notifications",
-        "id": "column.notifications"
+        "id": "tabs_bar.notifications"
       },
       {
-        "defaultMessage": "Local timeline",
-        "id": "column.community"
+        "defaultMessage": "Local",
+        "id": "tabs_bar.local_timeline"
       },
       {
-        "defaultMessage": "Federated timeline",
-        "id": "column.public"
+        "defaultMessage": "Federated",
+        "id": "tabs_bar.federated_timeline"
       },
       {
-        "defaultMessage": "Welcome to Mastodon!",
-        "id": "onboarding.page_one.welcome"
+        "defaultMessage": "Direct messages",
+        "id": "navigation_bar.direct"
       },
       {
-        "defaultMessage": "Mastodon is a network of independent servers joining up to make one larger social network. We call these servers instances.",
-        "id": "onboarding.page_one.federation"
+        "defaultMessage": "Favourites",
+        "id": "navigation_bar.favourites"
       },
       {
-        "defaultMessage": "Your full handle",
-        "id": "onboarding.page_one.full_handle"
+        "defaultMessage": "Lists",
+        "id": "navigation_bar.lists"
       },
       {
-        "defaultMessage": "This is what you would tell your friends to search for.",
-        "id": "onboarding.page_one.handle_hint"
+        "defaultMessage": "Preferences",
+        "id": "navigation_bar.preferences"
       },
       {
-        "defaultMessage": "Write posts from the compose column. You can upload images, change privacy settings, and add content warnings with the icons below.",
-        "id": "onboarding.page_two.compose"
-      },
-      {
-        "defaultMessage": "Use the search bar to find people and look at hashtags, such as {illustration} and {introductions}. To look for a person who is not on this instance, use their full handle.",
-        "id": "onboarding.page_three.search"
-      },
-      {
-        "defaultMessage": "Edit your profile to change your avatar, bio, and display name. There, you will also find other preferences.",
-        "id": "onboarding.page_three.profile"
-      },
-      {
-        "defaultMessage": "The home timeline shows posts from people you follow.",
-        "id": "onboarding.page_four.home"
-      },
-      {
-        "defaultMessage": "The notifications column shows when someone interacts with you.",
-        "id": "onboarding.page_four.notifications"
-      },
-      {
-        "defaultMessage": "The local timeline shows public posts from everyone on {domain}. The federated timeline shows public posts from everyone who people on {domain} follow. These are the Public Timelines, a great way to discover new people.",
-        "id": "onboarding.page_five.public_timelines"
-      },
-      {
-        "defaultMessage": "Your instance's admin is {admin}.",
-        "id": "onboarding.page_six.admin"
-      },
-      {
-        "defaultMessage": "Please read {domain}'s {guidelines}!",
-        "id": "onboarding.page_six.read_guidelines"
-      },
-      {
-        "defaultMessage": "community guidelines",
-        "id": "onboarding.page_six.guidelines"
-      },
-      {
-        "defaultMessage": "Almost done...",
-        "id": "onboarding.page_six.almost_done"
-      },
-      {
-        "defaultMessage": "Mastodon is free open-source software. You can report bugs, request features, or contribute to the code on {github}.",
-        "id": "onboarding.page_six.github"
-      },
-      {
-        "defaultMessage": "There are {apps} available for iOS, Android and other platforms.",
-        "id": "onboarding.page_six.apps_available"
-      },
-      {
-        "defaultMessage": "mobile apps",
-        "id": "onboarding.page_six.various_app"
-      },
-      {
-        "defaultMessage": "Bon Appetoot!",
-        "id": "onboarding.page_six.appetoot"
-      },
-      {
-        "defaultMessage": "Next",
-        "id": "onboarding.next"
-      },
-      {
-        "defaultMessage": "Done",
-        "id": "onboarding.done"
-      },
-      {
-        "defaultMessage": "Skip",
-        "id": "onboarding.skip"
+        "defaultMessage": "Follows and followers",
+        "id": "navigation_bar.follows_and_followers"
       }
     ],
-    "path": "app/javascript/mastodon/features/ui/components/onboarding_modal.json"
-  },
+    "path": "app/javascript/mastodon/features/ui/components/navigation_panel.json"
   {
     "descriptors": [
       {
