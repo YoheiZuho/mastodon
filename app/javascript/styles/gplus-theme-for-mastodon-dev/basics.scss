@@ -1,0 +1,47 @@
+@charset "UTF-8";
+
+@import 'variables';
+@import 'mixins';
+
+
+
+body {
+	&,
+	.ui {
+		color: $primary-text-color;
+		background: $base-color;
+	}
+}
+
+.focusable {
+	&:focus {
+		background: inherit;
+
+		.status {
+			@include status-focus-shadow;
+
+			&.status-direct { background: $status-direct-color }
+		}
+
+		.detailed-status {
+			& { background: $status-color }
+			&__action-bar { background: $status-actionbar-color }
+		}
+	}
+}
+
+::-webkit-scrollbar-thumb {
+	background: darken($base-lighter1-color, 12%);
+
+	&:hover { background: darken($base-lighter1-color, 16%) }
+	&:active { background: darken($base-lighter1-color, 12%) }
+}
+
+::-webkit-scrollbar-track {
+	background: $base-color;
+
+	&:hover,
+	&:active {
+		background: darken($base-lighter1-color, 8%);
+	}
+}

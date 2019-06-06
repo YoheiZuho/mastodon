@@ -131,6 +131,10 @@ const mapDispatchToProps = (dispatch, { intl }) => ({
     }));
   },
 
+  onGenerateQrcode (account) {
+    dispatch(openModal('QRCODE', { account: account }));
+  },
+
 });
 
 export default injectIntl(connect(makeMapStateToProps, mapDispatchToProps)(Header));

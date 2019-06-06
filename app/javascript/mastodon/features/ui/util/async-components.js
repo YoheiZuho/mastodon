@@ -90,6 +90,10 @@ export function FavouritedStatuses () {
   return import(/* webpackChunkName: "features/favourited_statuses" */'../../favourited_statuses');
 }
 
+export function BookmarkedStatuses () {
+  return import(/* webpackChunkName: "features/bookmarked_statuses" */'../../bookmarked_statuses');
+}
+
 export function Blocks () {
   return import(/* webpackChunkName: "features/blocks" */'../../blocks');
 }
@@ -122,6 +126,10 @@ export function EmbedModal () {
   return import(/* webpackChunkName: "modals/embed_modal" */'../components/embed_modal');
 }
 
+export function QrcodeModal () {
+  return import(/* webpackChunkName: "modals/embed_modal" */'../components/qrcode_modal');
+}
+
 export function ListEditor () {
   return import(/* webpackChunkName: "features/list_editor" */'../../list_editor');
 }
@@ -132,4 +140,8 @@ export function ListAdder () {
 
 export function Search () {
   return import(/*webpackChunkName: "features/search" */'../../search');
+}
+
+export function Trends () {
+  return import(/* webpackChunkName: "features/trends" */'../../trends');
 }
