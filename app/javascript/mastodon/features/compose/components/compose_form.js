@@ -38,10 +38,6 @@ const messages = defineMessages({
 export default @injectIntl
 class ComposeForm extends ImmutablePureComponent {
 
-  setRef = c => {
-    this.composeForm = c;
-  };
-
   static contextTypes = {
     router: PropTypes.object,
   };
@@ -128,7 +124,9 @@ class ComposeForm extends ImmutablePureComponent {
   }
 
   handleFocus = () => {
-    this.composeForm.scrollIntoView();
+    if (this.composeForm) {
+      this.composeForm.scrollIntoView();
+    }
   }
 
   componentDidUpdate (prevProps) {
@@ -171,6 +169,10 @@ class ComposeForm extends ImmutablePureComponent {
   setSpoilerText = (c) => {
     this.spoilerText = c;
   }
+
+  setRef = c => {
+    this.composeForm = c;
+  };
 
   handleEmojiPick = (data) => {
     const { text }     = this.props;
@@ -221,7 +223,7 @@ class ComposeForm extends ImmutablePureComponent {
           />
         </div>
 
-        <div className='emoji-picker-wrapper'>
+        <div className={`emoji-picker-wrapper ${this.props.showSearch ? 'emoji-picker-wrapper--hidden' : ''}`}>
           <EmojiPickerDropdown onPickEmoji={this.handleEmojiPick} />
         </div>
 
