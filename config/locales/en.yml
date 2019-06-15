@@ -1015,8 +1015,8 @@ en:
     default: Mastodon (Dark)
     mastodon-light: Mastodon (Light)
     google-plus: Google+
-    google-plus-dev: Google+ Dev (Unstable)
-    dark-google-plus-dev: Dark Google+ Dev (Unstable)
+    google-plus-dev: Google+ Dev
+    dark-google-plus-dev: Dark Google+ Dev
   time:
     formats:
       default: "%b %d, %Y, %H:%M"
