@@ -49,12 +49,14 @@
 
 				&:hover {
 					color: $primary-text-color;
+					background-color: $column-header-hover-color;
 				}
 			}
 		}
 	}
 
 	.status {
+		background-color: $base-lighter1-color;
 		padding-top: 16px;
 		padding-bottom: 16px;
 		padding-right: 16px;
