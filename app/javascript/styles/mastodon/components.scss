@@ -622,10 +622,29 @@
     justify-content: flex-end;
     min-width: 0;
     flex: 0 0 auto;
-
+    padding-top: 10px;
+    
     .compose-form__publish-button-wrapper {
       overflow: hidden;
-      padding-top: 10px;
+
+      button {
+        display: inline-block;
+        width: auto;
+
+        margin-right: 0.5em;
+      }
+
+      button:last-child {
+        margin-right: auto;
+      }
+    }
+  }
+
+  .compose-form__utilBtns {
+    padding-top: 10px;
+
+    * {
+      margin-bottom: 1em;
     }
   }
 }
@@ -5419,6 +5438,12 @@ noscript {
       border: 0;
     }
   }
+}
+
+.embed-modal__qrcode {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .account__moved-note {
