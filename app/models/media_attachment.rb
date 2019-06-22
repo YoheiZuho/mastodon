@@ -69,13 +69,19 @@ class MediaAttachment < ApplicationRecord
 
   AUDIO_STYLES = {
     original: {
-      format: 'ogg',
-      convert_options: {},
+      format: 'mp3',
+      content_type: 'audio/mpeg',
+      convert_options: {
+        output: {
+          'q:a' => 2,
+        },
+      },
     },
   }.freeze
 
   VIDEO_FORMAT = {
     format: 'mp4',
+    content_type: 'video/mp4',
     convert_options: {
       output: {
         'loglevel' => 'fatal',
@@ -171,6 +177,14 @@ class MediaAttachment < ApplicationRecord
   before_save :set_meta
 
   class << self
+    def supported_mime_types
+      IMAGE_MIME_TYPES + VIDEO_MIME_TYPES + AUDIO_MIME_TYPES
+    end
+
+    def supported_file_extensions
+      IMAGE_FILE_EXTENSIONS + VIDEO_FILE_EXTENSIONS + AUDIO_FILE_EXTENSIONS
+    end
+
     private
 
     def file_styles(f)
@@ -189,11 +203,11 @@ class MediaAttachment < ApplicationRecord
       if f.file_content_type == 'image/gif'
         [:gif_transcoder, :blurhash_transcoder]
       elsif VIDEO_MIME_TYPES.include?(f.file_content_type)
-        [:video_transcoder, :blurhash_transcoder]
+        [:video_transcoder, :blurhash_transcoder, :type_corrector]
       elsif AUDIO_MIME_TYPES.include?(f.file_content_type)
-        [:transcoder]
+        [:transcoder, :type_corrector]
       else
-        [:lazy_thumbnail, :blurhash_transcoder]
+        [:lazy_thumbnail, :blurhash_transcoder, :type_corrector]
       end
     end
   end
