@@ -161,6 +161,15 @@
   {
     "descriptors": [
       {
+        "defaultMessage": "{count, plural, one {# new item} other {# new items}}",
+        "id": "load_pending"
+      }
+    ],
+    "path": "app/javascript/mastodon/components/load_pending.json"
+  },
+  {
+    "descriptors": [
+      {
         "defaultMessage": "Loading...",
         "id": "loading_indicator.label"
       }
@@ -739,7 +748,7 @@
   {
     "descriptors": [
       {
-        "defaultMessage": "Media Only",
+        "defaultMessage": "Media only",
         "id": "community.column_settings.media_only"
       }
     ],
@@ -1019,6 +1028,10 @@
       {
         "defaultMessage": "Toots",
         "id": "search_results.statuses"
+      },
+      {
+        "defaultMessage": "Searching toots by their content is not enabled on this Mastodon server.",
+        "id": "search_results.statuses_fts_disabled"
       },
       {
         "defaultMessage": "Hashtags",
@@ -1429,10 +1442,6 @@
   {
     "descriptors": [
       {
-        "defaultMessage": "Basic",
-        "id": "home.column_settings.basic"
-      },
-      {
         "defaultMessage": "Show boosts",
         "id": "home.column_settings.show_reblogs"
       },
@@ -1812,6 +1821,14 @@
       {
         "defaultMessage": "Push notifications",
         "id": "notifications.column_settings.push"
+      },
+      {
+        "defaultMessage": "Basic",
+        "id": "home.column_settings.basic"
+      },
+      {
+        "defaultMessage": "Update in real-time",
+        "id": "home.column_settings.update_live"
       },
       {
         "defaultMessage": "Quick filter bar",

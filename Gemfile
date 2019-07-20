@@ -5,7 +5,7 @@ ruby '>= 2.4.0', '< 2.7.0'
 
 gem 'pkg-config', '~> 1.3'
 
-gem 'puma', '~> 3.12'
+gem 'puma', '~> 4.0'
 gem 'rails', '~> 5.2.3'
 gem 'thor', '~> 0.20'
 
@@ -15,7 +15,7 @@ gem 'makara', '~> 0.4'
 gem 'pghero', '~> 2.2'
 gem 'dotenv-rails', '~> 2.7'
 
-gem 'aws-sdk-s3', '~> 1.42', require: false
+gem 'aws-sdk-s3', '~> 1.45', require: false
 gem 'fog-core', '<= 2.1.0'
 gem 'fog-openstack', '~> 0.3', require: false
 gem 'paperclip', '~> 6.0'
@@ -58,6 +58,7 @@ gem 'idn-ruby', require: 'idn'
 gem 'kaminari', '~> 1.1'
 gem 'link_header', '~> 0.0'
 gem 'mime-types', '~> 3.2', require: 'mime/types/columnar'
+gem 'nilsimsa', git: 'https://github.com/witgo/nilsimsa', ref: 'fd184883048b922b176939f851338d0a4971a532'
 gem 'nokogiri', '~> 1.10'
 gem 'nsa', '~> 0.2'
 gem 'oj', '~> 3.7'
@@ -66,7 +67,7 @@ gem 'ox', '~> 2.11'
 gem 'posix-spawn', git: 'https://github.com/rtomayko/posix-spawn', ref: '58465d2e213991f8afb13b984854a49fcdcc980c'
 gem 'pundit', '~> 2.0'
 gem 'premailer-rails'
-gem 'rack-attack', '~> 6.0'
+gem 'rack-attack', '~> 6.1'
 gem 'rack-cors', '~> 1.0', require: 'rack/cors'
 gem 'rails-i18n', '~> 5.1'
 gem 'rails-settings-cached', '~> 0.6'
@@ -110,13 +111,13 @@ group :production, :test do
 end
 
 group :test do
-  gem 'capybara', '~> 3.24'
+  gem 'capybara', '~> 3.25'
   gem 'climate_control', '~> 0.2'
   gem 'faker', '~> 1.9'
   gem 'microformats', '~> 4.1'
   gem 'rails-controller-testing', '~> 1.0'
   gem 'rspec-sidekiq', '~> 3.0'
-  gem 'simplecov', '~> 0.16', require: false
+  gem 'simplecov', '~> 0.17', require: false
   gem 'webmock', '~> 3.6'
   gem 'parallel_tests', '~> 2.29'
 end
@@ -130,8 +131,8 @@ group :development do
   gem 'letter_opener', '~> 1.7'
   gem 'letter_opener_web', '~> 1.3'
   gem 'memory_profiler'
-  gem 'rubocop', '~> 0.71', require: false
-  gem 'rubocop-rails', '~> 2.0', require: false
+  gem 'rubocop', '~> 0.72', require: false
+  gem 'rubocop-rails', '~> 2.2', require: false
   gem 'brakeman', '~> 4.5', require: false
   gem 'bundler-audit', '~> 0.6', require: false
 
@@ -150,3 +151,4 @@ group :production do
 end
 
 gem 'concurrent-ruby', require: false
+gem 'connection_pool', require: false
