@@ -186,6 +186,7 @@ en:
       username: Username
       warn: Warn
       web: Web
+      whitelisted: Whitelisted
     action_logs:
       actions:
         assigned_to_self_report: "%{name} assigned report %{target} to themselves"
@@ -269,6 +270,11 @@ en:
       week_interactions: interactions this week
       week_users_active: active this week
       week_users_new: users this week
+    domain_allows:
+      add_new: Whitelist domain
+      created_msg: Domain has been successfully whitelisted
+      destroyed_msg: Domain has been removed from the whitelist
+      undo: Remove from whitelist
     domain_blocks:
       add_new: Add new domain block
       created_msg: Domain block is now being processed
@@ -477,13 +483,14 @@ en:
       title: Account statuses
       with_media: With media
     tags:
-      accounts: Accounts
-      hidden: Hidden
-      hide: Hide from directory
-      name: Hashtag
+      context: Context
+      directory: In directory
+      in_directory: "%{count} in directory"
+      review: Review status
+      reviewed: Reviewed
       title: Hashtags
-      unhide: Show in directory
-      visible: Visible
+      trending_right_now: Trending right now
+      unique_uses_today: "%{count} posting today"
     title: Administration
     warning_presets:
       add_new: Add new
@@ -499,6 +506,9 @@ en:
       body: "%{reporter} has reported %{target}"
       body_remote: Someone from %{domain} has reported %{target}
       subject: New report for %{instance} (#%{id})
+    new_trending_tag:
+      body: 'The hashtag #%{name} is trending today, but has not been previously reviewed. It will not be displayed publicly unless you allow it to, or just save the form as it is to never hear about it again.'
+      subject: New hashtag up for review on %{instance} (#%{name})
   appearance:
     advanced_web_interface: Advanced web interface
     advanced_web_interface_hint: 'If you want to make use of your entire screen width, the advanced web interface allows you to configure many different columns to see as much information at the same time as you want: Home, notifications, federated timeline, any number of lists and hashtags.'
@@ -524,7 +534,7 @@ en:
     apply_for_account: Request an invite
     change_password: Password
     checkbox_agreement_html: I agree to the <a href="%{rules_path}" target="_blank">server rules</a> and <a href="%{terms_path}" target="_blank">terms of service</a>
-    confirm_email: Confirm email
+    checkbox_agreement_without_rules_html: I agree to the <a href="%{terms_path}" target="_blank">terms of service</a>
     delete_account: Delete account
     delete_account_html: If you wish to delete your account, you can <a href="%{path}">proceed here</a>. You will be asked for confirmation.
     didnt_get_confirmation: Didn't receive confirmation instructions?
@@ -544,6 +554,14 @@ en:
     reset_password: Reset password
     security: Security
     set_new_password: Set new password
+    setup:
+      email_below_hint_html: If the below e-mail address is incorrect, you can change it here and receive a new confirmation e-mail.
+      email_settings_hint_html: The confirmation e-mail was sent to %{email}. If that e-mail address is not correct, you can change it in account settings.
+      title: Setup
+    status:
+      account_status: Account status
+      confirming: Waiting for e-mail confirmation to be completed.
+      pending: Your application is pending review by our staff. This may take some time. You will receive an e-mail if your application is approved.
     trouble_logging_in: Trouble logging in?
   authorize_follow:
     already_following: You are already following this account
@@ -925,6 +943,8 @@ en:
     pinned: Pinned toot
     reblogged: boosted
     sensitive_content: Sensitive content
+  tags:
+    does_not_match_previous_name: does not match the previous name
   terms:
     body_html: |
       <h2>Privacy Policy</h2>

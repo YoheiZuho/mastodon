@@ -9,6 +9,9 @@ class Auth::RegistrationsController < Devise::RegistrationsController
   before_action :set_sessions, only: [:edit, :update]
   before_action :set_instance_presenter, only: [:new, :create, :update]
   before_action :set_body_classes, only: [:new, :create, :edit, :update]
+  before_action :require_not_suspended!, only: [:update]
+
+  skip_before_action :require_functional!, only: [:edit, :update]
 
   def new
     super(&:build_invite_request)
@@ -43,7 +46,7 @@ class Auth::RegistrationsController < Devise::RegistrationsController
   end
 
   def after_sign_up_path_for(_resource)
-    new_user_session_path
+    auth_setup_path
   end
 
   def after_sign_in_path_for(_resource)
@@ -103,33 +106,7 @@ class Auth::RegistrationsController < Devise::RegistrationsController
     @sessions = current_user.session_activations
   end
 
-  def check_recaptcha
-    unless is_human?
-      self.resource = resource_class.new sign_up_params
-      set_instance_presenter
-      resource.validate
-      respond_with_navigational(resource) { render :new }
-    end
-  end
-
-  concerning :RecaptchaFeature do
-    if ENV['RECAPTCHA_ENABLED'] == 'true'
-      def is_human?
-        g_recaptcha_response = params["g-recaptcha-response"]
-        return false unless g_recaptcha_response.present?
-        verify_by_recaptcha g_recaptcha_response
-      end
-      def verify_by_recaptcha(g_recaptcha_response)
-        conn = Faraday.new(url: 'https://www.google.com')
-        res = conn.post '/recaptcha/api/siteverify', {
-            secret: ENV['RECAPTCHA_SECRET_KEY'],
-            response: g_recaptcha_response
-        }
-        j = JSON.parse(res.body)
-        j['success']
-      end
-    else
-      def is_human?; true end
-    end
+  def require_not_suspended!
+    forbidden if current_account.suspended?
   end
 end
