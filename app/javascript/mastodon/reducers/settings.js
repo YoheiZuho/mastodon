@@ -12,10 +12,6 @@ const initialState = ImmutableMap({
 
   skinTone: 1,
 
-  trends: ImmutableMap({
-    show: true,
-  }),
-
   home: ImmutableMap({
     shows: ImmutableMap({
       reblog: true,

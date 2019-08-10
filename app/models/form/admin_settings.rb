@@ -29,7 +29,6 @@ class Form::AdminSettings
     hero
     mascot
     spam_check_enabled
-    trends
   ).freeze
 
   BOOLEAN_KEYS = %i(
@@ -42,7 +41,6 @@ class Form::AdminSettings
     preview_sensitive_media
     profile_directory
     spam_check_enabled
-    trends
   ).freeze
 
   UPLOAD_KEYS = %i(

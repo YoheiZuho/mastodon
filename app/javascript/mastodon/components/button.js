@@ -12,7 +12,6 @@ export default class Button extends React.PureComponent {
     secondary: PropTypes.bool,
     size: PropTypes.number,
     className: PropTypes.string,
-    title: PropTypes.string,
     style: PropTypes.object,
     children: PropTypes.node,
   };
@@ -55,7 +54,6 @@ export default class Button extends React.PureComponent {
         onClick={this.handleClick}
         ref={this.setRef}
         style={style}
-        title={this.props.title}
       >
         {this.props.text || this.props.children}
       </button>

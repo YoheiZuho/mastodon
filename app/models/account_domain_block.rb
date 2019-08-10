@@ -15,7 +15,7 @@ class AccountDomainBlock < ApplicationRecord
   include DomainNormalizable
 
   belongs_to :account
-  validates :domain, presence: true, uniqueness: { scope: :account_id }, domain: true
+  validates :domain, presence: true, uniqueness: { scope: :account_id }
 
   after_commit :remove_blocking_cache
   after_commit :remove_relationship_cache

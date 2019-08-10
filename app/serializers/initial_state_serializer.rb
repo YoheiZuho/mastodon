@@ -20,7 +20,6 @@ class InitialStateSerializer < ActiveModel::Serializer
       invites_enabled: Setting.min_invite_role == 'user',
       mascot: instance_presenter.mascot&.file&.url,
       profile_directory: Setting.profile_directory,
-      trends: Setting.trends,
     }
 
     if object.current_account
@@ -36,7 +35,6 @@ class InitialStateSerializer < ActiveModel::Serializer
       store[:use_blurhash]      = object.current_account.user.setting_use_blurhash
       store[:use_pending_items] = object.current_account.user.setting_use_pending_items
       store[:is_staff]          = object.current_account.user.staff?
-      store[:trends]            = Setting.trends && object.current_account.user.setting_trends
     end
 
     store

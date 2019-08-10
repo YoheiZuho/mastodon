@@ -5,8 +5,6 @@ class TrendingTags
   EXPIRE_HISTORY_AFTER = 7.days.seconds
   EXPIRE_TRENDS_AFTER  = 1.day.seconds
   THRESHOLD            = 5
-  LIMIT                = 10
-  REVIEW_THRESHOLD     = 3
 
   class << self
     include Redisable
@@ -20,18 +18,18 @@ class TrendingTags
     end
 
     def get(limit, filtered: true)
-      tag_ids = redis.zrevrange("#{KEY}:#{Time.now.utc.beginning_of_day.to_i}", 0, LIMIT - 1).map(&:to_i)
+      tag_ids = redis.zrevrange("#{KEY}:#{Time.now.utc.beginning_of_day.to_i}", 0, limit - 1).map(&:to_i)
 
       tags = Tag.where(id: tag_ids)
       tags = tags.where(trendable: true) if filtered
       tags = tags.each_with_object({}) { |tag, h| h[tag.id] = tag }
 
-      tag_ids.map { |tag_id| tags[tag_id] }.compact.take(limit)
+      tag_ids.map { |tag_id| tags[tag_id] }.compact
     end
 
     def trending?(tag)
       rank = redis.zrevrank("#{KEY}:#{Time.now.utc.beginning_of_day.to_i}", tag.id)
-      rank.present? && rank <= LIMIT
+      rank.present? && rank <= 10
     end
 
     private
@@ -74,17 +72,13 @@ class TrendingTags
         old_rank = redis.zrevrank(key, tag.id)
 
         redis.zadd(key, score, tag.id)
-        request_review!(tag) if (old_rank.nil? || old_rank > REVIEW_THRESHOLD) && redis.zrevrank(key, tag.id) <= REVIEW_THRESHOLD && !tag.trendable? && tag.requires_review? && !tag.requested_review?
+        request_review!(tag) if (old_rank.nil? || old_rank > 10) && redis.zrevrank(key, tag.id) <= 10 && !tag.trendable? && tag.requires_review? && !tag.requested_review?
       end
 
       redis.expire(key, EXPIRE_TRENDS_AFTER)
     end
 
     def request_review!(tag)
-      return unless Setting.trends
-
-      tag.touch(:requested_review_at)
-
       User.staff.includes(:account).find_each { |u| AdminMailer.new_trending_tag(u.account, tag).deliver_later! if u.allows_trending_tag_emails? }
     end
   end
