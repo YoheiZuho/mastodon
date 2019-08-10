@@ -22,6 +22,7 @@
 #  application_id         :bigint(8)
 #  in_reply_to_account_id :bigint(8)
 #  poll_id                :bigint(8)
+#  local_only             :boolean
 #
 
 class Status < ApplicationRecord
@@ -50,6 +51,7 @@ class Status < ApplicationRecord
   belongs_to :reblog, foreign_key: 'reblog_of_id', class_name: 'Status', inverse_of: :reblogs, optional: true
 
   has_many :favourites, inverse_of: :status, dependent: :destroy
+  has_many :bookmarks, inverse_of: :status, dependent: :destroy
   has_many :reblogs, foreign_key: 'reblog_of_id', class_name: 'Status', inverse_of: :reblog, dependent: :destroy
   has_many :replies, foreign_key: 'in_reply_to_id', class_name: 'Status', inverse_of: :thread
   has_many :mentions, dependent: :destroy, inverse_of: :status
@@ -294,6 +296,10 @@ class Status < ApplicationRecord
 
     def favourites_map(status_ids, account_id)
       Favourite.select('status_id').where(status_id: status_ids).where(account_id: account_id).each_with_object({}) { |f, h| h[f.status_id] = true }
+    end
+
+    def bookmarks_map(status_ids, account_id)
+      Bookmark.select('status_id').where(status_id: status_ids).where(account_id: account_id).map { |f| [f.status_id, true] }.to_h
     end
 
     def reblogs_map(status_ids, account_id)

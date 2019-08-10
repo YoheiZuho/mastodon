@@ -1056,6 +1056,9 @@ en:
     contrast: Mastodon (High contrast)
     default: Mastodon (Dark)
     mastodon-light: Mastodon (Light)
+    google-plus: Google+
+    google-plus-dev: Google+ Dev
+    dark-google-plus-dev: Dark Google+ Dev
   time:
     formats:
       default: "%b %d, %Y, %H:%M"
