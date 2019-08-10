@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import ImmutablePureComponent from 'react-immutable-pure-component';
-import { me, profile_directory } from '../../initial_state';
+import { me, profile_directory, showTrends } from '../../initial_state';
 import { fetchFollowRequests } from 'mastodon/actions/accounts';
 import { List as ImmutableList } from 'immutable';
 import NavigationBar from '../compose/components/navigation_bar';
@@ -173,6 +173,8 @@ class GettingStarted extends ImmutablePureComponent {
 
           <LinkFooter withHotkeys={multiColumn} />
         </div>
+
+        {multiColumn && showTrends && <TrendsContainer />}
       </Column>
     );
   }

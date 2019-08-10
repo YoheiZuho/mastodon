@@ -3,8 +3,8 @@ import React from 'react';
 import ImmutablePureComponent from 'react-immutable-pure-component';
 import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
+import Hashtag from 'mastodon/components/hashtag';
 import { FormattedMessage, defineMessages } from 'react-intl';
-import Hashtag from '../../../components/hashtag';
 import { Link } from 'react-router-dom';
 
 const messages = defineMessages({
