@@ -1,0 +1,121 @@
+@charset "UTF-8";
+
+@import 'variables';
+@import 'mixins';
+
+
+
+.status {
+	@include status-shadow;
+	@include material-card-radius;
+	border-bottom: 0;
+
+	transition: box-shadow 0.1s 0s ease-out;
+
+	&.light {
+		.status {
+			&__relative-time { color: $primary-lighter1-text-color }
+			&__display-name {
+				color: $primary-text-color;
+
+				.display-name__account { color: $primary-lighter1-text-color }
+			}
+
+			&__content { color: $primary-text-color }
+		}
+	}
+
+	&.status-direct {
+		background: $status-direct-color;
+
+		&:not(.read) {
+			background: inherit;
+			border-bottom-color: initial;
+		}
+	}
+
+	&.muted {
+		.status__content {
+			p { color: lighten($primary-text-color, 20%) }
+		}
+	}
+
+	.status {
+		&__info {
+			.status__display-name {
+				color: $primary-lighter1-text-color;
+	
+				strong { color: $primary-text-color }
+			}
+	
+			.status__relative-time { color: $primary-lighter1-text-color }
+		}
+	}
+
+	&__action-bar__counter__label { color: $primary-lighter1-text-color }
+}
+
+.detailed-status {
+	&__display-name {
+		color: $secondary-text-color;
+
+		strong { color: $primary-text-color }
+	}
+
+	&__meta {
+		.detailed-status__datetime { color: $primary-lighter1-text-color }
+
+		.detailed-status__link {
+			.fa.fa-star { vertical-align: middle }
+		}
+	}
+	
+	&__wrapper {
+		@include status-shadow;
+		
+		.detailed-status { @extend .detailed-status; }
+		.detailed-status__action-bar {
+			background: $status-actionbar-color;
+			border-color: $base-separation-color;
+		}
+	}
+}
+
+.status,
+.detailed-status {
+	background: $status-color;
+
+	.status__content {
+		color: $primary-text-color;
+
+		a { color: $secondary-text-color }
+
+		.status__content__spoiler-link {
+			color: $primary-text-color;
+			background: $base-color;
+		}
+	}
+}
+
+a.status-card,
+a.status-card.compact {
+	&:hover { background: initial }
+}
+
+.status-card,
+.status-card.compact {
+	border-color: $non-elevated-card-boader;
+
+	&__title {
+		color : $primary-text-color;
+	}
+
+	&__host {
+		color: $primary-lighter1-text-color;
+	}
+}
+
+.name-tag,
+a.name-tag {
+	color: $secondary-text-color;
+}

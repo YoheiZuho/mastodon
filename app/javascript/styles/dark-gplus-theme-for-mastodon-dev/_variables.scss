@@ -1,0 +1,98 @@
+@charset "UTF-8";
+
+
+
+// Base colors
+$active-color: #db4437;
+$accent-color: #fbbc04;
+$valid-color: #4285f4;
+$error-color: #d50000;
+$checked-color: #4285f4;
+$verified-color: #4caf50;
+
+
+// Text colors
+$primary-text-color: #ffffff;
+$primary-lighter1-text-color: change-color($color: $primary-text-color, $lightness: 62%, $alpha: 1.0); // ex: 時間表示
+$primary-lighter2-text-color: change-color($color: $primary-text-color, $lightness: 38%, $alpha: 1.0); // ex: 通知メッセージ表示
+$secondary-text-color: #2196F3; // ex: リンク
+$secondary-lighter1-text-color: #00bfff; // ex: アカウントTLのユーザーID
+$light-text-color: #000000;
+$light-darker1-text-color: darken($light-text-color, 15%);
+$active-text-color: $active-color;
+$error-text-color: $error-color;
+
+
+// Icon colors
+$icon-color: #BDBDBD;
+$icon-active-color: $active-color;
+
+
+// Background colors
+$base-color: #212121;
+$base-lighter1-color: #2d2d2d;
+$base-darker1-color: #000000;
+
+$column-header-color: $base-lighter1-color;
+$column-header-hover-color: change-color($color: $column-header-color, $lightness: 10%);
+
+$status-color: $base-lighter1-color;
+$status-direct-color: darken($status-color, 5%);
+$status-actionbar-color: darken($status-color, 2%);
+
+$account-color: $base-lighter1-color;
+$account-foreground-color: $base-darker1-color;
+
+$card-color: $base-lighter1-color;
+$card-hover-color: $column-header-hover-color;
+$card-image-color: $base-color;
+
+$form-color: rgba(0, 0, 0, 0.1);
+$form-focused-color: lighten($form-color, 20%);
+$trend-color: $base-lighter1-color;
+
+$setting-base-color: $base-color;
+$setting-lists-selected-color: darken($base-color, 2%);
+$setting-lists-hover-color: darken($base-color, 5%);
+$setting-content-base-color: $base-lighter1-color;
+
+$setting-toggle-color: #b9b9b9;
+$setting-toggle-checked-color: change-color($color: $checked-color, $alpha: 0.5);
+$setting-toggle-thumb-color: #fafafa;
+$setting-toggle-thumb-checked-color: $checked-color;
+
+$setting-emphasis-color: $verified-color;
+
+$dashboard-counters-base-color: $base-color;
+$dashboard-counters-hover-color: lighten($base-color, 2%);
+
+$log-entry-color: $base-lighter1-color;
+$log-entry-extra-color: $base-color;
+$log-entry-extra--neutral-color: $valid-color;
+$log-entry-extra--old-color: $active-color;
+$log-entry-extra--new-color: $verified-color;
+
+$explore-header-color: lighten($accent-color, 16%);
+$explore-directory-color: $base-lighter1-color;
+
+$active-button-color: $valid-color; //文字入りボタン
+$non-active-button-color: lighten($base-color, 20%);
+
+$floating-acton-button-hover-color: lighten($active-color, 10%);
+
+
+// Shadow colors
+$column-header-shadow-color: rgba(0, 0, 0, 0.3);
+$status-shadow-color: rgba(0, 0, 0, 0.14);
+$status-focused-shadow-color: change-color($color: $status-shadow-color, $alpha: 0.3);
+$icon-hovered-shadow-color: rgba(0, 0, 0, 0.26);
+$account-header-image-shadow-color: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.46));
+$button-shadow-color: rgba(0, 0, 0, 0.4);
+
+
+// Separation colors
+$base-separation-color: rgba(0, 0, 0, 0.14);
+
+
+//Border colors
+$non-elevated-card-boader : #e0e0e0;

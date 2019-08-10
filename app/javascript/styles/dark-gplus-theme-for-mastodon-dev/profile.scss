@@ -1,0 +1,232 @@
+@charset "UTF-8";
+
+@import 'variables';
+@import 'mixins';
+
+
+
+.public-layout {
+	a.button {
+		@include button-shadow;
+
+		color: $primary-text-color;
+		background: $base-lighter1-color;
+
+		&:hover,
+		&:focus,
+		&:active {
+			background: darken($base-lighter1-color, 8%);
+		}
+	}
+
+	.logo-button {
+		svg path {
+			/* Only for Itabashi-don */
+			&:not(#Mastodon):not(#Itabashi) { fill: $secondary-text-color !important }
+			&#Mastodon { fill: $base-lighter1-color !important }
+		}
+	}
+
+	.public-account-header {
+		@include status-shadow;
+
+		&__image {
+			background: $base-lighter1-color;
+
+			@media screen and (min-width: 600px) { height: 500px }
+
+			&::after {
+				content: "";
+				
+				position: absolute;
+				top: auto;
+				left: 0;
+				bottom: 0;
+
+				width: 100%;
+				height: 30%;
+				background: $account-header-image-shadow-color;
+				box-shadow: none;
+			}
+
+			> img:not([src]),
+			> img[src="/headers/original/missing.png"] {
+				content: url("https://raw.githubusercontent.com/GenbuProject/GPlusTheme-for-Mastodon/asset/account-default_header.jpg");
+			}
+		}
+
+		&__bar {
+			@media screen and (max-width: 600px) {
+				flex-direction: column;
+				background: $base-color;
+			}
+			
+			@media screen and (min-width: 600px) { margin-top: -140px }
+
+			&::before { background: $base-lighter1-color }
+
+			.avatar {
+				@media screen and (max-width: 600px) {
+					position: relative;
+					bottom: 30px;
+
+					display: initial;
+					width: 60px;
+					height: 60px;
+					margin: 0 auto;
+					padding: 0;
+				}
+
+				img {
+					border: 2px solid $base-lighter1-color;
+					border-radius: 50%;
+					background: transparent;
+				}
+			}
+		}
+
+		&__tabs {
+			@media screen and (max-width: 600px) {
+				flex-wrap: wrap;
+				margin-left: 0;
+
+				&__name {
+					width: 100%;
+					text-align: center;
+
+					h1 {
+						color: $primary-text-color;
+
+						small { color: $primary-lighter1-text-color }
+					}
+				}
+
+				&__tabs {
+					justify-content: center;
+					flex: auto;
+
+					.spacer { display: none }
+
+					a.button.logo-button {
+						color: $light-text-color;
+						background: $secondary-text-color;
+
+						svg path {
+							/* Only for Itabashi-don */
+							&:not(#Mastodon):not(#Itabashi) { fill: $base-lighter1-color !important }
+							&#Mastodon { fill: $secondary-text-color !important }
+						}
+					}
+				}
+			}
+
+			.details-counters {
+				.counter {
+					color: $light-text-color;
+					border-right: 0;
+
+					&::after { border-bottom-color: $base-color }
+
+					&.active {
+						&::after { border-bottom-color: $active-color }
+					}
+				}
+			}
+		}
+
+		&__extra {
+			.public-account-bio {
+				.account__header__content { text-align: center }
+			}
+
+			&__links {
+				color: $primary-text-color;
+
+				a {
+					&, strong { color: $primary-text-color }
+				}
+			}
+		}
+	}
+
+	.public-account-bio,
+	.endorsements-widget,
+	.hero-widget { @include status-shadow; }
+
+	.public-account-bio {
+		background: $base-lighter1-color;
+		
+		.account__header__content { color: $primary-text-color }
+		&__extra { color: $primary-lighter1-text-color }
+	}
+
+	.endorsements-widget {
+		padding-bottom: 0;
+		border-radius: 4px;
+
+		h4 {
+			color: $primary-lighter1-text-color;
+			background: $base-lighter1-color;
+		}
+	}
+
+	.hero-widget {
+		&__img { background: $base-color }
+		&__text {
+			background: $base-lighter1-color;
+
+			&, em { color: $primary-lighter2-text-color }
+			a { color: $secondary-text-color }
+		}
+	}
+
+	.account__section-headline {
+		background: $base-lighter1-color;
+		border-bottom-color: $base-separation-color;
+
+		a {
+			color: $primary-lighter1-text-color;
+
+			&.active {
+				color: $primary-lighter2-text-color;
+
+				&::before { border-color: transparent transparent $base-separation-color }
+				&::after { border-color: transparent transparent $status-color }
+			}
+		}
+	}
+
+	.activity-stream {
+		box-shadow: none;
+
+		.entry {
+			margin: 1em 0;
+			background: transparent;
+
+			&:first-of-type { margin: 0 }
+		}
+	}
+
+	.nothing-here {
+		@include status-shadow;
+
+		color: $primary-lighter1-text-color;
+		background: $base-lighter1-color;
+	}
+
+	.footer {
+		h4 { color: $primary-lighter1-text-color }
+
+		ul {
+			a { color: $primary-lighter2-text-color }
+		}
+
+		.brand {
+			svg path {
+				/* Only for Itabashi-don */
+				&:not(#Mastodon):not(#Itabashi) { fill: $secondary-text-color !important }
+				&#Mastodon { fill: $base-lighter1-color !important }
+			}
+		}
+	}
+}

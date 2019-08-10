@@ -1,0 +1,55 @@
+@charset "UTF-8";
+
+@import 'variables';
+
+
+
+.column {
+	.column-back-button { background: inherit }
+
+	.column-inline-form {
+		background: $column-header-color;
+
+		label input {
+			color: $secondary-text-color;
+			&:focus { color: $primary-text-color }
+		}
+	}
+
+	.column-inline-form ~ .scrollable {
+		article { margin: 0 }
+	}
+}
+
+.modal-root {
+	.column-inline-form {
+		background: $column-header-color;
+		
+		.setting-text {
+			color: $primary-text-color;
+			&:active, &:focus { color: $primary-lighter2-text-color }
+		}
+	}
+
+	.list-editor {
+		background: $base-color;
+		h4 { background: $column-header-color }
+
+		.drawer__pager {
+			.drawer__inner { background: $column-header-color }
+		}
+	}
+
+	.list-adder {
+		background: $base-color;
+
+		.column-inline-form { border-bottom: 1px solid $base-separation-color }
+
+		&__account,
+		&__lists { background: $column-header-color }
+
+		&__lists {
+			.list { border-color: $base-separation-color }
+		}
+	}
+}

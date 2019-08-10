@@ -1,0 +1,263 @@
+@charset "UTF-8";
+
+@import 'variables';
+@import 'mixins';
+
+
+
+.tabs-bar {
+	@include column-shadow;
+	margin: 0;
+	background: $column-header-color;
+
+	.tabs-bar {
+		&__link {
+			color: $icon-color;
+			border-bottom: 4px solid $column-header-color;
+			padding: 15px 10px 11px 10px;
+			
+			&.active {
+				border-bottom: 4px solid $active-color;
+			}
+
+			.fa {
+				@include material-icon-large;
+				vertical-align: top;
+			}
+		}
+	}
+}
+
+.drawer {
+	.drawer {
+		&__header {
+			@include column-shadow;
+			background: $column-header-color;
+	
+			.drawer__tab {
+				@include material-icon-large;
+				color: $icon-color;
+			}
+	
+			a {
+				&:hover { background: $column-header-hover-color }
+			}
+		}
+	
+		&__pager {
+			@include status-shadow;
+			@include material-card-radius;
+			
+			.drawer__inner {
+				background: $column-header-color;
+		
+				&__mastodon { display: none }
+			}
+		}
+	}
+}
+
+.navigation-bar {
+	color: $secondary-text-color;
+	background: $column-header-color;
+
+	.navigation-bar {
+		&__profile {
+			strong { color: $primary-text-color }
+			&-edit { color: $secondary-text-color }
+		}
+	}
+}
+
+
+.compose-form {
+	.compose-form {
+		&__buttons-wrapper {
+			background: $column-header-color;
+
+			&.character-counter__wrapper {
+				.character-counter { color: $primary-lighter1-text-color }
+			}
+		}
+
+		&__publish { border-top: 1px solid $base-separation-color }
+		&__publish-button-wrapper { @include button-shadow }
+		&__modifiers { background-color: $base-lighter1-color }
+	}
+
+	.autosuggest-textarea__textarea {
+		background-color: $base-lighter1-color;
+		color: $primary-text-color;
+	}
+
+	.character-counter {
+		color: $icon-color
+	}
+}
+
+.column {
+	.column-header {
+		@include column-shadow;
+		background: $column-header-color;
+
+		&.active {
+			.column-header__icon {
+				color: $icon-active-color;
+				text-shadow: 0 0 10px change-color($color: $icon-active-color, $alpha: 0.4);
+			}
+		}
+
+		* { background: inherit }
+
+		&__icon {
+			@include material-icon-large;
+			color: $icon-color;
+			vertical-align: bottom;
+			margin-right: 10px;
+		}
+
+		&__buttons {
+			height: 50px;
+
+			.column-header {
+				&__back-button {
+					.column-back-button__icon { vertical-align: unset }
+				}
+	
+				&__button {
+					&.active {
+						color: $icon-active-color;
+						background: inherit;
+					}
+		
+					.fa { vertical-align: unset }
+				}
+			}
+		}
+
+		&__button {
+			color: $icon-color;
+			padding: 0 16px;
+		}
+
+		&__collapsible {
+			color: $secondary-text-color;
+			border-bottom: 1px solid $base-separation-color;
+	
+			&-inner { background: $column-header-color }
+		}
+	}
+
+	.column-back-button {
+		&__icon {
+			@include material-icon-large;
+			vertical-align: bottom;
+			margin-right: 8px;
+		}
+	}
+
+	.column {
+		&-subheading,
+		&-link__badge { background: darken($base-color, 10%) }
+	
+		&-link {
+			color: $primary-text-color;
+			background: $base-color;
+	
+			&__icon {
+				@include material-icon-large;
+				color: $icon-color;
+				vertical-align: bottom;
+				margin-right: 8px;
+			}
+		}
+	}
+
+	.scrollable {
+		background: transparent;
+
+		*[role="feed"] {
+			article {
+				margin: 1em 0;
+				&:first-of-type { margin: 0 }
+
+				&:focus { outline: none }
+			}
+		}
+
+		div[tabindex="-1"] { margin-bottom: 1em }
+	}
+
+	.notification__filter-bar {
+		background: $column-header-color;
+		border-bottom-color: $base-separation-color;
+
+		button {
+			color: $icon-color;
+			background: $column-header-color;
+
+			&.active {
+				color: $icon-active-color;
+
+				&::before { border-color: transparent transparent $base-separation-color }
+				&::after { border-color: transparent transparent $column-header-color }
+			}
+		}
+	}
+
+	.empty-column-indicator {
+		flex-direction: column;
+		background: $base-color;
+
+		&::before {
+			content: "";
+			display: block;
+
+			width: 100px;
+			height: 100px;
+			margin-bottom: 1em;
+
+			background: none center / contain no-repeat;
+			background-image: url("https://raw.githubusercontent.com/GenbuProject/GPlusTheme-for-Mastodon/asset/notification-jingle_2x.gif");
+		}
+	}
+}
+
+.getting-started {
+	&__wrapper,
+	& {
+		background: $base-color;
+	}
+
+	& {
+		border-top: 1px solid $base-separation-color;
+
+		a { color: $primary-text-color }
+	}
+}
+
+.load {
+	&-more,
+	&-gap {
+		background: transparent;
+
+		&:hover { background: darken($column-header-color, 10%) }
+	}
+
+	&-gap { border: 0 }
+}
+
+.confirmation-modal {
+	@include material-card-radius;
+	color: $primary-text-color;
+	background-color: $base-lighter1-color;
+
+	&__action-bar {
+		background-color: $base-lighter1-color;
+	}
+
+	&__cancel-button {
+		color: $primary-lighter1-text-color;
+		box-shadow: 0 2px 5px 0 transparent;
+	}
+}

@@ -96,6 +96,8 @@ gem 'json-ld', git: 'https://github.com/ruby-rdf/json-ld.git', ref: '345b7a57333
 gem 'json-ld-preloaded', '~> 3.0'
 gem 'rdf-normalize', '~> 0.3'
 
+gem 'redcarpet', "~> 3.4.0" 
+
 group :development, :test do
   gem 'fabrication', '~> 2.20'
   gem 'fuubar', '~> 2.4'

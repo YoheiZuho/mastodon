@@ -1,0 +1,54 @@
+@charset "UTF-8";
+
+@import 'variables';
+
+
+
+.edit_account {
+	@media screen and (min-width: 415px) {
+		.card {
+			> a {
+				position: relative;
+
+				.card__img {
+					border-bottom: 1px solid $base-separation-color;
+
+					> img:not([src]),
+					> img[src="/headers/original/missing.png"] {
+						content: url("https://raw.githubusercontent.com/GenbuProject/GPlusTheme-for-Mastodon/asset/account-default_header.jpg");
+					}
+				}
+				
+				.card__bar {
+					position: static;
+					padding-top: 30%;
+			
+					.avatar {
+						position: absolute;
+						left: 0;
+						bottom: 0;
+
+						display: flex;
+						justify-content: center;
+						align-items: center;
+						width: 100%;
+						height: 100%;
+
+						img {
+							width: 128px;
+							height: 128px;
+
+							border-radius: 50%;
+						}
+					}
+			
+					.display-name {
+						flex: auto;
+						margin-left: 0;
+						text-align: center;
+					}
+				}
+			}
+		}
+	}
+}
