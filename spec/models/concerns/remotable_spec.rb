@@ -29,7 +29,10 @@ RSpec.describe Remotable do
 
   context 'Remotable module is included' do
     before do
-      class Foo; include Remotable; end
+      class Foo
+        include Remotable
+        remotable_attachment :hoge, 1.kilobyte
+      end
     end
 
     let(:attribute_name) { "#{hoge}_remote_url".to_sym }
@@ -85,7 +88,18 @@ RSpec.describe Remotable do
 
       context 'parsed_url.host is empty' do
         it 'makes no request' do
-          parsed_url = double(scheme: 'https', host: double(empty?: true))
+          parsed_url = double(scheme: 'https', host: double(blank?: true))
+          allow(Addressable::URI).to receive_message_chain(:parse, :normalize)
+            .with(url).with(no_args).and_return(parsed_url)
+
+          foo.hoge_remote_url = url
+          expect(request).not_to have_been_requested
+        end
+      end
+
+      context 'parsed_url.host is nil' do
+        it 'makes no request' do
+          parsed_url = Addressable::URI.parse('https:https://example.com/path/file.png')
           allow(Addressable::URI).to receive_message_chain(:parse, :normalize)
             .with(url).with(no_args).and_return(parsed_url)
 

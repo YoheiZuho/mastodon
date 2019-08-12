@@ -3,11 +3,15 @@ import { ScrollContainer } from 'react-router-scroll-4';
 import PropTypes from 'prop-types';
 import IntersectionObserverArticleContainer from '../containers/intersection_observer_article_container';
 import LoadMore from './load_more';
+import LoadPending from './load_pending';
 import IntersectionObserverWrapper from '../features/ui/util/intersection_observer_wrapper';
 import { throttle } from 'lodash';
 import { List as ImmutableList } from 'immutable';
 import classNames from 'classnames';
 import { attachFullscreenListener, detachFullscreenListener, isFullscreen } from '../features/ui/util/fullscreen';
+import LoadingIndicator from './loading_indicator';
+
+const MOUSE_IDLE_DELAY = 300;
 
 export default class ScrollableList extends PureComponent {
 
@@ -17,16 +21,21 @@ export default class ScrollableList extends PureComponent {
 
   static propTypes = {
     scrollKey: PropTypes.string.isRequired,
-    onScrollToBottom: PropTypes.func,
+    onLoadMore: PropTypes.func,
+    onLoadPending: PropTypes.func,
     onScrollToTop: PropTypes.func,
     onScroll: PropTypes.func,
     trackScroll: PropTypes.bool,
     shouldUpdateScroll: PropTypes.func,
     isLoading: PropTypes.bool,
+    showLoading: PropTypes.bool,
     hasMore: PropTypes.bool,
+    numPending: PropTypes.number,
     prepend: PropTypes.node,
+    alwaysPrepend: PropTypes.bool,
     emptyMessage: PropTypes.node,
     children: PropTypes.node,
+    bindToDocument: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -34,65 +43,159 @@ export default class ScrollableList extends PureComponent {
   };
 
   state = {
-    lastMouseMove: null,
+    fullscreen: null,
+    cachedMediaWidth: 250, // Default media/card width using default Mastodon theme
   };
 
   intersectionObserverWrapper = new IntersectionObserverWrapper();
 
   handleScroll = throttle(() => {
     if (this.node) {
-      const { scrollTop, scrollHeight, clientHeight } = this.node;
+      const scrollTop = this.getScrollTop();
+      const scrollHeight = this.getScrollHeight();
+      const clientHeight = this.getClientHeight();
       const offset = scrollHeight - scrollTop - clientHeight;
-      this._oldScrollPosition = scrollHeight - scrollTop;
 
-      if (400 > offset && this.props.onScrollToBottom && !this.props.isLoading) {
-        this.props.onScrollToBottom();
-      } else if (scrollTop < 100 && this.props.onScrollToTop) {
+      if (400 > offset && this.props.onLoadMore && this.props.hasMore && !this.props.isLoading) {
+        this.props.onLoadMore();
+      }
+
+      if (scrollTop < 100 && this.props.onScrollToTop) {
         this.props.onScrollToTop();
       } else if (this.props.onScroll) {
         this.props.onScroll();
       }
+
+      if (!this.lastScrollWasSynthetic) {
+        // If the last scroll wasn't caused by setScrollTop(), assume it was
+        // intentional and cancel any pending scroll reset on mouse idle
+        this.scrollToTopOnMouseIdle = false;
+      }
+      this.lastScrollWasSynthetic = false;
     }
   }, 150, {
     trailing: true,
   });
 
-  handleMouseMove = throttle(() => {
-    this._lastMouseMove = new Date();
-  }, 300);
+  mouseIdleTimer = null;
+  mouseMovedRecently = false;
+  lastScrollWasSynthetic = false;
+  scrollToTopOnMouseIdle = false;
 
-  handleMouseLeave = () => {
-    this._lastMouseMove = null;
+  setScrollTop = newScrollTop => {
+    if (this.getScrollTop() !== newScrollTop) {
+      this.lastScrollWasSynthetic = true;
+
+      if (this.props.bindToDocument) {
+        document.scrollingElement.scrollTop = newScrollTop;
+      } else {
+        this.node.scrollTop = newScrollTop;
+      }
+    }
+  };
+
+  clearMouseIdleTimer = () => {
+    if (this.mouseIdleTimer === null) {
+      return;
+    }
+
+    clearTimeout(this.mouseIdleTimer);
+    this.mouseIdleTimer = null;
+  };
+
+  handleMouseMove = throttle(() => {
+    // As long as the mouse keeps moving, clear and restart the idle timer.
+    this.clearMouseIdleTimer();
+    this.mouseIdleTimer = setTimeout(this.handleMouseIdle, MOUSE_IDLE_DELAY);
+
+    if (!this.mouseMovedRecently && this.getScrollTop() === 0) {
+      // Only set if we just started moving and are scrolled to the top.
+      this.scrollToTopOnMouseIdle = true;
+    }
+
+    // Save setting this flag for last, so we can do the comparison above.
+    this.mouseMovedRecently = true;
+  }, MOUSE_IDLE_DELAY / 2);
+
+  handleWheel = throttle(() => {
+    this.scrollToTopOnMouseIdle = false;
+  }, 150, {
+    trailing: true,
+  });
+
+  handleMouseIdle = () => {
+    if (this.scrollToTopOnMouseIdle) {
+      this.setScrollTop(0);
+    }
+
+    this.mouseMovedRecently = false;
+    this.scrollToTopOnMouseIdle = false;
   }
 
   componentDidMount () {
     this.attachScrollListener();
     this.attachIntersectionObserver();
+
     attachFullscreenListener(this.onFullScreenChange);
 
     // Handle initial scroll posiiton
     this.handleScroll();
   }
 
-  componentDidUpdate (prevProps) {
+  getScrollPosition = () => {
+    if (this.node && (this.getScrollTop() > 0 || this.mouseMovedRecently)) {
+      return { height: this.getScrollHeight(), top: this.getScrollTop() };
+    } else {
+      return null;
+    }
+  }
+
+  getScrollTop = () => {
+    return this.props.bindToDocument ? document.scrollingElement.scrollTop : this.node.scrollTop;
+  }
+
+  getScrollHeight = () => {
+    return this.props.bindToDocument ? document.scrollingElement.scrollHeight : this.node.scrollHeight;
+  }
+
+  getClientHeight = () => {
+    return this.props.bindToDocument ? document.scrollingElement.clientHeight : this.node.clientHeight;
+  }
+
+  updateScrollBottom = (snapshot) => {
+    const newScrollTop = this.getScrollHeight() - snapshot;
+
+    this.setScrollTop(newScrollTop);
+  }
+
+  getSnapshotBeforeUpdate (prevProps) {
     const someItemInserted = React.Children.count(prevProps.children) > 0 &&
       React.Children.count(prevProps.children) < React.Children.count(this.props.children) &&
       this.getFirstChildKey(prevProps) !== this.getFirstChildKey(this.props);
 
+    if (someItemInserted && (this.getScrollTop() > 0 || this.mouseMovedRecently)) {
+      return this.getScrollHeight() - this.getScrollTop();
+    } else {
+      return null;
+    }
+  }
+
+  componentDidUpdate (prevProps, prevState, snapshot) {
     // Reset the scroll position when a new child comes in in order not to
     // jerk the scrollbar around if you're already scrolled down the page.
-    if (someItemInserted && this._oldScrollPosition && this.node.scrollTop > 0) {
-      const newScrollTop = this.node.scrollHeight - this._oldScrollPosition;
+    if (snapshot !== null) {
+      this.setScrollTop(this.getScrollHeight() - snapshot);
+    }
+  }
 
-      if (this.node.scrollTop !== newScrollTop) {
-        this.node.scrollTop = newScrollTop;
-      }
-    } else {
-      this._oldScrollPosition = this.node.scrollHeight - this.node.scrollTop;
+  cacheMediaWidth = (width) => {
+    if (width && this.state.cachedMediaWidth !== width) {
+      this.setState({ cachedMediaWidth: width });
     }
   }
 
   componentWillUnmount () {
+    this.clearMouseIdleTimer();
     this.detachScrollListener();
     this.detachIntersectionObserver();
     detachFullscreenListener(this.onFullScreenChange);
@@ -114,21 +217,35 @@ export default class ScrollableList extends PureComponent {
   }
 
   attachScrollListener () {
-    this.node.addEventListener('scroll', this.handleScroll);
+    if (this.props.bindToDocument) {
+      document.addEventListener('scroll', this.handleScroll);
+      document.addEventListener('wheel', this.handleWheel);
+    } else {
+      this.node.addEventListener('scroll', this.handleScroll);
+      this.node.addEventListener('wheel', this.handleWheel);
+    }
   }
 
   detachScrollListener () {
-    this.node.removeEventListener('scroll', this.handleScroll);
+    if (this.props.bindToDocument) {
+      document.removeEventListener('scroll', this.handleScroll);
+      document.removeEventListener('wheel', this.handleWheel);
+    } else {
+      this.node.removeEventListener('scroll', this.handleScroll);
+      this.node.removeEventListener('wheel', this.handleWheel);
+    }
   }
 
   getFirstChildKey (props) {
     const { children } = props;
-    let firstChild = children;
+    let firstChild     = children;
+
     if (children instanceof ImmutableList) {
       firstChild = children.get(0);
     } else if (Array.isArray(children)) {
       firstChild = children[0];
     }
+
     return firstChild && firstChild.key;
   }
 
@@ -136,28 +253,44 @@ export default class ScrollableList extends PureComponent {
     this.node = c;
   }
 
-  handleLoadMore = (e) => {
+  handleLoadMore = e => {
     e.preventDefault();
-    this.props.onScrollToBottom();
+    this.props.onLoadMore();
   }
 
-  _recentlyMoved () {
-    return this._lastMouseMove !== null && ((new Date()) - this._lastMouseMove < 600);
+  handleLoadPending = e => {
+    e.preventDefault();
+    this.props.onLoadPending();
   }
 
   render () {
-    const { children, scrollKey, trackScroll, shouldUpdateScroll, isLoading, hasMore, prepend, emptyMessage } = this.props;
+    const { children, scrollKey, trackScroll, shouldUpdateScroll, showLoading, isLoading, hasMore, numPending, prepend, alwaysPrepend, emptyMessage, onLoadMore } = this.props;
     const { fullscreen } = this.state;
     const childrenCount = React.Children.count(children);
 
-    const loadMore     = (hasMore && childrenCount > 0) ? <LoadMore visible={!isLoading} onClick={this.handleLoadMore} /> : null;
+    const loadMore     = (hasMore && onLoadMore) ? <LoadMore visible={!isLoading} onClick={this.handleLoadMore} /> : null;
+    const loadPending  = (numPending > 0) ? <LoadPending count={numPending} onClick={this.handleLoadPending} /> : null;
     let scrollableArea = null;
 
-    if (isLoading || childrenCount > 0 || !emptyMessage) {
+    if (showLoading) {
       scrollableArea = (
-        <div className={classNames('scrollable', { fullscreen })} ref={this.setRef} onMouseMove={this.handleMouseMove} onMouseLeave={this.handleMouseLeave}>
+        <div className='scrollable scrollable--flex' ref={this.setRef}>
           <div role='feed' className='item-list'>
             {prepend}
+          </div>
+
+          <div className='scrollable__append'>
+            <LoadingIndicator />
+          </div>
+        </div>
+      );
+    } else if (isLoading || childrenCount > 0 || hasMore || !emptyMessage) {
+      scrollableArea = (
+        <div className={classNames('scrollable', { fullscreen })} ref={this.setRef} onMouseMove={this.handleMouseMove}>
+          <div role='feed' className='item-list'>
+            {prepend}
+
+            {loadPending}
 
             {React.Children.map(this.props.children, (child, index) => (
               <IntersectionObserverArticleContainer
@@ -168,7 +301,12 @@ export default class ScrollableList extends PureComponent {
                 intersectionObserverWrapper={this.intersectionObserverWrapper}
                 saveHeightKey={trackScroll ? `${this.context.router.route.location.key}:${scrollKey}` : null}
               >
-                {child}
+                {React.cloneElement(child, {
+                  getScrollPosition: this.getScrollPosition,
+                  updateScrollBottom: this.updateScrollBottom,
+                  cachedMediaWidth: this.state.cachedMediaWidth,
+                  cacheMediaWidth: this.cacheMediaWidth,
+                })}
               </IntersectionObserverArticleContainer>
             ))}
 
@@ -178,8 +316,12 @@ export default class ScrollableList extends PureComponent {
       );
     } else {
       scrollableArea = (
-        <div className='empty-column-indicator' ref={this.setRef}>
-          {emptyMessage}
+        <div className={classNames('scrollable scrollable--flex', { fullscreen })} ref={this.setRef}>
+          {alwaysPrepend && prepend}
+
+          <div className='empty-column-indicator'>
+            {emptyMessage}
+          </div>
         </div>
       );
     }

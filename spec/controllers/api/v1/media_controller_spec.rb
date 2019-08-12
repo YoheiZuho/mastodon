@@ -4,7 +4,7 @@ RSpec.describe Api::V1::MediaController, type: :controller do
   render_views
 
   let(:user)  { Fabricate(:user, account: Fabricate(:account, username: 'alice')) }
-  let(:token) { Fabricate(:accessible_access_token, resource_owner_id: user.id, scopes: 'write') }
+  let(:token) { Fabricate(:accessible_access_token, resource_owner_id: user.id, scopes: 'write:media') }
 
   before do
     allow(controller).to receive(:doorkeeper_token) { token }
@@ -30,7 +30,7 @@ RSpec.describe Api::V1::MediaController, type: :controller do
         end
 
         it 'returns http 422' do
-          expect(response).to have_http_status(:error)
+          expect(response).to have_http_status(500)
         end
       end
     end
@@ -41,7 +41,7 @@ RSpec.describe Api::V1::MediaController, type: :controller do
       end
 
       it 'returns http success' do
-        expect(response).to have_http_status(:success)
+        expect(response).to have_http_status(200)
       end
 
       it 'creates a media attachment' do
@@ -63,7 +63,7 @@ RSpec.describe Api::V1::MediaController, type: :controller do
       end
 
       it 'returns http success' do
-        expect(response).to have_http_status(:success)
+        expect(response).to have_http_status(200)
       end
 
       it 'creates a media attachment' do
@@ -84,19 +84,17 @@ RSpec.describe Api::V1::MediaController, type: :controller do
         post :create, params: { file: fixture_file_upload('files/attachment.webm', 'video/webm') }
       end
 
-      xit 'returns http success' do
-        expect(response).to have_http_status(:success)
-      end
+      it do
+        # returns http success
+        expect(response).to have_http_status(200)
 
-      xit 'creates a media attachment' do
+        # creates a media attachment
         expect(MediaAttachment.first).to_not be_nil
-      end
 
-      xit 'uploads a file' do
+        # uploads a file
         expect(MediaAttachment.first).to have_attached_file(:file)
-      end
 
-      xit 'returns media ID in JSON' do
+        # returns media ID in JSON
         expect(body_as_json[:id]).to eq MediaAttachment.first.id.to_s
       end
     end

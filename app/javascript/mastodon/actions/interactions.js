@@ -1,4 +1,5 @@
 import api from '../api';
+import { importFetchedAccounts, importFetchedStatus } from './importer';
 
 export const REBLOG_REQUEST = 'REBLOG_REQUEST';
 export const REBLOG_SUCCESS = 'REBLOG_SUCCESS';
@@ -32,6 +33,14 @@ export const UNPIN_REQUEST = 'UNPIN_REQUEST';
 export const UNPIN_SUCCESS = 'UNPIN_SUCCESS';
 export const UNPIN_FAIL    = 'UNPIN_FAIL';
 
+export const BOOKMARK_REQUEST = 'BOOKMARK_REQUEST';
+export const BOOKMARK_SUCCESS = 'BOOKMARKED_SUCCESS';
+export const BOOKMARK_FAIL    = 'BOOKMARKED_FAIL';
+
+export const UNBOOKMARK_REQUEST = 'UNBOOKMARKED_REQUEST';
+export const UNBOOKMARK_SUCCESS = 'UNBOOKMARKED_SUCCESS';
+export const UNBOOKMARK_FAIL    = 'UNBOOKMARKED_FAIL';
+
 export function reblog(status) {
   return function (dispatch, getState) {
     dispatch(reblogRequest(status));
@@ -39,7 +48,8 @@ export function reblog(status) {
     api(getState).post(`/api/v1/statuses/${status.get('id')}/reblog`).then(function (response) {
       // The reblog API method returns a new status wrapped around the original. In this case we are only
       // interested in how the original is modified, hence passing it skipping the wrapper
-      dispatch(reblogSuccess(status, response.data.reblog));
+      dispatch(importFetchedStatus(response.data.reblog));
+      dispatch(reblogSuccess(status));
     }).catch(function (error) {
       dispatch(reblogFail(status, error));
     });
@@ -51,7 +61,8 @@ export function unreblog(status) {
     dispatch(unreblogRequest(status));
 
     api(getState).post(`/api/v1/statuses/${status.get('id')}/unreblog`).then(response => {
-      dispatch(unreblogSuccess(status, response.data));
+      dispatch(importFetchedStatus(response.data));
+      dispatch(unreblogSuccess(status));
     }).catch(error => {
       dispatch(unreblogFail(status, error));
     });
@@ -62,14 +73,15 @@ export function reblogRequest(status) {
   return {
     type: REBLOG_REQUEST,
     status: status,
+    skipLoading: true,
   };
 };
 
-export function reblogSuccess(status, response) {
+export function reblogSuccess(status) {
   return {
     type: REBLOG_SUCCESS,
     status: status,
-    response: response,
+    skipLoading: true,
   };
 };
 
@@ -78,6 +90,7 @@ export function reblogFail(status, error) {
     type: REBLOG_FAIL,
     status: status,
     error: error,
+    skipLoading: true,
   };
 };
 
@@ -85,14 +98,15 @@ export function unreblogRequest(status) {
   return {
     type: UNREBLOG_REQUEST,
     status: status,
+    skipLoading: true,
   };
 };
 
-export function unreblogSuccess(status, response) {
+export function unreblogSuccess(status) {
   return {
     type: UNREBLOG_SUCCESS,
     status: status,
-    response: response,
+    skipLoading: true,
   };
 };
 
@@ -101,6 +115,7 @@ export function unreblogFail(status, error) {
     type: UNREBLOG_FAIL,
     status: status,
     error: error,
+    skipLoading: true,
   };
 };
 
@@ -109,7 +124,8 @@ export function favourite(status) {
     dispatch(favouriteRequest(status));
 
     api(getState).post(`/api/v1/statuses/${status.get('id')}/favourite`).then(function (response) {
-      dispatch(favouriteSuccess(status, response.data));
+      dispatch(importFetchedStatus(response.data));
+      dispatch(favouriteSuccess(status));
     }).catch(function (error) {
       dispatch(favouriteFail(status, error));
     });
@@ -121,7 +137,8 @@ export function unfavourite(status) {
     dispatch(unfavouriteRequest(status));
 
     api(getState).post(`/api/v1/statuses/${status.get('id')}/unfavourite`).then(response => {
-      dispatch(unfavouriteSuccess(status, response.data));
+      dispatch(importFetchedStatus(response.data));
+      dispatch(unfavouriteSuccess(status));
     }).catch(error => {
       dispatch(unfavouriteFail(status, error));
     });
@@ -132,14 +149,15 @@ export function favouriteRequest(status) {
   return {
     type: FAVOURITE_REQUEST,
     status: status,
+    skipLoading: true,
   };
 };
 
-export function favouriteSuccess(status, response) {
+export function favouriteSuccess(status) {
   return {
     type: FAVOURITE_SUCCESS,
     status: status,
-    response: response,
+    skipLoading: true,
   };
 };
 
@@ -148,6 +166,7 @@ export function favouriteFail(status, error) {
     type: FAVOURITE_FAIL,
     status: status,
     error: error,
+    skipLoading: true,
   };
 };
 
@@ -155,20 +174,92 @@ export function unfavouriteRequest(status) {
   return {
     type: UNFAVOURITE_REQUEST,
     status: status,
+    skipLoading: true,
   };
 };
 
-export function unfavouriteSuccess(status, response) {
+export function unfavouriteSuccess(status) {
   return {
     type: UNFAVOURITE_SUCCESS,
     status: status,
-    response: response,
+    skipLoading: true,
   };
 };
 
 export function unfavouriteFail(status, error) {
   return {
     type: UNFAVOURITE_FAIL,
+    status: status,
+    error: error,
+    skipLoading: true,
+  };
+};
+
+export function bookmark(status) {
+  return function (dispatch, getState) {
+    dispatch(bookmarkRequest(status));
+
+    api(getState).post(`/api/v1/statuses/${status.get('id')}/bookmark`).then(function (response) {
+      dispatch(bookmarkSuccess(status, response.data));
+    }).catch(function (error) {
+      dispatch(bookmarkFail(status, error));
+    });
+  };
+};
+
+export function unbookmark(status) {
+  return (dispatch, getState) => {
+    dispatch(unbookmarkRequest(status));
+
+    api(getState).post(`/api/v1/statuses/${status.get('id')}/unbookmark`).then(response => {
+      dispatch(unbookmarkSuccess(status, response.data));
+    }).catch(error => {
+      dispatch(unbookmarkFail(status, error));
+    });
+  };
+};
+
+export function bookmarkRequest(status) {
+  return {
+    type: BOOKMARK_REQUEST,
+    status: status,
+  };
+};
+
+export function bookmarkSuccess(status, response) {
+  return {
+    type: BOOKMARK_SUCCESS,
+    status: status,
+    response: response,
+  };
+};
+
+export function bookmarkFail(status, error) {
+  return {
+    type: BOOKMARK_FAIL,
+    status: status,
+    error: error,
+  };
+};
+
+export function unbookmarkRequest(status) {
+  return {
+    type: UNBOOKMARK_REQUEST,
+    status: status,
+  };
+};
+
+export function unbookmarkSuccess(status, response) {
+  return {
+    type: UNBOOKMARK_SUCCESS,
+    status: status,
+    response: response,
+  };
+};
+
+export function unbookmarkFail(status, error) {
+  return {
+    type: UNBOOKMARK_FAIL,
     status: status,
     error: error,
   };
@@ -179,6 +270,7 @@ export function fetchReblogs(id) {
     dispatch(fetchReblogsRequest(id));
 
     api(getState).get(`/api/v1/statuses/${id}/reblogged_by`).then(response => {
+      dispatch(importFetchedAccounts(response.data));
       dispatch(fetchReblogsSuccess(id, response.data));
     }).catch(error => {
       dispatch(fetchReblogsFail(id, error));
@@ -213,6 +305,7 @@ export function fetchFavourites(id) {
     dispatch(fetchFavouritesRequest(id));
 
     api(getState).get(`/api/v1/statuses/${id}/favourited_by`).then(response => {
+      dispatch(importFetchedAccounts(response.data));
       dispatch(fetchFavouritesSuccess(id, response.data));
     }).catch(error => {
       dispatch(fetchFavouritesFail(id, error));
@@ -247,7 +340,8 @@ export function pin(status) {
     dispatch(pinRequest(status));
 
     api(getState).post(`/api/v1/statuses/${status.get('id')}/pin`).then(response => {
-      dispatch(pinSuccess(status, response.data));
+      dispatch(importFetchedStatus(response.data));
+      dispatch(pinSuccess(status));
     }).catch(error => {
       dispatch(pinFail(status, error));
     });
@@ -258,14 +352,15 @@ export function pinRequest(status) {
   return {
     type: PIN_REQUEST,
     status,
+    skipLoading: true,
   };
 };
 
-export function pinSuccess(status, response) {
+export function pinSuccess(status) {
   return {
     type: PIN_SUCCESS,
     status,
-    response,
+    skipLoading: true,
   };
 };
 
@@ -274,6 +369,7 @@ export function pinFail(status, error) {
     type: PIN_FAIL,
     status,
     error,
+    skipLoading: true,
   };
 };
 
@@ -282,7 +378,8 @@ export function unpin (status) {
     dispatch(unpinRequest(status));
 
     api(getState).post(`/api/v1/statuses/${status.get('id')}/unpin`).then(response => {
-      dispatch(unpinSuccess(status, response.data));
+      dispatch(importFetchedStatus(response.data));
+      dispatch(unpinSuccess(status));
     }).catch(error => {
       dispatch(unpinFail(status, error));
     });
@@ -293,14 +390,15 @@ export function unpinRequest(status) {
   return {
     type: UNPIN_REQUEST,
     status,
+    skipLoading: true,
   };
 };
 
-export function unpinSuccess(status, response) {
+export function unpinSuccess(status) {
   return {
     type: UNPIN_SUCCESS,
     status,
-    response,
+    skipLoading: true,
   };
 };
 
@@ -309,5 +407,6 @@ export function unpinFail(status, error) {
     type: UNPIN_FAIL,
     status,
     error,
+    skipLoading: true,
   };
 };

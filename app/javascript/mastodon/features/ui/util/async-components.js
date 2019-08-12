@@ -26,6 +26,10 @@ export function HashtagTimeline () {
   return import(/* webpackChunkName: "features/hashtag_timeline" */'../../hashtag_timeline');
 }
 
+export function DirectTimeline() {
+  return import(/* webpackChunkName: "features/direct_timeline" */'../../direct_timeline');
+}
+
 export function ListTimeline () {
   return import(/* webpackChunkName: "features/list_timeline" */'../../list_timeline');
 }
@@ -86,16 +90,20 @@ export function FavouritedStatuses () {
   return import(/* webpackChunkName: "features/favourited_statuses" */'../../favourited_statuses');
 }
 
+export function BookmarkedStatuses () {
+  return import(/* webpackChunkName: "features/bookmarked_statuses" */'../../bookmarked_statuses');
+}
+
 export function Blocks () {
   return import(/* webpackChunkName: "features/blocks" */'../../blocks');
 }
 
-export function Mutes () {
-  return import(/* webpackChunkName: "features/mutes" */'../../mutes');
+export function DomainBlocks () {
+  return import(/* webpackChunkName: "features/domain_blocks" */'../../domain_blocks');
 }
 
-export function OnboardingModal () {
-  return import(/* webpackChunkName: "modals/onboarding_modal" */'../components/onboarding_modal');
+export function Mutes () {
+  return import(/* webpackChunkName: "features/mutes" */'../../mutes');
 }
 
 export function MuteModal () {
@@ -120,4 +128,12 @@ export function EmbedModal () {
 
 export function ListEditor () {
   return import(/* webpackChunkName: "features/list_editor" */'../../list_editor');
+}
+
+export function ListAdder () {
+  return import(/*webpackChunkName: "features/list_adder" */'../../list_adder');
+}
+
+export function Search () {
+  return import(/*webpackChunkName: "features/search" */'../../search');
 }

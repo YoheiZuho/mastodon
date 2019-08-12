@@ -1,4 +1,6 @@
 import api from '../api';
+import { importFetchedAccounts } from './importer';
+import { showAlertForError } from './alerts';
 
 export const LIST_FETCH_REQUEST = 'LIST_FETCH_REQUEST';
 export const LIST_FETCH_SUCCESS = 'LIST_FETCH_SUCCESS';
@@ -39,6 +41,13 @@ export const LIST_EDITOR_ADD_FAIL    = 'LIST_EDITOR_ADD_FAIL';
 export const LIST_EDITOR_REMOVE_REQUEST = 'LIST_EDITOR_REMOVE_REQUEST';
 export const LIST_EDITOR_REMOVE_SUCCESS = 'LIST_EDITOR_REMOVE_SUCCESS';
 export const LIST_EDITOR_REMOVE_FAIL    = 'LIST_EDITOR_REMOVE_FAIL';
+
+export const LIST_ADDER_RESET = 'LIST_ADDER_RESET';
+export const LIST_ADDER_SETUP = 'LIST_ADDER_SETUP';
+
+export const LIST_ADDER_LISTS_FETCH_REQUEST = 'LIST_ADDER_LISTS_FETCH_REQUEST';
+export const LIST_ADDER_LISTS_FETCH_SUCCESS = 'LIST_ADDER_LISTS_FETCH_SUCCESS';
+export const LIST_ADDER_LISTS_FETCH_FAIL    = 'LIST_ADDER_LISTS_FETCH_FAIL';
 
 export const fetchList = id => (dispatch, getState) => {
   if (getState().getIn(['lists', id])) {
@@ -200,9 +209,10 @@ export const deleteListFail = (id, error) => ({
 export const fetchListAccounts = listId => (dispatch, getState) => {
   dispatch(fetchListAccountsRequest(listId));
 
-  api(getState).get(`/api/v1/lists/${listId}/accounts`, { params: { limit: 0 } })
-    .then(({ data }) => dispatch(fetchListAccountsSuccess(listId, data)))
-    .catch(err => dispatch(fetchListAccountsFail(listId, err)));
+  api(getState).get(`/api/v1/lists/${listId}/accounts`, { params: { limit: 0 } }).then(({ data }) => {
+    dispatch(importFetchedAccounts(data));
+    dispatch(fetchListAccountsSuccess(listId, data));
+  }).catch(err => dispatch(fetchListAccountsFail(listId, err)));
 };
 
 export const fetchListAccountsRequest = id => ({
@@ -231,8 +241,10 @@ export const fetchListSuggestions = q => (dispatch, getState) => {
     following: true,
   };
 
-  api(getState).get('/api/v1/accounts/search', { params })
-    .then(({ data }) => dispatch(fetchListSuggestionsReady(q, data)));
+  api(getState).get('/api/v1/accounts/search', { params }).then(({ data }) => {
+    dispatch(importFetchedAccounts(data));
+    dispatch(fetchListSuggestionsReady(q, data));
+  }).catch(error => dispatch(showAlertForError(error)));
 };
 
 export const fetchListSuggestionsReady = (query, accounts) => ({
@@ -311,3 +323,50 @@ export const removeFromListFail = (listId, accountId, error) => ({
   accountId,
   error,
 });
+
+export const resetListAdder = () => ({
+  type: LIST_ADDER_RESET,
+});
+
+export const setupListAdder = accountId => (dispatch, getState) => {
+  dispatch({
+    type: LIST_ADDER_SETUP,
+    account: getState().getIn(['accounts', accountId]),
+  });
+  dispatch(fetchLists());
+  dispatch(fetchAccountLists(accountId));
+};
+
+export const fetchAccountLists = accountId => (dispatch, getState) => {
+  dispatch(fetchAccountListsRequest(accountId));
+
+  api(getState).get(`/api/v1/accounts/${accountId}/lists`)
+    .then(({ data }) => dispatch(fetchAccountListsSuccess(accountId, data)))
+    .catch(err => dispatch(fetchAccountListsFail(accountId, err)));
+};
+
+export const fetchAccountListsRequest = id => ({
+  type:LIST_ADDER_LISTS_FETCH_REQUEST,
+  id,
+});
+
+export const fetchAccountListsSuccess = (id, lists) => ({
+  type: LIST_ADDER_LISTS_FETCH_SUCCESS,
+  id,
+  lists,
+});
+
+export const fetchAccountListsFail = (id, err) => ({
+  type: LIST_ADDER_LISTS_FETCH_FAIL,
+  id,
+  err,
+});
+
+export const addToListAdder = listId => (dispatch, getState) => {
+  dispatch(addToList(listId, getState().getIn(['listAdder', 'accountId'])));
+};
+
+export const removeFromListAdder = listId => (dispatch, getState) => {
+  dispatch(removeFromList(listId, getState().getIn(['listAdder', 'accountId'])));
+};
+

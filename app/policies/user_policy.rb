@@ -5,6 +5,10 @@ class UserPolicy < ApplicationPolicy
     staff? && !record.staff?
   end
 
+  def change_email?
+    staff? && !record.staff?
+  end
+
   def disable_2fa?
     admin? && !record.staff?
   end
@@ -14,11 +18,19 @@ class UserPolicy < ApplicationPolicy
   end
 
   def enable?
-    admin?
+    staff?
+  end
+
+  def approve?
+    staff? && !record.approved?
+  end
+
+  def reject?
+    staff? && !record.approved?
   end
 
   def disable?
-    admin? && !record.admin?
+    staff? && !record.admin?
   end
 
   def promote?
@@ -32,7 +44,7 @@ class UserPolicy < ApplicationPolicy
   private
 
   def promoteable?
-    !record.staff? || !record.admin?
+    record.approved? && (!record.staff? || !record.admin?)
   end
 
   def demoteable?

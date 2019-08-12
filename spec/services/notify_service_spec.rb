@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe NotifyService do
+RSpec.describe NotifyService, type: :service do
   subject do
     -> { described_class.new.call(recipient, activity) }
   end
@@ -39,12 +39,12 @@ RSpec.describe NotifyService do
   end
 
   it 'does not notify when sender is silenced and not followed' do
-    sender.update(silenced: true)
+    sender.silence!
     is_expected.to_not change(Notification, :count)
   end
 
   it 'does not notify when recipient is suspended' do
-    recipient.update(suspended: true)
+    recipient.suspend!
     is_expected.to_not change(Notification, :count)
   end
 
@@ -62,8 +62,17 @@ RSpec.describe NotifyService do
         is_expected.to_not change(Notification, :count)
       end
 
-      context 'if the message chain initiated by recipient' do
+      context 'if the message chain initiated by recipient, but is not direct message' do
         let(:reply_to) { Fabricate(:status, account: recipient) }
+        let(:activity) { Fabricate(:mention, account: recipient, status: Fabricate(:status, account: sender, visibility: :direct, thread: reply_to)) }
+
+        it 'does not notify' do
+          is_expected.to_not change(Notification, :count)
+        end
+      end
+
+      context 'if the message chain initiated by recipient and is direct message' do
+        let(:reply_to) { Fabricate(:status, account: recipient, visibility: :direct) }
         let(:activity) { Fabricate(:mention, account: recipient, status: Fabricate(:status, account: sender, visibility: :direct, thread: reply_to)) }
 
         it 'does notify' do
@@ -95,9 +104,9 @@ RSpec.describe NotifyService do
       is_expected.to change(Notification, :count)
     end
 
-    it 'hides reblogs when disabled' do
+    it 'shows reblogs when disabled' do
       recipient.follow!(sender, reblogs: false)
-      is_expected.to_not change(Notification, :count)
+      is_expected.to change(Notification, :count)
     end
   end
 

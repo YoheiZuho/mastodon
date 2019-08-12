@@ -1,11 +1,12 @@
-require 'simplecov'
-
 GC.disable
 
-SimpleCov.start 'rails' do
-  add_group 'Services', 'app/services'
-  add_group 'Presenters', 'app/presenters'
-  add_group 'Validators', 'app/validators'
+if ENV['DISABLE_SIMPLECOV'] != 'true'
+  require 'simplecov'
+  SimpleCov.start 'rails' do
+    add_group 'Services', 'app/services'
+    add_group 'Presenters', 'app/presenters'
+    add_group 'Validators', 'app/validators'
+  end
 end
 
 gc_counter = -1
@@ -23,6 +24,11 @@ RSpec.configure do |config|
       example.call
       mocks.verify_partial_doubles = true
     end
+  end
+
+  config.before :suite do
+    Rails.application.load_seed
+    Chewy.strategy(:bypass)
   end
 
   config.after :suite do

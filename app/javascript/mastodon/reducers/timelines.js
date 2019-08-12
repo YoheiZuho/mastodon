@@ -1,15 +1,14 @@
 import {
-  TIMELINE_REFRESH_REQUEST,
-  TIMELINE_REFRESH_SUCCESS,
-  TIMELINE_REFRESH_FAIL,
   TIMELINE_UPDATE,
   TIMELINE_DELETE,
+  TIMELINE_CLEAR,
   TIMELINE_EXPAND_SUCCESS,
   TIMELINE_EXPAND_REQUEST,
   TIMELINE_EXPAND_FAIL,
   TIMELINE_SCROLL_TOP,
   TIMELINE_CONNECT,
   TIMELINE_DISCONNECT,
+  TIMELINE_LOAD_PENDING,
 } from '../actions/timelines';
 import {
   ACCOUNT_BLOCK_SUCCESS,
@@ -17,6 +16,7 @@ import {
   ACCOUNT_UNFOLLOW_SUCCESS,
 } from '../actions/accounts';
 import { Map as ImmutableMap, List as ImmutableList, fromJS } from 'immutable';
+import compareId from '../compare_id';
 
 const initialState = ImmutableMap();
 
@@ -24,38 +24,50 @@ const initialTimeline = ImmutableMap({
   unread: 0,
   online: false,
   top: true,
-  loaded: false,
   isLoading: false,
-  next: false,
+  hasMore: true,
+  pendingItems: ImmutableList(),
   items: ImmutableList(),
 });
 
-const normalizeTimeline = (state, timeline, statuses, next) => {
-  const oldIds    = state.getIn([timeline, 'items'], ImmutableList());
-  const ids       = ImmutableList(statuses.map(status => status.get('id'))).filter(newId => !oldIds.includes(newId));
-  const wasLoaded = state.getIn([timeline, 'loaded']);
-  const hadNext   = state.getIn([timeline, 'next']);
-
+const expandNormalizedTimeline = (state, timeline, statuses, next, isPartial, isLoadingRecent, usePendingItems) => {
   return state.update(timeline, initialTimeline, map => map.withMutations(mMap => {
-    mMap.set('loaded', true);
     mMap.set('isLoading', false);
-    if (!hadNext) mMap.set('next', next);
-    mMap.set('items', wasLoaded ? ids.concat(oldIds) : ids);
+    mMap.set('isPartial', isPartial);
+
+    if (!next && !isLoadingRecent) mMap.set('hasMore', false);
+
+    if (timeline.endsWith(':pinned')) {
+      mMap.set('items', statuses.map(status => status.get('id')));
+    } else if (!statuses.isEmpty()) {
+      mMap.update(usePendingItems ? 'pendingItems' : 'items', ImmutableList(), oldIds => {
+        const newIds = statuses.map(status => status.get('id'));
+
+        const lastIndex = oldIds.findLastIndex(id => id !== null && compareId(id, newIds.last()) >= 0) + 1;
+        const firstIndex = oldIds.take(lastIndex).findLastIndex(id => id !== null && compareId(id, newIds.first()) > 0);
+
+        if (firstIndex < 0) {
+          return (isPartial ? newIds.unshift(null) : newIds).concat(oldIds.skip(lastIndex));
+        }
+
+        return oldIds.take(firstIndex + 1).concat(
+          isPartial && oldIds.get(firstIndex) !== null ? newIds.unshift(null) : newIds,
+          oldIds.skip(lastIndex)
+        );
+      });
+    }
   }));
 };
 
-const appendNormalizedTimeline = (state, timeline, statuses, next) => {
-  const oldIds = state.getIn([timeline, 'items'], ImmutableList());
-  const ids    = ImmutableList(statuses.map(status => status.get('id'))).filter(newId => !oldIds.includes(newId));
+const updateTimeline = (state, timeline, status, usePendingItems) => {
+  if (usePendingItems) {
+    if (state.getIn([timeline, 'pendingItems'], ImmutableList()).includes(status.get('id')) || state.getIn([timeline, 'items'], ImmutableList()).includes(status.get('id'))) {
+      return state;
+    }
 
-  return state.update(timeline, initialTimeline, map => map.withMutations(mMap => {
-    mMap.set('isLoading', false);
-    mMap.set('next', next);
-    mMap.set('items', oldIds.concat(ids));
-  }));
-};
+    return state.update(timeline, initialTimeline, map => map.update('pendingItems', list => list.unshift(status.get('id'))));
+  }
 
-const updateTimeline = (state, timeline, status) => {
   const top        = state.getIn([timeline, 'top']);
   const ids        = state.getIn([timeline, 'items'], ImmutableList());
   const includesId = ids.includes(status.get('id'));
@@ -74,17 +86,24 @@ const updateTimeline = (state, timeline, status) => {
   }));
 };
 
-const deleteStatus = (state, id, accountId, references) => {
+const deleteStatus = (state, id, accountId, references, exclude_account = null) => {
   state.keySeq().forEach(timeline => {
-    state = state.updateIn([timeline, 'items'], list => list.filterNot(item => item === id));
+    if (exclude_account === null || (timeline !== `account:${exclude_account}` && !timeline.startsWith(`account:${exclude_account}:`))) {
+      const helper = list => list.filterNot(item => item === id);
+      state = state.updateIn([timeline, 'items'], helper).updateIn([timeline, 'pendingItems'], helper);
+    }
   });
 
   // Remove reblogs of deleted status
   references.forEach(ref => {
-    state = deleteStatus(state, ref[0], ref[1], []);
+    state = deleteStatus(state, ref[0], ref[1], [], exclude_account);
   });
 
   return state;
+};
+
+const clearTimeline = (state, timeline) => {
+  return state.set(timeline, initialTimeline);
 };
 
 const filterTimelines = (state, relationship, statuses) => {
@@ -96,17 +115,16 @@ const filterTimelines = (state, relationship, statuses) => {
     }
 
     references = statuses.filter(item => item.get('reblog') === status.get('id')).map(item => [item.get('id'), item.get('account')]);
-    state      = deleteStatus(state, status.get('id'), status.get('account'), references);
+    state      = deleteStatus(state, status.get('id'), status.get('account'), references, relationship.id);
   });
 
   return state;
 };
 
-const filterTimeline = (timeline, state, relationship, statuses) =>
-  state.updateIn([timeline, 'items'], ImmutableList(), list =>
-    list.filterNot(statusId =>
-      statuses.getIn([statusId, 'account']) === relationship.id
-    ));
+const filterTimeline = (timeline, state, relationship, statuses) => {
+  const helper = list => list.filterNot(statusId => statuses.getIn([statusId, 'account']) === relationship.id);
+  return state.updateIn([timeline, 'items'], ImmutableList(), helper).updateIn([timeline, 'pendingItems'], ImmutableList(), helper);
+};
 
 const updateTop = (state, timeline, top) => {
   return state.update(timeline, initialTimeline, map => map.withMutations(mMap => {
@@ -117,20 +135,21 @@ const updateTop = (state, timeline, top) => {
 
 export default function timelines(state = initialState, action) {
   switch(action.type) {
-  case TIMELINE_REFRESH_REQUEST:
+  case TIMELINE_LOAD_PENDING:
+    return state.update(action.timeline, initialTimeline, map =>
+      map.update('items', list => map.get('pendingItems').concat(list.take(40))).set('pendingItems', ImmutableList()).set('unread', 0));
   case TIMELINE_EXPAND_REQUEST:
     return state.update(action.timeline, initialTimeline, map => map.set('isLoading', true));
-  case TIMELINE_REFRESH_FAIL:
   case TIMELINE_EXPAND_FAIL:
     return state.update(action.timeline, initialTimeline, map => map.set('isLoading', false));
-  case TIMELINE_REFRESH_SUCCESS:
-    return normalizeTimeline(state, action.timeline, fromJS(action.statuses), action.next);
   case TIMELINE_EXPAND_SUCCESS:
-    return appendNormalizedTimeline(state, action.timeline, fromJS(action.statuses), action.next);
+    return expandNormalizedTimeline(state, action.timeline, fromJS(action.statuses), action.next, action.partial, action.isLoadingRecent, action.usePendingItems);
   case TIMELINE_UPDATE:
-    return updateTimeline(state, action.timeline, fromJS(action.status));
+    return updateTimeline(state, action.timeline, fromJS(action.status), action.usePendingItems);
   case TIMELINE_DELETE:
     return deleteStatus(state, action.id, action.accountId, action.references, action.reblogOf);
+  case TIMELINE_CLEAR:
+    return clearTimeline(state, action.timeline);
   case ACCOUNT_BLOCK_SUCCESS:
   case ACCOUNT_MUTE_SUCCESS:
     return filterTimelines(state, action.relationship, action.statuses);
@@ -141,7 +160,11 @@ export default function timelines(state = initialState, action) {
   case TIMELINE_CONNECT:
     return state.update(action.timeline, initialTimeline, map => map.set('online', true));
   case TIMELINE_DISCONNECT:
-    return state.update(action.timeline, initialTimeline, map => map.set('online', false));
+    return state.update(
+      action.timeline,
+      initialTimeline,
+      map => map.set('online', false).update(action.usePendingItems ? 'pendingItems' : 'items', items => items.first() ? items.unshift(null) : items)
+    );
   default:
     return state;
   }

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe RejectFollowService do
+RSpec.describe RejectFollowService, type: :service do
   let(:sender) { Fabricate(:account, username: 'alice') }
 
   subject { RejectFollowService.new }
@@ -37,13 +37,6 @@ RSpec.describe RejectFollowService do
 
     it 'does not create follow relation' do
       expect(bob.following?(sender)).to be false
-    end
-
-    it 'sends a follow request rejection salmon slap' do
-      expect(a_request(:post, "http://salmon.example.com/").with { |req|
-        xml = OStatus2::Salmon.new.unpack(req.body)
-        xml.match(OStatus::TagManager::VERBS[:reject])
-      }).to have_been_made.once
     end
   end
 

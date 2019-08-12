@@ -41,9 +41,9 @@ RSpec.describe User, type: :model do
     end
 
     it 'cleans out empty string from languages' do
-      user = Fabricate.build(:user, filtered_languages: [''])
+      user = Fabricate.build(:user, chosen_languages: [''])
       user.valid?
-      expect(user.filtered_languages).to eq []
+      expect(user.chosen_languages).to eq nil
     end
   end
 
@@ -67,7 +67,7 @@ RSpec.describe User, type: :model do
     describe 'confirmed' do
       it 'returns an array of users who are confirmed' do
         user_1 = Fabricate(:user, confirmed_at: nil)
-        user_2 = Fabricate(:user, confirmed_at: Time.now)
+        user_2 = Fabricate(:user, confirmed_at: Time.zone.now)
         expect(User.confirmed).to match_array([user_2])
       end
     end
@@ -75,7 +75,7 @@ RSpec.describe User, type: :model do
     describe 'inactive' do
       it 'returns a relation of inactive users' do
         specified = Fabricate(:user, current_sign_in_at: 15.days.ago)
-        Fabricate(:user, current_sign_in_at: 13.days.ago)
+        Fabricate(:user, current_sign_in_at: 6.days.ago)
 
         expect(User.inactive).to match_array([specified])
       end
@@ -87,18 +87,6 @@ RSpec.describe User, type: :model do
         Fabricate(:user, email: 'unspecified@spec')
 
         expect(User.matches_email('specified')).to match_array([specified])
-      end
-    end
-
-    describe 'with_recent_ip_address' do
-      it 'returns a relation of users who is, or was at last time, online with the given IP address' do
-        specifieds = [
-          Fabricate(:user, current_sign_in_ip: '0.0.0.42', last_sign_in_ip: '0.0.0.0'),
-          Fabricate(:user, current_sign_in_ip: nil, last_sign_in_ip: '0.0.0.42')
-        ]
-        Fabricate(:user, current_sign_in_ip: '0.0.0.0', last_sign_in_ip: '0.0.0.0')
-
-        expect(User.with_recent_ip_address('0.0.0.42')).to match_array(specifieds)
       end
     end
   end
@@ -118,19 +106,19 @@ RSpec.describe User, type: :model do
     end
 
     it 'should allow a non-blacklisted user to be created' do
-      user = User.new(email: 'foo@example.com', account: account, password: password)
+      user = User.new(email: 'foo@example.com', account: account, password: password, agreement: true)
 
       expect(user.valid?).to be_truthy
     end
 
     it 'should not allow a blacklisted user to be created' do
-      user = User.new(email: 'foo@mvrht.com', account: account, password: password)
+      user = User.new(email: 'foo@mvrht.com', account: account, password: password, agreement: true)
 
       expect(user.valid?).to be_falsey
     end
 
     it 'should not allow a subdomain blacklisted user to be created' do
-      user = User.new(email: 'foo@mvrht.com.topdomain.tld', account: account, password: password)
+      user = User.new(email: 'foo@mvrht.com.topdomain.tld', account: account, password: password, agreement: true)
 
       expect(user.valid?).to be_falsey
     end
@@ -145,6 +133,14 @@ RSpec.describe User, type: :model do
     it 'returns false if a confirmed_at is nil' do
       user = Fabricate.build(:user, confirmed_at: nil)
       expect(user.confirmed?).to be false
+    end
+  end
+
+  describe '#confirm' do
+    it 'sets email to unconfirmed_email' do
+      user = Fabricate.build(:user, confirmed_at: Time.now.utc, unconfirmed_email: 'new-email@example.com')
+      user.confirm
+      expect(user.email).to eq 'new-email@example.com'
     end
   end
 
@@ -214,17 +210,17 @@ RSpec.describe User, type: :model do
     end
 
     it 'should not allow a user to be created unless they are whitelisted' do
-      user = User.new(email: 'foo@example.com', account: account, password: password)
+      user = User.new(email: 'foo@example.com', account: account, password: password, agreement: true)
       expect(user.valid?).to be_falsey
     end
 
     it 'should allow a user to be created if they are whitelisted' do
-      user = User.new(email: 'foo@mastodon.space', account: account, password: password)
+      user = User.new(email: 'foo@mastodon.space', account: account, password: password, agreement: true)
       expect(user.valid?).to be_truthy
     end
 
     it 'should not allow a user with a whitelisted top domain as subdomain in their email address to be created' do
-      user = User.new(email: 'foo@mastodon.space.userdomain.com', account: account, password: password)
+      user = User.new(email: 'foo@mastodon.space.userdomain.com', account: account, password: password, agreement: true)
       expect(user.valid?).to be_falsey
     end
 
@@ -246,7 +242,7 @@ RSpec.describe User, type: :model do
 
   it_behaves_like 'Settings-extended' do
     def create!
-      User.create!(account: Fabricate(:account), email: 'foo@mastodon.space', password: 'abcd1234' )
+      User.create!(account: Fabricate(:account), email: 'foo@mastodon.space', password: 'abcd1234', agreement: true)
     end
 
     def fabricate
@@ -314,6 +310,220 @@ RSpec.describe User, type: :model do
       expect(mod.role?('user')).to be true
       expect(admin.role?('user')).to be true
       expect(admin.role?('moderator')).to be true
+    end
+  end
+
+  describe '#disable!' do
+    subject(:user) { Fabricate(:user, disabled: false, current_sign_in_at: current_sign_in_at, last_sign_in_at: nil) }
+    let(:current_sign_in_at) { Time.zone.now }
+
+    before do
+      user.disable!
+    end
+
+    it 'disables user' do
+      expect(user).to have_attributes(disabled: true, current_sign_in_at: nil, last_sign_in_at: current_sign_in_at)
+    end
+  end
+
+  describe '#disable!' do
+    subject(:user) { Fabricate(:user, disabled: false, current_sign_in_at: current_sign_in_at, last_sign_in_at: nil) }
+    let(:current_sign_in_at) { Time.zone.now }
+
+    before do
+      user.disable!
+    end
+
+    it 'disables user' do
+      expect(user).to have_attributes(disabled: true, current_sign_in_at: nil, last_sign_in_at: current_sign_in_at)
+    end
+  end
+
+  describe '#enable!' do
+    subject(:user) { Fabricate(:user, disabled: true) }
+
+    before do
+      user.enable!
+    end
+
+    it 'enables user' do
+      expect(user).to have_attributes(disabled: false)
+    end
+  end
+
+  describe '#confirm!' do
+    subject(:user) { Fabricate(:user, confirmed_at: confirmed_at) }
+
+    before do
+      ActionMailer::Base.deliveries.clear
+      user.confirm!
+    end
+
+    after { ActionMailer::Base.deliveries.clear }
+
+    context 'when user is new' do
+      let(:confirmed_at) { nil }
+
+      it 'confirms user' do
+        expect(user.confirmed_at).to be_present
+      end
+
+      it 'delivers mails' do
+        expect(ActionMailer::Base.deliveries.count).to eq 2
+      end
+    end
+
+    context 'when user is not new' do
+      let(:confirmed_at) { Time.zone.now }
+
+      it 'confirms user' do
+        expect(user.confirmed_at).to be_present
+      end
+
+      it 'does not deliver mail' do
+        expect(ActionMailer::Base.deliveries.count).to eq 0
+      end
+    end
+  end
+
+  describe '#promote!' do
+    subject(:user) { Fabricate(:user, admin: is_admin, moderator: is_moderator) }
+
+    before do
+      user.promote!
+    end
+
+    context 'when user is an admin' do
+      let(:is_admin) { true }
+
+      context 'when user is a moderator' do
+        let(:is_moderator) { true }
+
+        it 'changes moderator filed false' do
+          expect(user).to be_admin
+          expect(user).not_to be_moderator
+        end
+      end
+
+      context 'when user is not a moderator' do
+        let(:is_moderator) { false }
+
+        it 'does not change status' do
+          expect(user).to be_admin
+          expect(user).not_to be_moderator
+        end
+      end
+    end
+
+    context 'when user is not admin' do
+      let(:is_admin) { false }
+
+      context 'when user is a moderator' do
+        let(:is_moderator) { true }
+
+        it 'changes user into an admin' do
+          expect(user).to be_admin
+          expect(user).not_to be_moderator
+        end
+      end
+
+      context 'when user is not a moderator' do
+        let(:is_moderator) { false }
+
+        it 'changes user into a moderator' do
+          expect(user).not_to be_admin
+          expect(user).to be_moderator
+        end
+      end
+    end
+  end
+
+  describe '#demote!' do
+    subject(:user) { Fabricate(:user, admin: admin, moderator: moderator) }
+
+    before do
+      user.demote!
+    end
+
+    context 'when user is an admin' do
+      let(:admin) { true }
+
+      context 'when user is a moderator' do
+        let(:moderator) { true }
+
+        it 'changes user into a moderator' do
+          expect(user).not_to be_admin
+          expect(user).to be_moderator
+        end
+      end
+
+      context 'when user is not a moderator' do
+        let(:moderator) { false }
+
+        it 'changes user into a moderator' do
+          expect(user).not_to be_admin
+          expect(user).to be_moderator
+        end
+      end
+    end
+
+    context 'when user is not an admin' do
+      let(:admin) { false }
+
+      context 'when user is a moderator' do
+        let(:moderator) { true }
+
+        it 'changes user into a plain user' do
+          expect(user).not_to be_admin
+          expect(user).not_to be_moderator
+        end
+      end
+
+      context 'when user is not a moderator' do
+        let(:moderator) { false }
+
+        it 'does not change any fields' do
+          expect(user).not_to be_admin
+          expect(user).not_to be_moderator
+        end
+      end
+    end
+  end
+
+  describe '#active_for_authentication?' do
+    subject { user.active_for_authentication? }
+    let(:user) { Fabricate(:user, disabled: disabled, confirmed_at: confirmed_at) }
+
+    context 'when user is disabled' do
+      let(:disabled) { true }
+
+      context 'when user is confirmed' do
+        let(:confirmed_at) { Time.zone.now }
+
+        it { is_expected.to be true }
+      end
+
+      context 'when user is not confirmed' do
+        let(:confirmed_at) { nil }
+
+        it { is_expected.to be true }
+      end
+    end
+
+    context 'when user is not disabled' do
+      let(:disabled) { false }
+
+      context 'when user is confirmed' do
+        let(:confirmed_at) { Time.zone.now }
+
+        it { is_expected.to be true }
+      end
+
+      context 'when user is not confirmed' do
+        let(:confirmed_at) { nil }
+
+        it { is_expected.to be true }
+      end
     end
   end
 end

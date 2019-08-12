@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe BlockService do
+RSpec.describe BlockService, type: :service do
   let(:sender) { Fabricate(:account, username: 'alice') }
 
   subject { BlockService.new }
@@ -27,13 +27,6 @@ RSpec.describe BlockService do
 
     it 'creates a blocking relation' do
       expect(sender.blocking?(bob)).to be true
-    end
-
-    it 'sends a block salmon slap' do
-      expect(a_request(:post, "http://salmon.example.com/").with { |req|
-        xml = OStatus2::Salmon.new.unpack(req.body)
-        xml.match(OStatus::TagManager::VERBS[:block])
-      }).to have_been_made.once
     end
   end
 

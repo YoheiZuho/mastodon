@@ -2,10 +2,13 @@
 
 module Settings
   module TwoFactorAuthentication
-    class ConfirmationsController < ApplicationController
+    class ConfirmationsController < BaseController
       layout 'admin'
 
       before_action :authenticate_user!
+      before_action :ensure_otp_secret
+
+      skip_before_action :require_functional!
 
       def new
         prepare_two_factor_form
@@ -13,7 +16,7 @@ module Settings
 
       def create
         if current_user.validate_and_consume_otp!(confirmation_params[:code])
-          flash[:notice] = I18n.t('two_factor_authentication.enabled_success')
+          flash.now[:notice] = I18n.t('two_factor_authentication.enabled_success')
 
           current_user.otp_required_for_login = true
           @recovery_codes = current_user.generate_otp_backup_codes!
@@ -37,6 +40,10 @@ module Settings
         @confirmation = Form::TwoFactorConfirmation.new
         @provision_url = current_user.otp_provisioning_uri(current_user.email, issuer: Rails.configuration.x.local_domain)
         @qrcode = RQRCode::QRCode.new(@provision_url)
+      end
+
+      def ensure_otp_secret
+        redirect_to settings_two_factor_authentication_path unless current_user.otp_secret
       end
     end
   end

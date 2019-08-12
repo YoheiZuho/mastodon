@@ -47,22 +47,18 @@ describe ApplicationController, type: :controller do
     include_examples 'respond_with_error', 422
   end
 
-  it "does not force ssl if LOCAL_HTTPS is not 'true'" do
+  it "does not force ssl if Rails.env.production? is not 'true'" do
     routes.draw { get 'success' => 'anonymous#success' }
-    ClimateControl.modify LOCAL_HTTPS: '' do
-      allow(Rails.env).to receive(:production?).and_return(true)
-      get 'success'
-      expect(response).to have_http_status(:success)
-    end
+    allow(Rails.env).to receive(:production?).and_return(false)
+    get 'success'
+    expect(response).to have_http_status(200)
   end
 
-  it "forces ssl if LOCAL_HTTPS is 'true'" do
+  it "forces ssl if Rails.env.production? is 'true'" do
     routes.draw { get 'success' => 'anonymous#success' }
-    ClimateControl.modify LOCAL_HTTPS: 'true' do
-      allow(Rails.env).to receive(:production?).and_return(true)
-      get 'success'
-      expect(response).to redirect_to('https://test.host/success')
-    end
+    allow(Rails.env).to receive(:production?).and_return(true)
+    get 'success'
+    expect(response).to redirect_to('https://test.host/success')
   end
 
   describe 'helper_method :current_account' do
@@ -93,6 +89,39 @@ describe ApplicationController, type: :controller do
       allow(Rails.configuration.x).to receive(:single_user_mode).and_return(true)
       Fabricate(:account)
       expect(controller.view_context.single_user_mode?).to eq true
+    end
+  end
+
+  describe 'helper_method :current_theme' do
+    it 'returns "default" when theme wasn\'t changed in admin settings' do
+      allow(Setting).to receive(:default_settings).and_return({ 'theme' => 'default' })
+
+      expect(controller.view_context.current_theme).to eq 'default'
+    end
+
+    it 'returns instances\'s theme when user is not signed in' do
+      allow(Setting).to receive(:[]).with('theme').and_return 'contrast'
+
+      expect(controller.view_context.current_theme).to eq 'contrast'
+    end
+
+    it 'returns instances\'s default theme when user didn\'t set theme' do
+      current_user = Fabricate(:user)
+      sign_in current_user
+
+      allow(Setting).to receive(:[]).with('theme').and_return 'contrast'
+
+      expect(controller.view_context.current_theme).to eq 'contrast'
+    end
+
+    it 'returns user\'s theme when it is set' do
+      current_user = Fabricate(:user)
+      current_user.settings['theme'] = 'mastodon-light'
+      sign_in current_user
+
+      allow(Setting).to receive(:[]).with('theme').and_return 'contrast'
+
+      expect(controller.view_context.current_theme).to eq 'mastodon-light'
     end
   end
 
@@ -149,26 +178,26 @@ describe ApplicationController, type: :controller do
 
     it 'does nothing if not signed in' do
       get 'success'
-      expect(response).to have_http_status(:success)
+      expect(response).to have_http_status(200)
     end
 
     it 'does nothing if user who signed in is not suspended' do
       sign_in(Fabricate(:user, account: Fabricate(:account, suspended: false)))
       get 'success'
-      expect(response).to have_http_status(:success)
+      expect(response).to have_http_status(200)
     end
 
-    it 'returns http 403 if user who signed in is suspended' do
+    it 'redirects to account status page' do
       sign_in(Fabricate(:user, account: Fabricate(:account, suspended: true)))
       get 'success'
-      expect(response).to have_http_status(403)
+      expect(response).to redirect_to(edit_user_registration_path)
     end
   end
 
   describe 'raise_not_found' do
     it 'raises error' do
       controller.params[:unmatched_route] = 'unmatched'
-      expect{ controller.raise_not_found }.to raise_error(ActionController::RoutingError, 'No route matches unmatched')
+      expect { controller.raise_not_found }.to raise_error(ActionController::RoutingError, 'No route matches unmatched')
     end
   end
 
@@ -185,10 +214,48 @@ describe ApplicationController, type: :controller do
       routes.draw { get 'sucesss' => 'anonymous#sucesss' }
     end
 
-    it 'redirects to root path if current user is not admin' do
+    it 'returns a 403 if current user is not admin' do
       sign_in(Fabricate(:user, admin: false))
       get 'sucesss'
-      expect(response).to redirect_to('/')
+      expect(response).to have_http_status(403)
+    end
+
+    it 'returns a 403 if current user is only a moderator' do
+      sign_in(Fabricate(:user, moderator: true))
+      get 'sucesss'
+      expect(response).to have_http_status(403)
+    end
+
+    it 'does nothing if current user is admin' do
+      sign_in(Fabricate(:user, admin: true))
+      get 'sucesss'
+      expect(response).to have_http_status(200)
+    end
+  end
+
+  describe 'require_staff!' do
+    controller do
+      before_action :require_staff!
+
+      def sucesss
+        head 200
+      end
+    end
+
+    before do
+      routes.draw { get 'sucesss' => 'anonymous#sucesss' }
+    end
+
+    it 'returns a 403 if current user is not admin or moderator' do
+      sign_in(Fabricate(:user, admin: false, moderator: false))
+      get 'sucesss'
+      expect(response).to have_http_status(403)
+    end
+
+    it 'does nothing if current user is moderator' do
+      sign_in(Fabricate(:user, moderator: true))
+      get 'sucesss'
+      expect(response).to have_http_status(200)
     end
 
     it 'does nothing if current user is admin' do
@@ -292,10 +359,6 @@ describe ApplicationController, type: :controller do
 
     context 'Status' do
       include_examples 'cacheable', :status, Status
-    end
-
-    context 'StreamEntry' do
-      include_examples 'receives :with_includes', :stream_entry, StreamEntry
     end
   end
 end

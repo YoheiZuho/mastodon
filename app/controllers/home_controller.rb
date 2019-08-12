@@ -2,6 +2,7 @@
 
 class HomeController < ApplicationController
   before_action :authenticate_user!
+  before_action :set_referrer_policy_header
   before_action :set_initial_state_json
 
   def index
@@ -20,7 +21,7 @@ class HomeController < ApplicationController
       when 'statuses'
         status = Status.find_by(id: matches[2])
 
-        if status && (status.public_visibility? || status.unlisted_visibility?)
+        if status&.distributable?
           redirect_to(ActivityPub::TagManager.instance.url_for(status))
           return
         end
@@ -34,7 +35,8 @@ class HomeController < ApplicationController
       end
     end
 
-    redirect_to(default_redirect_path)
+    matches = request.path.match(%r{\A/web/timelines/tag/(?<tag>.+)\z})
+    redirect_to(matches ? tag_path(CGI.unescape(matches[:tag])) : default_redirect_path)
   end
 
   def set_initial_state_json
@@ -48,17 +50,21 @@ class HomeController < ApplicationController
       push_subscription: current_account.user.web_push_subscription(current_session),
       current_account: current_account,
       token: current_session.token,
-      admin: Account.find_local(Setting.site_contact_username),
+      admin: Account.find_local(Setting.site_contact_username.strip.gsub(/\A@/, '')),
     }
   end
 
   def default_redirect_path
-    if request.path.start_with?('/web')
+    if request.path.start_with?('/web') || whitelist_mode?
       new_user_session_path
     elsif single_user_mode?
-      short_account_path(Account.first)
+      short_account_path(Account.local.without_suspended.where('id > 0').first)
     else
       about_path
     end
+  end
+
+  def set_referrer_policy_header
+    response.headers['Referrer-Policy'] = 'origin'
   end
 end

@@ -3,11 +3,17 @@
 class MediaProxyController < ApplicationController
   include RoutingHelper
 
+  skip_before_action :store_current_location
+
+  before_action :authenticate_user!, if: :whitelist_mode?
+
   def show
     RedisLock.acquire(lock_options) do |lock|
       if lock.acquired?
         @media_attachment = MediaAttachment.remote.find(params[:id])
         redownload! if @media_attachment.needs_redownload? && !reject_media?
+      else
+        raise Mastodon::RaceConditionError
       end
     end
 
@@ -35,6 +41,6 @@ class MediaProxyController < ApplicationController
   end
 
   def reject_media?
-    DomainBlock.find_by(domain: @media_attachment.account.domain)&.reject_media?
+    DomainBlock.reject_media?(@media_attachment.account.domain)
   end
 end

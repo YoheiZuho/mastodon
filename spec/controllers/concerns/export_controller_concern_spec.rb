@@ -8,6 +8,7 @@ describe ApplicationController, type: :controller do
     def index
       send_export_file
     end
+
     def export_data
       @export.account.username
     end
@@ -19,7 +20,7 @@ describe ApplicationController, type: :controller do
       sign_in user
       get :index, format: :csv
 
-      expect(response).to have_http_status(:success)
+      expect(response).to have_http_status(200)
       expect(response.content_type).to eq 'text/csv'
       expect(response.headers['Content-Disposition']).to eq 'attachment; filename="anonymous.csv"'
       expect(response.body).to eq user.account.username

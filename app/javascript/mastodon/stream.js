@@ -1,21 +1,24 @@
 import WebSocketClient from 'websocket.js';
 
+const randomIntUpTo = max => Math.floor(Math.random() * Math.floor(max));
+
 export function connectStream(path, pollingRefresh = null, callbacks = () => ({ onConnect() {}, onDisconnect() {}, onReceive() {} })) {
   return (dispatch, getState) => {
     const streamingAPIBaseURL = getState().getIn(['meta', 'streaming_api_base_url']);
     const accessToken = getState().getIn(['meta', 'access_token']);
     const { onConnect, onDisconnect, onReceive } = callbacks(dispatch, getState);
+
     let polling = null;
 
     const setupPolling = () => {
-      polling = setInterval(() => {
-        pollingRefresh(dispatch);
-      }, 20000);
+      pollingRefresh(dispatch, () => {
+        polling = setTimeout(() => setupPolling(), 20000 + randomIntUpTo(20000));
+      });
     };
 
     const clearPolling = () => {
       if (polling) {
-        clearInterval(polling);
+        clearTimeout(polling);
         polling = null;
       }
     };
@@ -25,13 +28,15 @@ export function connectStream(path, pollingRefresh = null, callbacks = () => ({ 
         if (pollingRefresh) {
           clearPolling();
         }
+
         onConnect();
       },
 
       disconnected () {
         if (pollingRefresh) {
-          setupPolling();
+          polling = setTimeout(() => setupPolling(), randomIntUpTo(40000));
         }
+
         onDisconnect();
       },
 
@@ -44,6 +49,7 @@ export function connectStream(path, pollingRefresh = null, callbacks = () => ({ 
           clearPolling();
           pollingRefresh(dispatch);
         }
+
         onConnect();
       },
 
@@ -53,6 +59,7 @@ export function connectStream(path, pollingRefresh = null, callbacks = () => ({ 
       if (subscription) {
         subscription.close();
       }
+
       clearPolling();
     };
 
@@ -64,11 +71,7 @@ export function connectStream(path, pollingRefresh = null, callbacks = () => ({ 
 export default function getStream(streamingAPIBaseURL, accessToken, stream, { connected, received, disconnected, reconnected }) {
   const params = [ `stream=${stream}` ];
 
-  if (accessToken !== null) {
-    params.push(`access_token=${accessToken}`);
-  }
-
-  const ws = new WebSocketClient(`${streamingAPIBaseURL}/api/v1/streaming/?${params.join('&')}`);
+  const ws = new WebSocketClient(`${streamingAPIBaseURL}/api/v1/streaming/?${params.join('&')}`, accessToken);
 
   ws.onopen      = connected;
   ws.onmessage   = e => received(JSON.parse(e.data));

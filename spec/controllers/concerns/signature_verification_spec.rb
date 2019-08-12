@@ -38,7 +38,7 @@ describe ApplicationController, type: :controller do
   end
 
   context 'with signature header' do
-    let!(:author) { Fabricate(:account) }
+    let!(:author) { Fabricate(:account, domain: 'example.com', uri: 'https://example.com/actor') }
 
     context 'without body' do
       before do
@@ -68,6 +68,30 @@ describe ApplicationController, type: :controller do
 
         it 'returns nil when method does not match' do
           post :success
+          expect(controller.signed_request_account).to be_nil
+        end
+      end
+    end
+
+    context 'with request older than a day' do
+      before do
+        get :success
+
+        fake_request = Request.new(:get, request.url)
+        fake_request.add_headers({ 'Date' => 2.days.ago.utc.httpdate })
+        fake_request.on_behalf_of(author)
+
+        request.headers.merge!(fake_request.headers)
+      end
+
+      describe '#signed_request?' do
+        it 'returns true' do
+          expect(controller.signed_request?).to be true
+        end
+      end
+
+      describe '#signed_request_account' do
+        it 'returns nil' do
           expect(controller.signed_request_account).to be_nil
         end
       end
@@ -105,7 +129,7 @@ describe ApplicationController, type: :controller do
         end
 
         it 'returns nil when body has been tampered' do
-          request.headers['RAW_POST_DATA'] = 'doo doo doo'
+          post :success, body: 'doo doo doo'
           expect(controller.signed_request_account).to be_nil
         end
       end

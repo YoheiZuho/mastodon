@@ -6,7 +6,8 @@ class ManifestSerializer < ActiveModel::Serializer
 
   attributes :name, :short_name, :description,
              :icons, :theme_color, :background_color,
-             :display, :start_url, :scope
+             :display, :start_url, :scope,
+             :share_target
 
   def name
     object.site_title
@@ -17,7 +18,7 @@ class ManifestSerializer < ActiveModel::Serializer
   end
 
   def description
-    strip_tags(object.site_description.presence || I18n.t('about.about_mastodon_html'))
+    strip_tags(object.site_short_description.presence || I18n.t('about.about_mastodon_html'))
   end
 
   def icons
@@ -48,5 +49,17 @@ class ManifestSerializer < ActiveModel::Serializer
 
   def scope
     root_url
+  end
+
+  def share_target
+    {
+      url_template: 'share?title={title}&text={text}&url={url}',
+      action: 'share',
+      params: {
+        title: 'title',
+        text: 'text',
+        url: 'url',
+      },
+    }
   end
 end

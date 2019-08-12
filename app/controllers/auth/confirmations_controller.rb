@@ -3,9 +3,21 @@
 class Auth::ConfirmationsController < Devise::ConfirmationsController
   layout 'auth'
 
-  def show
-    super do |user|
-      BootstrapTimelineWorker.perform_async(user.account_id) if user.errors.empty?
+  before_action :set_body_classes
+
+  skip_before_action :require_functional!
+
+  private
+
+  def set_body_classes
+    @body_classes = 'lighter'
+  end
+
+  def after_confirmation_path_for(_resource_name, user)
+    if user.created_by_application && truthy_param?(:redirect_to_app)
+      user.created_by_application.redirect_uri
+    else
+      super
     end
   end
 end

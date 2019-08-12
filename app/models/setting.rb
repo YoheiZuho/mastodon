@@ -3,13 +3,13 @@
 #
 # Table name: settings
 #
-#  id         :integer          not null, primary key
+#  id         :bigint(8)        not null, primary key
 #  var        :string           not null
 #  value      :text
 #  thing_type :string
 #  created_at :datetime
 #  updated_at :datetime
-#  thing_id   :integer
+#  thing_id   :bigint(8)
 #
 
 class Setting < RailsSettings::Base
@@ -40,7 +40,7 @@ class Setting < RailsSettings::Base
 
     def all_as_records
       vars    = thing_scoped
-      records = vars.map { |r| [r.var, r] }.to_h
+      records = vars.each_with_object({}) { |r, h| h[r.var] = r }
 
       default_settings.each do |key, default_value|
         next if records.key?(key) || default_value.is_a?(Hash)

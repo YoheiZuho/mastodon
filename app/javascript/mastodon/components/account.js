@@ -19,16 +19,20 @@ const messages = defineMessages({
   unmute_notifications: { id: 'account.unmute_notifications', defaultMessage: 'Unmute notifications from @{name}' },
 });
 
-@injectIntl
-export default class Account extends ImmutablePureComponent {
+export default @injectIntl
+class Account extends ImmutablePureComponent {
 
   static propTypes = {
     account: ImmutablePropTypes.map.isRequired,
     onFollow: PropTypes.func.isRequired,
     onBlock: PropTypes.func.isRequired,
     onMute: PropTypes.func.isRequired,
+    onMuteNotifications: PropTypes.func.isRequired,
     intl: PropTypes.object.isRequired,
     hidden: PropTypes.bool,
+    actionIcon: PropTypes.string,
+    actionTitle: PropTypes.string,
+    onActionClick: PropTypes.func,
   };
 
   handleFollow = () => {
@@ -51,8 +55,12 @@ export default class Account extends ImmutablePureComponent {
     this.props.onMuteNotifications(this.props.account, false);
   }
 
+  handleAction = () => {
+    this.props.onActionClick(this.props.account);
+  }
+
   render () {
-    const { account, intl, hidden } = this.props;
+    const { account, intl, hidden, onActionClick, actionIcon, actionTitle } = this.props;
 
     if (!account) {
       return <div />;
@@ -60,16 +68,18 @@ export default class Account extends ImmutablePureComponent {
 
     if (hidden) {
       return (
-        <div>
+        <Fragment>
           {account.get('display_name')}
           {account.get('username')}
-        </div>
+        </Fragment>
       );
     }
 
     let buttons;
 
-    if (account.get('id') !== me && account.get('relationship', null) !== null) {
+    if (onActionClick && actionIcon) {
+      buttons = <IconButton icon={actionIcon} title={actionTitle} onClick={this.handleAction} />;
+    } else if (account.get('id') !== me && account.get('relationship', null) !== null) {
       const following = account.getIn(['relationship', 'following']);
       const requested = account.getIn(['relationship', 'requested']);
       const blocking  = account.getIn(['relationship', 'blocking']);
@@ -78,7 +88,7 @@ export default class Account extends ImmutablePureComponent {
       if (requested) {
         buttons = <IconButton disabled icon='hourglass' title={intl.formatMessage(messages.requested)} />;
       } else if (blocking) {
-        buttons = <IconButton active icon='unlock-alt' title={intl.formatMessage(messages.unblock, { name: account.get('username') })} onClick={this.handleBlock} />;
+        buttons = <IconButton active icon='unlock' title={intl.formatMessage(messages.unblock, { name: account.get('username') })} onClick={this.handleBlock} />;
       } else if (muting) {
         let hidingNotificationsButton;
         if (account.getIn(['relationship', 'muting_notifications'])) {
@@ -92,7 +102,7 @@ export default class Account extends ImmutablePureComponent {
             {hidingNotificationsButton}
           </Fragment>
         );
-      } else if (!account.get('moved')) {
+      } else if (!account.get('moved') || following) {
         buttons = <IconButton icon={following ? 'user-times' : 'user-plus'} title={intl.formatMessage(following ? messages.unfollow : messages.follow)} onClick={this.handleFollow} active={following} />;
       }
     }
@@ -100,7 +110,7 @@ export default class Account extends ImmutablePureComponent {
     return (
       <div className='account'>
         <div className='account__wrapper'>
-          <Permalink key={account.get('id')} className='account__display-name' href={account.get('url')} to={`/accounts/${account.get('id')}`}>
+          <Permalink key={account.get('id')} className='account__display-name' title={account.get('acct')} href={account.get('url')} to={`/accounts/${account.get('id')}`}>
             <div className='account__avatar-wrapper'><Avatar account={account} size={36} /></div>
             <DisplayName account={account} />
           </Permalink>

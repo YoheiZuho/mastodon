@@ -1,13 +1,17 @@
 ---
 ar:
   activerecord:
+    attributes:
+      poll:
+        expires_at: آخر أجل
+        options: الخيارات
     errors:
       models:
         account:
           attributes:
             username:
-              invalid: فقط حروف و أرقام و تسطير سفلي
+              invalid: فقط حروف و أرقام و سطور سفلية
         status:
           attributes:
             reblog:
-              taken: المنشور موجود
+              taken: المنشور موجود مِن قبل

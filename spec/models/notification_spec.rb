@@ -1,19 +1,14 @@
 require 'rails_helper'
 
 RSpec.describe Notification, type: :model do
-  describe '#from_account' do
-    pending
-  end
-
   describe '#target_status' do
-    let(:notification) { Fabricate(:notification, activity_type: type, activity: activity) }
+    let(:notification) { Fabricate(:notification, activity: activity) }
     let(:status)       { Fabricate(:status) }
     let(:reblog)       { Fabricate(:status, reblog: status) }
     let(:favourite)    { Fabricate(:favourite, status: status) }
     let(:mention)      { Fabricate(:mention, status: status) }
 
-    context 'type is :reblog' do
-      let(:type)     { :reblog }
+    context 'activity is reblog' do
       let(:activity) { reblog }
 
       it 'returns status' do
@@ -21,7 +16,7 @@ RSpec.describe Notification, type: :model do
       end
     end
 
-    context 'type is :favourite' do
+    context 'activity is favourite' do
       let(:type)     { :favourite }
       let(:activity) { favourite }
 
@@ -30,8 +25,7 @@ RSpec.describe Notification, type: :model do
       end
     end
 
-    context 'type is :mention' do
-      let(:type)     { :mention }
+    context 'activity is mention' do
       let(:activity) { mention }
 
       it 'returns status' do
@@ -103,7 +97,7 @@ RSpec.describe Notification, type: :model do
       before do
         allow(accounts_with_ids).to receive(:[]).with(stale_account1.id).and_return(account1)
         allow(accounts_with_ids).to receive(:[]).with(stale_account2.id).and_return(account2)
-        allow(Account).to receive_message_chain(:where, :map, :to_h).and_return(accounts_with_ids)
+        allow(Account).to receive_message_chain(:where, :includes, :each_with_object).and_return(accounts_with_ids)
       end
 
       let(:cached_items) do

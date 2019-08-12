@@ -36,7 +36,7 @@ sv:
         scopes: Separera omfattningen med mellanslag. Lämna tomt för att använda standardomfattning.
       index:
         application: Applikation
-        callback_url: Callback URL
+        callback_url: Återkalls URL
         delete: Ta bort
         name: Namn
         new: Ny applikation
@@ -48,10 +48,10 @@ sv:
       show:
         actions: Handlingar
         application_id: Klientnyckel
-        callback_urls: Callback URLs
+        callback_urls: Återkalls URLs
         scopes: Omfattning
         secret: Kundhemlighet
-        title: 'Application: %{name}'
+        title: 'Program: %{name}'
     authorizations:
       buttons:
         authorize: Godkänna
@@ -72,7 +72,6 @@ sv:
       index:
         application: Applikation
         created_at: Auktoriserad
-        date_format: "%Y-%m-%d %H:%M:%S"
         scopes: Omfattning
         title: Dina behöriga ansökningar
     errors:
@@ -110,10 +109,11 @@ sv:
       admin:
         nav:
           applications: Applikationer
-          oauth2_provider: OAuth2 Provider
+          oauth2_provider: OAuth2 leverantör
       application:
         title: OAuth-behörighet krävs
     scopes:
-      follow: följ, blockera, ta bort blockering och sluta följa konton
-      read: läs dina kontodata
-      write: posta på dina vägnar
+      follow: följa, blockera, ta bort blockerade och sluta följa konton
+      push: ta emot push aviseringar för ditt konto
+      read: läsa dina kontodata
+      write: posta åt dig

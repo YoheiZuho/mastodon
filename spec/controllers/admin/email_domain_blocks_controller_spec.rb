@@ -25,7 +25,7 @@ RSpec.describe Admin::EmailDomainBlocksController, type: :controller do
       assigned = assigns(:email_domain_blocks)
       expect(assigned.count).to eq 1
       expect(assigned.klass).to be EmailDomainBlock
-      expect(response).to have_http_status(:success)
+      expect(response).to have_http_status(200)
     end
   end
 
@@ -34,13 +34,13 @@ RSpec.describe Admin::EmailDomainBlocksController, type: :controller do
       get :new
 
       expect(assigns(:email_domain_block)).to be_instance_of(EmailDomainBlock)
-      expect(response).to have_http_status(:success)
+      expect(response).to have_http_status(200)
     end
   end
 
   describe 'POST #create' do
     it 'blocks the domain when succeeded to save' do
-      post :create, params: { email_domain_block: { domain: 'example.com'} }
+      post :create, params: { email_domain_block: { domain: 'example.com' } }
 
       expect(flash[:notice]).to eq I18n.t('admin.email_domain_blocks.created_msg')
       expect(response).to redirect_to(admin_email_domain_blocks_path)
@@ -50,7 +50,7 @@ RSpec.describe Admin::EmailDomainBlocksController, type: :controller do
   describe 'DELETE #destroy' do
     it 'unblocks the domain' do
       email_domain_block = Fabricate(:email_domain_block)
-      delete :destroy, params: { id: email_domain_block.id } 
+      delete :destroy, params: { id: email_domain_block.id }
 
       expect(flash[:notice]).to eq I18n.t('admin.email_domain_blocks.destroyed_msg')
       expect(response).to redirect_to(admin_email_domain_blocks_path)

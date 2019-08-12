@@ -24,10 +24,10 @@ describe('emoji', () => {
       expect(emojify('\uD83D\uDC69\u200D\uD83D\uDC69\u200D\uD83D\uDC66\u200D\uD83D\uDC66')).toEqual(
         '<img draggable="false" class="emojione" alt="👩‍👩‍👦‍👦" title=":woman-woman-boy-boy:" src="/emoji/1f469-200d-1f469-200d-1f466-200d-1f466.svg" />');
       expect(emojify('👨‍👩‍👧‍👧')).toEqual(
-      '<img draggable="false" class="emojione" alt="👨‍👩‍👧‍👧" title=":man-woman-girl-girl:" src="/emoji/1f468-200d-1f469-200d-1f467-200d-1f467.svg" />');
+        '<img draggable="false" class="emojione" alt="👨‍👩‍👧‍👧" title=":man-woman-girl-girl:" src="/emoji/1f468-200d-1f469-200d-1f467-200d-1f467.svg" />');
       expect(emojify('👩‍👩‍👦')).toEqual('<img draggable="false" class="emojione" alt="👩‍👩‍👦" title=":woman-woman-boy:" src="/emoji/1f469-200d-1f469-200d-1f466.svg" />');
       expect(emojify('\u2757')).toEqual(
-      '<img draggable="false" class="emojione" alt="❗" title=":exclamation:" src="/emoji/2757.svg" />');
+        '<img draggable="false" class="emojione" alt="❗" title=":exclamation:" src="/emoji/2757.svg" />');
     });
 
     it('does multiple unicode', () => {
@@ -51,7 +51,7 @@ describe('emoji', () => {
     });
 
     it('does an emoji that has no shortcode', () => {
-      expect(emojify('🕉️')).toEqual('<img draggable="false" class="emojione" alt="🕉️" title="" src="/emoji/1f549.svg" />');
+      expect(emojify('👁‍🗨')).toEqual('<img draggable="false" class="emojione" alt="👁‍🗨" title="" src="/emoji/1f441-200d-1f5e8.svg" />');
     });
 
     it('does an emoji whose filename is irregular', () => {
@@ -72,6 +72,11 @@ describe('emoji', () => {
         .toEqual('<span class="invisible">😄<span class="invisible">😕</span>😴</span><img draggable="false" class="emojione" alt="😇" title=":innocent:" src="/emoji/1f607.svg" />');
       expect(emojify('<span class="invisible">😄<br/>😴</span>😇'))
         .toEqual('<span class="invisible">😄<br/>😴</span><img draggable="false" class="emojione" alt="😇" title=":innocent:" src="/emoji/1f607.svg" />');
+    });
+
+    it('skips the textual presentation VS15 character', () => {
+      expect(emojify('✴︎')) // This is U+2734 EIGHT POINTED BLACK STAR then U+FE0E VARIATION SELECTOR-15
+        .toEqual('<img draggable="false" class="emojione" alt="✴" title=":eight_pointed_black_star:" src="/emoji/2734.svg" />');
     });
   });
 });

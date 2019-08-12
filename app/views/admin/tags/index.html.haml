@@ -1,0 +1,22 @@
+- content_for :page_title do
+  = t('admin.tags.title')
+
+.filters
+  .filter-subset
+    %strong= t('admin.tags.context')
+    %ul
+      %li= filter_link_to t('generic.all'), context: nil
+      %li= filter_link_to t('admin.tags.directory'), context: 'directory'
+
+  .filter-subset
+    %strong= t('admin.tags.review')
+    %ul
+      %li= filter_link_to t('generic.all'), review: nil
+      %li= filter_link_to t('admin.tags.unreviewed'), review: 'unreviewed'
+      %li= filter_link_to t('admin.tags.reviewed'), review: 'reviewed'
+      %li= filter_link_to safe_join([t('admin.accounts.moderation.pending'), "(#{Tag.pending_review.count})"], ' '), review: 'pending_review'
+
+%hr.spacer/
+
+= render @tags
+= paginate @tags

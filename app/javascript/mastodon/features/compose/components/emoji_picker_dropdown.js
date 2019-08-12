@@ -6,7 +6,7 @@ import Overlay from 'react-overlays/lib/Overlay';
 import classNames from 'classnames';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import detectPassiveEvents from 'detect-passive-events';
-import { buildCustomEmojis } from '../../emoji/emoji';
+import { buildCustomEmojis, categoriesFromEmojis } from '../../emoji/emoji';
 
 const messages = defineMessages({
   emoji: { id: 'emoji_button.label', defaultMessage: 'Insert emoji' },
@@ -28,21 +28,8 @@ const messages = defineMessages({
 const assetHost = process.env.CDN_HOST || '';
 let EmojiPicker, Emoji; // load asynchronously
 
-const backgroundImageFn = () => `${assetHost}/emoji/sheet.png`;
+const backgroundImageFn = () => `${assetHost}/emoji/sheet_10.png`;
 const listenerOptions = detectPassiveEvents.hasSupport ? { passive: true } : false;
-
-const categoriesSort = [
-  'recent',
-  'custom',
-  'people',
-  'nature',
-  'foods',
-  'activity',
-  'places',
-  'objects',
-  'symbols',
-  'flags',
-];
 
 class ModifierPickerMenu extends React.PureComponent {
 
@@ -162,12 +149,12 @@ class EmojiPickerMenu extends React.PureComponent {
   static defaultProps = {
     style: {},
     loading: true,
-    placement: 'bottom',
     frequentlyUsedEmojis: [],
   };
 
   state = {
     modifierOpen: false,
+    placement: null,
   };
 
   handleDocumentClick = e => {
@@ -241,7 +228,22 @@ class EmojiPickerMenu extends React.PureComponent {
     }
 
     const title = intl.formatMessage(messages.emoji);
+
     const { modifierOpen } = this.state;
+
+    const categoriesSort = [
+      'recent',
+      'people',
+      'nature',
+      'foods',
+      'activity',
+      'places',
+      'objects',
+      'symbols',
+      'flags',
+    ];
+
+    categoriesSort.splice(1, 0, ...Array.from(categoriesFromEmojis(custom_emojis)).sort());
 
     return (
       <div className={classNames('emoji-picker-dropdown__menu', { selecting: modifierOpen })} style={style} ref={this.setRef}>
@@ -261,6 +263,7 @@ class EmojiPickerMenu extends React.PureComponent {
           skin={skinTone}
           showPreview={false}
           backgroundImageFn={backgroundImageFn}
+          autoFocus
           emojiTooltip
         />
 
@@ -277,8 +280,8 @@ class EmojiPickerMenu extends React.PureComponent {
 
 }
 
-@injectIntl
-export default class EmojiPickerDropdown extends React.PureComponent {
+export default @injectIntl
+class EmojiPickerDropdown extends React.PureComponent {
 
   static propTypes = {
     custom_emojis: ImmutablePropTypes.list,
@@ -298,7 +301,7 @@ export default class EmojiPickerDropdown extends React.PureComponent {
     this.dropdown = c;
   }
 
-  onShowDropdown = () => {
+  onShowDropdown = ({ target }) => {
     this.setState({ active: true });
 
     if (!EmojiPicker) {
@@ -313,6 +316,9 @@ export default class EmojiPickerDropdown extends React.PureComponent {
         this.setState({ loading: false });
       });
     }
+
+    const { top } = target.getBoundingClientRect();
+    this.setState({ placement: top * 2 < innerHeight ? 'bottom' : 'top' });
   }
 
   onHideDropdown = () => {
@@ -324,7 +330,7 @@ export default class EmojiPickerDropdown extends React.PureComponent {
       if (this.state.active) {
         this.onHideDropdown();
       } else {
-        this.onShowDropdown();
+        this.onShowDropdown(e);
       }
     }
   }
@@ -346,7 +352,7 @@ export default class EmojiPickerDropdown extends React.PureComponent {
   render () {
     const { intl, onPickEmoji, onSkinTone, skinTone, frequentlyUsedEmojis } = this.props;
     const title = intl.formatMessage(messages.emoji);
-    const { active, loading } = this.state;
+    const { active, loading, placement } = this.state;
 
     return (
       <div className='emoji-picker-dropdown' onKeyDown={this.handleKeyDown}>
@@ -358,7 +364,7 @@ export default class EmojiPickerDropdown extends React.PureComponent {
           />
         </div>
 
-        <Overlay show={active} placement='bottom' target={this.findTarget}>
+        <Overlay show={active} placement={placement} target={this.findTarget}>
           <EmojiPickerMenu
             custom_emojis={this.props.custom_emojis}
             loading={loading}

@@ -12,6 +12,10 @@ module AccountFinderConcern
       find_remote(username, domain) || raise(ActiveRecord::RecordNotFound)
     end
 
+    def representative
+      Account.find(-99)
+    end
+
     def find_local(username)
       find_remote(username, nil)
     end
@@ -30,7 +34,7 @@ module AccountFinderConcern
     end
 
     def account
-      scoped_accounts.take
+      scoped_accounts.order(id: :asc).take
     end
 
     private

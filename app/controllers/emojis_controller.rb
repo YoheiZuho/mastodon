@@ -2,14 +2,13 @@
 
 class EmojisController < ApplicationController
   before_action :set_emoji
+  before_action :set_cache_headers
 
   def show
     respond_to do |format|
       format.json do
-        render json: @emoji,
-               serializer: ActivityPub::EmojiSerializer,
-               adapter: ActivityPub::Adapter,
-               content_type: 'application/activity+json'
+        expires_in 3.minutes, public: true
+        render_with_cache json: @emoji, content_type: 'application/activity+json', serializer: ActivityPub::EmojiSerializer, adapter: ActivityPub::Adapter
       end
     end
   end

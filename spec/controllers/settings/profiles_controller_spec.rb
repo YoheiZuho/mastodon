@@ -11,7 +11,7 @@ RSpec.describe Settings::ProfilesController, type: :controller do
   describe "GET #show" do
     it "returns http success" do
       get :show
-      expect(response).to have_http_status(:success)
+      expect(response).to have_http_status(200)
     end
   end
 
@@ -24,6 +24,28 @@ RSpec.describe Settings::ProfilesController, type: :controller do
       expect(account.reload.display_name).to eq 'New name'
       expect(response).to redirect_to(settings_profile_path)
       expect(ActivityPub::UpdateDistributionWorker).to have_received(:perform_async).with(account.id)
+    end
+  end
+
+  describe 'PUT #update with new profile image' do
+    it 'updates profile image' do
+      allow(ActivityPub::UpdateDistributionWorker).to receive(:perform_async)
+      account = Fabricate(:account, user: @user, display_name: 'AvatarTest')
+      expect(account.avatar.instance.avatar_file_name).to be_nil
+
+      put :update, params: { account: { avatar: fixture_file_upload('files/avatar.gif', 'image/gif') } }
+      expect(response).to redirect_to(settings_profile_path)
+      expect(account.reload.avatar.instance.avatar_file_name).not_to be_nil
+      expect(ActivityPub::UpdateDistributionWorker).to have_received(:perform_async).with(account.id)
+    end
+  end
+
+  describe 'PUT #update with oversized image' do
+    it 'gives the user an error message' do
+      allow(ActivityPub::UpdateDistributionWorker).to receive(:perform_async)
+      account = Fabricate(:account, user: @user, display_name: 'AvatarTest')
+      put :update, params: { account: { avatar: fixture_file_upload('files/4096x4097.png', 'image/png') } }
+      expect(response.body).to include('images are not supported')
     end
   end
 end

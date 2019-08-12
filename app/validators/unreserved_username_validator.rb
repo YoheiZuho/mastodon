@@ -2,14 +2,22 @@
 
 class UnreservedUsernameValidator < ActiveModel::Validator
   def validate(account)
-    return if account.username.nil?
-    account.errors.add(:username, I18n.t('accounts.reserved_username')) if reserved_username?(account.username)
+    @username = account.username
+    return if @username.nil?
+
+    account.errors.add(:username, I18n.t('accounts.reserved_username')) if reserved_username?
   end
 
   private
 
-  def reserved_username?(value)
+  def pam_controlled?
+    return false unless Devise.pam_authentication && Devise.pam_controlled_service
+    Rpam2.account(Devise.pam_controlled_service, @username).present?
+  end
+
+  def reserved_username?
+    return true if pam_controlled?
     return false unless Setting.reserved_usernames
-    Setting.reserved_usernames.include?(value.downcase)
+    Setting.reserved_usernames.include?(@username.downcase)
   end
 end

@@ -6,9 +6,20 @@ class Auth::SessionsController < Devise::SessionsController
   layout 'auth'
 
   skip_before_action :require_no_authentication, only: [:create]
-  skip_before_action :check_suspension, only: [:destroy]
+  skip_before_action :require_functional!
+
   prepend_before_action :authenticate_with_two_factor, if: :two_factor_enabled?, only: [:create]
+
   before_action :set_instance_presenter, only: [:new]
+  before_action :set_body_classes
+
+  def new
+    Devise.omniauth_configs.each do |provider, config|
+      return redirect_to(omniauth_authorize_path(resource_name, provider)) if config.strategy.redirect_at_sign_in
+    end
+
+    super
+  end
 
   def create
     super do |resource|
@@ -18,8 +29,10 @@ class Auth::SessionsController < Devise::SessionsController
   end
 
   def destroy
+    tmp_stored_location = stored_location_for(:user)
     super
     flash.delete(:notice)
+    store_location_for(:user, tmp_stored_location) if continue_after?
   end
 
   protected
@@ -28,7 +41,11 @@ class Auth::SessionsController < Devise::SessionsController
     if session[:otp_user_id]
       User.find(session[:otp_user_id])
     elsif user_params[:email]
-      User.find_for_authentication(email: user_params[:email])
+      if use_seamless_external_login? && Devise.check_at_sign && user_params[:email].index('@').nil?
+        User.joins(:account).find_by(accounts: { username: user_params[:email] })
+      else
+        User.find_for_authentication(email: user_params[:email])
+      end
     end
   end
 
@@ -44,6 +61,14 @@ class Auth::SessionsController < Devise::SessionsController
     else
       last_url || root_path
     end
+  end
+
+  def after_sign_out_path_for(_resource_or_scope)
+    Devise.omniauth_configs.each_value do |config|
+      return root_path if config.strategy.redirect_at_sign_in
+    end
+
+    super
   end
 
   def two_factor_enabled?
@@ -89,11 +114,19 @@ class Auth::SessionsController < Devise::SessionsController
     @instance_presenter = InstancePresenter.new
   end
 
+  def set_body_classes
+    @body_classes = 'lighter'
+  end
+
   def home_paths(resource)
     paths = [about_path]
     if single_user_mode? && resource.is_a?(User)
       paths << short_account_path(username: resource.account)
     end
     paths
+  end
+
+  def continue_after?
+    truthy_param?(:continue)
   end
 end

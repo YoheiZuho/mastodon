@@ -15,17 +15,16 @@ describe Settings::ApplicationsController do
 
     it 'shows apps' do
       get :index
-      expect(response).to have_http_status(:success)
+      expect(response).to have_http_status(200)
       expect(assigns(:applications)).to include(app)
       expect(assigns(:applications)).to_not include(other_app)
     end
   end
 
-
   describe 'GET #show' do
     it 'returns http success' do
       get :show, params: { id: app.id }
-      expect(response).to have_http_status(:success)
+      expect(response).to have_http_status(200)
       expect(assigns[:application]).to eql(app)
     end
 
@@ -40,7 +39,7 @@ describe Settings::ApplicationsController do
   describe 'GET #new' do
     it 'works' do
       get :new
-      expect(response).to have_http_status(:success)
+      expect(response).to have_http_status(200)
     end
   end
 
@@ -48,13 +47,13 @@ describe Settings::ApplicationsController do
     context 'success (passed scopes as a String)' do
       def call_create
         post :create, params: {
-               doorkeeper_application: {
-                 name: 'My New App',
-                 redirect_uri: 'urn:ietf:wg:oauth:2.0:oob',
-                 website: 'http://google.com',
-                 scopes: 'read write follow'
-               }
-             }
+          doorkeeper_application: {
+            name: 'My New App',
+            redirect_uri: 'urn:ietf:wg:oauth:2.0:oob',
+            website: 'http://google.com',
+            scopes: 'read write follow'
+          }
+        }
         response
       end
 
@@ -70,13 +69,13 @@ describe Settings::ApplicationsController do
     context 'success (passed scopes as an Array)' do
       def call_create
         post :create, params: {
-               doorkeeper_application: {
-                 name: 'My New App',
-                 redirect_uri: 'urn:ietf:wg:oauth:2.0:oob',
-                 website: 'http://google.com',
-                 scopes: [ 'read', 'write', 'follow' ]
-               }
-             }
+          doorkeeper_application: {
+            name: 'My New App',
+            redirect_uri: 'urn:ietf:wg:oauth:2.0:oob',
+            website: 'http://google.com',
+            scopes: [ 'read', 'write', 'follow' ]
+          }
+        }
         response
       end
 
@@ -92,17 +91,17 @@ describe Settings::ApplicationsController do
     context 'failure' do
       before do
         post :create, params: {
-               doorkeeper_application: {
-                 name: '',
-                 redirect_uri: '',
-                 website: '',
-                 scopes: []
-               }
-             }
+          doorkeeper_application: {
+            name: '',
+            redirect_uri: '',
+            website: '',
+            scopes: []
+          }
+        }
       end
 
       it 'returns http success' do
-        expect(response).to have_http_status(:success)
+        expect(response).to have_http_status(200)
       end
 
       it 'renders form again' do
@@ -121,9 +120,9 @@ describe Settings::ApplicationsController do
 
       def call_update
         patch :update, params: {
-                id: app.id,
-                doorkeeper_application: opts
-              }
+          id: app.id,
+          doorkeeper_application: opts
+        }
         response
       end
 
@@ -140,18 +139,18 @@ describe Settings::ApplicationsController do
     context 'failure' do
       before do
         patch :update, params: {
-                id: app.id,
-                doorkeeper_application: {
-                  name: '',
-                  redirect_uri: '',
-                  website: '',
-                  scopes: []
-                }
-              }
+          id: app.id,
+          doorkeeper_application: {
+            name: '',
+            redirect_uri: '',
+            website: '',
+            scopes: []
+          }
+        }
       end
 
       it 'returns http success' do
-        expect(response).to have_http_status(:success)
+        expect(response).to have_http_status(200)
       end
 
       it 'renders form again' do

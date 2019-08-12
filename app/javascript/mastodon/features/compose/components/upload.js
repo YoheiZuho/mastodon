@@ -1,26 +1,31 @@
 import React from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import PropTypes from 'prop-types';
-import IconButton from '../../../components/icon_button';
 import Motion from '../../ui/util/optional_motion';
 import spring from 'react-motion/lib/spring';
 import ImmutablePureComponent from 'react-immutable-pure-component';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import classNames from 'classnames';
+import Icon from 'mastodon/components/icon';
 
 const messages = defineMessages({
-  undo: { id: 'upload_form.undo', defaultMessage: 'Undo' },
   description: { id: 'upload_form.description', defaultMessage: 'Describe for the visually impaired' },
 });
 
-@injectIntl
-export default class Upload extends ImmutablePureComponent {
+export default @injectIntl
+class Upload extends ImmutablePureComponent {
+
+  static contextTypes = {
+    router: PropTypes.object,
+  };
 
   static propTypes = {
     media: ImmutablePropTypes.map.isRequired,
     intl: PropTypes.object.isRequired,
     onUndo: PropTypes.func.isRequired,
     onDescriptionChange: PropTypes.func.isRequired,
+    onOpenFocalPoint: PropTypes.func.isRequired,
+    onSubmit: PropTypes.func.isRequired,
   };
 
   state = {
@@ -29,8 +34,25 @@ export default class Upload extends ImmutablePureComponent {
     dirtyDescription: null,
   };
 
-  handleUndoClick = () => {
+  handleKeyDown = (e) => {
+    if (e.keyCode === 13 && (e.ctrlKey || e.metaKey)) {
+      this.handleSubmit();
+    }
+  }
+
+  handleSubmit = () => {
+    this.handleInputBlur();
+    this.props.onSubmit(this.context.router.history);
+  }
+
+  handleUndoClick = e => {
+    e.stopPropagation();
     this.props.onUndo(this.props.media.get('id'));
+  }
+
+  handleFocalPointClick = e => {
+    e.stopPropagation();
+    this.props.onOpenFocalPoint(this.props.media.get('id'));
   }
 
   handleInputChange = e => {
@@ -49,6 +71,10 @@ export default class Upload extends ImmutablePureComponent {
     this.setState({ focused: true });
   }
 
+  handleClick = () => {
+    this.setState({ focused: true });
+  }
+
   handleInputBlur = () => {
     const { dirtyDescription } = this.state;
 
@@ -63,26 +89,33 @@ export default class Upload extends ImmutablePureComponent {
     const { intl, media } = this.props;
     const active          = this.state.hovered || this.state.focused;
     const description     = this.state.dirtyDescription || (this.state.dirtyDescription !== '' && media.get('description')) || '';
+    const focusX = media.getIn(['meta', 'focus', 'x']);
+    const focusY = media.getIn(['meta', 'focus', 'y']);
+    const x = ((focusX /  2) + .5) * 100;
+    const y = ((focusY / -2) + .5) * 100;
 
     return (
-      <div className='compose-form__upload' onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}>
+      <div className='compose-form__upload' tabIndex='0' onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave} onClick={this.handleClick} role='button'>
         <Motion defaultStyle={{ scale: 0.8 }} style={{ scale: spring(1, { stiffness: 180, damping: 12 }) }}>
           {({ scale }) => (
-            <div className='compose-form__upload-thumbnail' style={{ transform: `scale(${scale})`, backgroundImage: `url(${media.get('preview_url')})` }}>
-              <IconButton icon='times' title={intl.formatMessage(messages.undo)} size={36} onClick={this.handleUndoClick} />
+            <div className='compose-form__upload-thumbnail' style={{ transform: `scale(${scale})`, backgroundImage: `url(${media.get('preview_url')})`, backgroundPosition: `${x}% ${y}%` }}>
+              <div className={classNames('compose-form__upload__actions', { active })}>
+                <button className='icon-button' onClick={this.handleUndoClick}><Icon id='times' /> <FormattedMessage id='upload_form.undo' defaultMessage='Delete' /></button>
+                {media.get('type') === 'image' && <button className='icon-button' onClick={this.handleFocalPointClick}><Icon id='crosshairs' /> <FormattedMessage id='upload_form.focus' defaultMessage='Crop' /></button>}
+              </div>
 
               <div className={classNames('compose-form__upload-description', { active })}>
                 <label>
                   <span style={{ display: 'none' }}>{intl.formatMessage(messages.description)}</span>
 
-                  <input
+                  <textarea
                     placeholder={intl.formatMessage(messages.description)}
-                    type='text'
                     value={description}
                     maxLength={420}
                     onFocus={this.handleInputFocus}
                     onChange={this.handleInputChange}
                     onBlur={this.handleInputBlur}
+                    onKeyDown={this.handleKeyDown}
                   />
                 </label>
               </div>

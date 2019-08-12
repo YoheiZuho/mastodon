@@ -6,10 +6,11 @@ describe StatusFinder do
   include RoutingHelper
 
   describe '#status' do
+    subject { described_class.new(url) }
+
     context 'with a status url' do
       let(:status) { Fabricate(:status) }
       let(:url) { short_account_status_url(account_username: status.account.username, id: status.id) }
-      subject { described_class.new(url) }
 
       it 'finds the stream entry' do
         expect(subject.status).to eq(status)
@@ -24,20 +25,9 @@ describe StatusFinder do
       end
     end
 
-    context 'with a stream entry url' do
-      let(:stream_entry) { Fabricate(:stream_entry) }
-      let(:url) { account_stream_entry_url(stream_entry.account, stream_entry) }
-      subject { described_class.new(url) }
-
-      it 'finds the stream entry' do
-        expect(subject.status).to eq(stream_entry.status)
-      end
-    end
-
     context 'with a remote url even if id exists on local' do
       let(:status) { Fabricate(:status) }
       let(:url) { "https://example.com/users/test/statuses/#{status.id}" }
-      subject { described_class.new(url) }
 
       it 'raises an error' do
         expect { subject.status }.to raise_error(ActiveRecord::RecordNotFound)
@@ -46,7 +36,6 @@ describe StatusFinder do
 
     context 'with a plausible url' do
       let(:url) { 'https://example.com/users/test/updates/123/embed' }
-      subject { described_class.new(url) }
 
       it 'raises an error' do
         expect { subject.status }.to raise_error(ActiveRecord::RecordNotFound)
@@ -55,7 +44,6 @@ describe StatusFinder do
 
     context 'with an unrecognized url' do
       let(:url) { 'https://example.com/about' }
-      subject { described_class.new(url) }
 
       it 'raises an error' do
         expect { subject.status }.to raise_error(ActiveRecord::RecordNotFound)

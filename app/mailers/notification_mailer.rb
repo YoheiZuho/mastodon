@@ -1,13 +1,15 @@
 # frozen_string_literal: true
 
 class NotificationMailer < ApplicationMailer
-  helper StreamEntriesHelper
+  helper :statuses
+
+  add_template_helper RoutingHelper
 
   def mention(recipient, notification)
     @me     = recipient
     @status = notification.target_status
 
-    return if @me.user.disabled?
+    return if @me.user.disabled? || @status.nil?
 
     locale_for_account(@me) do
       thread_by_conversation(@status.conversation)
@@ -31,7 +33,7 @@ class NotificationMailer < ApplicationMailer
     @account = notification.from_account
     @status  = notification.target_status
 
-    return if @me.user.disabled?
+    return if @me.user.disabled? || @status.nil?
 
     locale_for_account(@me) do
       thread_by_conversation(@status.conversation)
@@ -44,7 +46,7 @@ class NotificationMailer < ApplicationMailer
     @account = notification.from_account
     @status  = notification.target_status
 
-    return if @me.user.disabled?
+    return if @me.user.disabled? || @status.nil?
 
     locale_for_account(@me) do
       thread_by_conversation(@status.conversation)
@@ -64,16 +66,20 @@ class NotificationMailer < ApplicationMailer
   end
 
   def digest(recipient, **opts)
-    @me            = recipient
-    @since         = opts[:since] || @me.user.last_emailed_at || @me.user.current_sign_in_at
-    @notifications = Notification.where(account: @me, activity_type: 'Mention').where('created_at > ?', @since)
-    @follows_since = Notification.where(account: @me, activity_type: 'Follow').where('created_at > ?', @since).count
+    return if recipient.user.disabled?
 
-    return if @me.user.disabled? || @notifications.empty?
+    @me                  = recipient
+    @since               = opts[:since] || [@me.user.last_emailed_at, (@me.user.current_sign_in_at + 1.day)].compact.max
+    @notifications_count = Notification.where(account: @me, activity_type: 'Mention').where('created_at > ?', @since).count
+
+    return if @notifications_count.zero?
+
+    @notifications = Notification.where(account: @me, activity_type: 'Mention').where('created_at > ?', @since).limit(40)
+    @follows_since = Notification.where(account: @me, activity_type: 'Follow').where('created_at > ?', @since).count
 
     locale_for_account(@me) do
       mail to: @me.user.email,
-           subject: I18n.t(:subject, scope: [:notification_mailer, :digest], count: @notifications.size)
+           subject: I18n.t(:subject, scope: [:notification_mailer, :digest], count: @notifications_count)
     end
   end
 

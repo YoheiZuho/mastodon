@@ -21,6 +21,10 @@
       "description": "The secret key base",
       "generator": "secret"
     },
+    "OTP_SECRET": {
+      "description": "One-time password secret",
+      "generator": "secret"
+    },
     "SINGLE_USER_MODE": {
       "description": "Should the instance run in single user mode? (Disable registrations, redirect to front page)",
       "value": "false",
@@ -87,13 +91,18 @@
       "description": "Internal scalingo configuration",
       "required": true,
       "value": "https://github.com/Scalingo/multi-buildpack.git"
+    },
+    "WITH_FFPROBE": {
+      "description": "Internal scalingo configuration to install ffprobe",
+      "required": true,
+      "value": "true"
     }
   },
   "scripts": {
     "postdeploy": "bundle exec rails db:migrate && bundle exec rails db:seed"
   },
   "addons": [
-    "scalingo-postgresql",
-    "scalingo-redis"
+    "postgresql",
+    "redis"
   ]
 }

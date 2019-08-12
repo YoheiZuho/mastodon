@@ -9,36 +9,40 @@ module Mastodon
     end
 
     def minor
-      1
+      9
     end
 
     def patch
-      0
-    end
-
-    def pre
-      ''
+      2
     end
 
     def flags
       ''
     end
 
+    def suffix
+      ''
+    end
+
     def to_a
-      [major, minor, patch, pre].compact
+      [major, minor, patch].compact
     end
 
     def to_s
-      [to_a.join('.'), flags].join
+      [to_a.join('.'), flags, suffix].join
+    end
+
+    def repository
+      ENV.fetch('GITHUB_REPOSITORY') { 'tootsuite/mastodon' }
     end
 
     def source_base_url
-      'https://github.com/tootsuite/mastodon'
+      ENV.fetch('SOURCE_BASE_URL') { "https://github.com/#{repository}" }
     end
 
     # specify git tag or commit hash here
     def source_tag
-      nil
+      ENV.fetch('SOURCE_TAG') { nil }
     end
 
     def source_url
@@ -47,6 +51,10 @@ module Mastodon
       else
         source_base_url
       end
+    end
+
+    def user_agent
+      @user_agent ||= "#{HTTP::Request::USER_AGENT} (Mastodon/#{Version}; +http#{Rails.configuration.x.use_https ? 's' : ''}://#{Rails.configuration.x.web_domain}/)"
     end
   end
 end

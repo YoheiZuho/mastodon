@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-class ActivityPub::BlockSerializer < ActiveModel::Serializer
+class ActivityPub::BlockSerializer < ActivityPub::Serializer
   attributes :id, :type, :actor
   attribute :virtual_object, key: :object
 
   def id
-    [ActivityPub::TagManager.instance.uri_for(object.account), '#blocks/', object.id].join
+    ActivityPub::TagManager.instance.uri_for(object) || [ActivityPub::TagManager.instance.uri_for(object.account), '#blocks/', object.id].join
   end
 
   def type

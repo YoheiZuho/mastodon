@@ -1,17 +1,22 @@
+@function hex-color($color) {
+  @if type-of($color) == 'color' {
+    $color: str-slice(ie-hex-str($color), 4);
+  }
+
+  @return '%23' + unquote($color);
+}
+
 body {
-  font-family: 'mastodon-font-sans-serif', sans-serif;
-  background: $ui-base-color;
-  background-size: cover;
-  background-attachment: fixed;
+  font-family: $font-sans-serif, sans-serif;
+  background: darken($ui-base-color, 7%);
   font-size: 13px;
   line-height: 18px;
   font-weight: 400;
   color: $primary-text-color;
-  padding-bottom: 20px;
   text-rendering: optimizelegibility;
   font-feature-settings: "kern";
   text-size-adjust: none;
-  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   -webkit-tap-highlight-color: transparent;
 
   &.system-font {
@@ -25,30 +30,49 @@ body {
     // Fira Sans => Firefox OS
     // Droid Sans => Older Androids (<4.0)
     // Helvetica Neue => Older macOS <10.11
-    // mastodon-font-sans-serif => web-font (Roboto) fallback and newer Androids (>=4.0)
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", mastodon-font-sans-serif, sans-serif;
+    // $font-sans-serif => web-font (Roboto) fallback and newer Androids (>=4.0)
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", $font-sans-serif, sans-serif;
   }
 
   &.app-body {
-    position: absolute;
-    width: 100%;
-    height: 100%;
     padding: 0;
+
+    &.layout-single-column {
+      height: auto;
+      min-height: 100vh;
+      overflow-y: scroll;
+    }
+
+    &.layout-multiple-columns {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+    }
+
+    &.with-modals--active {
+      overflow-y: hidden;
+    }
+  }
+
+  &.lighter {
     background: $ui-base-color;
   }
 
-  &.about-body {
-    background: darken($ui-base-color, 8%);
-    padding-bottom: 0;
+  &.with-modals {
+    overflow-x: hidden;
+    overflow-y: scroll;
+
+    &--active {
+      overflow-y: hidden;
+    }
   }
 
-  &.tag-body {
-    background: darken($ui-base-color, 8%);
-    padding-bottom: 0;
+  &.player {
+    text-align: center;
   }
 
   &.embed {
-    background: transparent;
+    background: lighten($ui-base-color, 4%);
     margin: 0;
     padding-bottom: 0;
 
@@ -71,7 +95,7 @@ body {
   &.error {
     position: absolute;
     text-align: center;
-    color: $ui-primary-color;
+    color: $darker-text-color;
     background: $ui-base-color;
     width: 100%;
     height: 100%;
@@ -84,12 +108,14 @@ body {
       vertical-align: middle;
       margin: 20px;
 
-      img {
-        display: block;
-        max-width: 470px;
-        width: 100%;
-        height: auto;
-        margin-top: -120px;
+      &__illustration {
+        img {
+          display: block;
+          max-width: 470px;
+          width: 100%;
+          height: auto;
+          margin-top: -120px;
+        }
       }
 
       h1 {
@@ -115,8 +141,22 @@ button {
   & > div {
     display: flex;
     width: 100%;
-    height: 100%;
     align-items: center;
     justify-content: center;
+    outline: 0 !important;
+  }
+}
+
+.layout-single-column .app-holder {
+  &,
+  & > div {
+    min-height: 100%;
+  }
+}
+
+.layout-multiple-columns .app-holder {
+  &,
+  & > div {
+    height: 100%;
   }
 }

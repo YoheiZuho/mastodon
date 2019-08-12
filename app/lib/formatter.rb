@@ -19,19 +19,25 @@ class Formatter
 
     raw_content = status.text
 
+    if options[:inline_poll_options] && status.preloadable_poll
+      raw_content = raw_content + "\n\n" + status.preloadable_poll.options.map { |title| "[ ] #{title}" }.join("\n")
+    end
+
+    return '' if raw_content.blank?
+
     unless status.local?
       html = reformat(raw_content)
-      html = encode_custom_emojis(html, status.emojis) if options[:custom_emojify]
+      html = encode_custom_emojis(html, status.emojis, options[:autoplay]) if options[:custom_emojify]
       return html.html_safe # rubocop:disable Rails/OutputSafety
     end
 
-    linkable_accounts = status.mentions.map(&:account)
+    linkable_accounts = status.active_mentions.map(&:account)
     linkable_accounts << status.account
 
     html = raw_content
     html = "RT @#{prepend_reblog} #{html}" if prepend_reblog
     html = encode_and_link_urls(html, linkable_accounts)
-    html = encode_custom_emojis(html, status.emojis) if options[:custom_emojify]
+    html = encode_custom_emojis(html, status.emojis, options[:autoplay]) if options[:custom_emojify]
     html = simple_format(html, {}, sanitize: false)
     html = html.delete("\n")
 
@@ -49,18 +55,38 @@ class Formatter
     strip_tags(text)
   end
 
-  def simplified_format(account)
-    return reformat(account.note).html_safe unless account.local? # rubocop:disable Rails/OutputSafety
-    linkify(account.note)
+  def simplified_format(account, **options)
+    html = account.local? ? linkify(account.note) : reformat(account.note)
+    html = encode_custom_emojis(html, account.emojis, options[:autoplay]) if options[:custom_emojify]
+    html.html_safe # rubocop:disable Rails/OutputSafety
   end
 
   def sanitize(html, config)
     Sanitize.fragment(html, config)
   end
 
-  def format_spoiler(status)
+  def format_spoiler(status, **options)
     html = encode(status.spoiler_text)
-    html = encode_custom_emojis(html, status.emojis)
+    html = encode_custom_emojis(html, status.emojis, options[:autoplay])
+    html.html_safe # rubocop:disable Rails/OutputSafety
+  end
+
+  def format_poll_option(status, option, **options)
+    html = encode(option.title)
+    html = encode_custom_emojis(html, status.emojis, options[:autoplay])
+    html.html_safe # rubocop:disable Rails/OutputSafety
+  end
+
+  def format_display_name(account, **options)
+    html = encode(account.display_name.presence || account.username)
+    html = encode_custom_emojis(html, account.emojis, options[:autoplay]) if options[:custom_emojify]
+    html.html_safe # rubocop:disable Rails/OutputSafety
+  end
+
+  def format_field(account, str, **options)
+    return reformat(str).html_safe unless account.local? # rubocop:disable Rails/OutputSafety
+    html = encode_and_link_urls(str, me: true)
+    html = encode_custom_emojis(html, account.emojis, options[:autoplay]) if options[:custom_emojify]
     html.html_safe # rubocop:disable Rails/OutputSafety
   end
 
@@ -74,16 +100,25 @@ class Formatter
 
   private
 
-  def encode(html)
-    HTMLEntities.new.encode(html)
+  def html_entities
+    @html_entities ||= HTMLEntities.new
   end
 
-  def encode_and_link_urls(html, accounts = nil)
-    entities = Extractor.extract_entities_with_indices(html, extract_url_without_protocol: false)
+  def encode(html)
+    html_entities.encode(html)
+  end
+
+  def encode_and_link_urls(html, accounts = nil, options = {})
+    entities = utf8_friendly_extractor(html, extract_url_without_protocol: false)
+
+    if accounts.is_a?(Hash)
+      options  = accounts
+      accounts = nil
+    end
 
     rewrite(html.dup, entities) do |entity|
       if entity[:url]
-        link_to_url(entity)
+        link_to_url(entity, options)
       elsif entity[:hashtag]
         link_to_hashtag(entity)
       elsif entity[:screen_name]
@@ -99,10 +134,10 @@ class Formatter
     end
   end
 
-  def encode_custom_emojis(html, emojis)
+  def encode_custom_emojis(html, emojis, animate = false)
     return html if emojis.empty?
 
-    emoji_map = emojis.map { |e| [e.shortcode, full_asset_url(e.image.url(:static))] }.to_h
+    emoji_map = emojis.each_with_object({}) { |e, h| h[e.shortcode] = [full_asset_url(e.image.url), full_asset_url(e.image.url(:static))] }
 
     i                     = -1
     tag_open_index        = nil
@@ -118,7 +153,14 @@ class Formatter
         emoji     = emoji_map[shortcode]
 
         if emoji
-          replacement = "<img draggable=\"false\" class=\"emojione\" alt=\":#{shortcode}:\" title=\":#{shortcode}:\" src=\"#{emoji}\" />"
+          original_url, static_url = emoji
+          replacement = begin
+            if animate
+              "<img draggable=\"false\" class=\"emojione\" alt=\":#{encode(shortcode)}:\" title=\":#{encode(shortcode)}:\" src=\"#{encode(original_url)}\" />"
+            else
+              "<img draggable=\"false\" class=\"emojione custom-emoji\" alt=\":#{encode(shortcode)}:\" title=\":#{encode(shortcode)}:\" src=\"#{encode(static_url)}\" data-original=\"#{original_url}\" data-static=\"#{static_url}\" />"
+            end
+          end
           before_html = shortname_start_index.positive? ? html[0..shortname_start_index - 1] : ''
           html        = before_html + replacement + html[i + 1..-1]
           i          += replacement.size - (shortcode.size + 2) - 1
@@ -148,7 +190,7 @@ class Formatter
   end
 
   def rewrite(text, entities)
-    chars = text.to_s.to_char_a
+    text = text.to_s
 
     # Sort by start index
     entities = entities.sort_by do |entity|
@@ -160,21 +202,61 @@ class Formatter
 
     last_index = entities.reduce(0) do |index, entity|
       indices = entity.respond_to?(:indices) ? entity.indices : entity[:indices]
-      result << encode(chars[index...indices.first].join)
+      result << encode(text[index...indices.first])
       result << yield(entity)
       indices.last
     end
 
-    result << encode(chars[last_index..-1].join)
+    result << encode(text[last_index..-1])
 
     result.flatten.join
   end
 
-  def link_to_url(entity)
-    normalized_url = Addressable::URI.parse(entity[:url]).normalize
-    html_attrs     = { target: '_blank', rel: 'nofollow noopener' }
+  UNICODE_ESCAPE_BLACKLIST_RE = /\p{Z}|\p{P}/
 
-    Twitter::Autolink.send(:link_to_text, entity, link_html(entity[:url]), normalized_url, html_attrs)
+  def utf8_friendly_extractor(text, options = {})
+    old_to_new_index = [0]
+
+    escaped = text.chars.map do |c|
+      output = begin
+        if c.ord.to_s(16).length > 2 && UNICODE_ESCAPE_BLACKLIST_RE.match(c).nil?
+          CGI.escape(c)
+        else
+          c
+        end
+      end
+
+      old_to_new_index << old_to_new_index.last + output.length
+
+      output
+    end.join
+
+    # Note: I couldn't obtain list_slug with @user/list-name format
+    # for mention so this requires additional check
+    special = Extractor.extract_urls_with_indices(escaped, options).map do |extract|
+      new_indices = [
+        old_to_new_index.find_index(extract[:indices].first),
+        old_to_new_index.find_index(extract[:indices].last),
+      ]
+
+      next extract.merge(
+        indices: new_indices,
+        url: text[new_indices.first..new_indices.last - 1]
+      )
+    end
+
+    standard = Extractor.extract_entities_with_indices(text, options)
+
+    Extractor.remove_overlapping_entities(special + standard)
+  end
+
+  def link_to_url(entity, options = {})
+    url        = Addressable::URI.parse(entity[:url])
+    html_attrs = { target: '_blank', rel: 'nofollow noopener' }
+
+    html_attrs[:rel] = "me #{html_attrs[:rel]}" if options[:me]
+
+    Twitter::Autolink.send(:link_to_text, entity, link_html(entity[:url]), url, html_attrs)
   rescue Addressable::URI::InvalidURIError, IDN::Idna::IdnaError
     encode(entity[:url])
   end
@@ -185,16 +267,16 @@ class Formatter
     return link_to_account(acct) unless linkable_accounts
 
     account = linkable_accounts.find { |item| TagManager.instance.same_acct?(item.acct, acct) }
-    account ? mention_html(account) : "@#{acct}"
+    account ? mention_html(account) : "@#{encode(acct)}"
   end
 
   def link_to_account(acct)
     username, domain = acct.split('@')
 
     domain  = nil if TagManager.instance.local_domain?(domain)
-    account = Account.find_remote(username, domain)
+    account = EntityCache.instance.mention(username, domain)
 
-    account ? mention_html(account) : "@#{acct}"
+    account ? mention_html(account) : "@#{encode(acct)}"
   end
 
   def link_to_hashtag(entity)
@@ -212,10 +294,10 @@ class Formatter
   end
 
   def hashtag_html(tag)
-    "<a href=\"#{tag_url(tag.downcase)}\" class=\"mention hashtag\" rel=\"tag\">#<span>#{tag}</span></a>"
+    "<a href=\"#{encode(tag_url(tag))}\" class=\"mention hashtag\" rel=\"tag\">#<span>#{encode(tag)}</span></a>"
   end
 
   def mention_html(account)
-    "<span class=\"h-card\"><a href=\"#{TagManager.instance.url_for(account)}\" class=\"u-url mention\">@<span>#{account.username}</span></a></span>"
+    "<span class=\"h-card\"><a href=\"#{encode(ActivityPub::TagManager.instance.url_for(account))}\" class=\"u-url mention\">@<span>#{encode(account.username)}</span></a></span>"
   end
 end

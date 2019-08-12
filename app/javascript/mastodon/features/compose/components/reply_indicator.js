@@ -7,13 +7,14 @@ import DisplayName from '../../../components/display_name';
 import { defineMessages, injectIntl } from 'react-intl';
 import ImmutablePureComponent from 'react-immutable-pure-component';
 import { isRtl } from '../../../rtl';
+import AttachmentList from 'mastodon/components/attachment_list';
 
 const messages = defineMessages({
   cancel: { id: 'reply_indicator.cancel', defaultMessage: 'Cancel' },
 });
 
-@injectIntl
-export default class ReplyIndicator extends ImmutablePureComponent {
+export default @injectIntl
+class ReplyIndicator extends ImmutablePureComponent {
 
   static contextTypes = {
     router: PropTypes.object,
@@ -30,7 +31,7 @@ export default class ReplyIndicator extends ImmutablePureComponent {
   }
 
   handleAccountClick = (e) => {
-    if (e.button === 0) {
+    if (e.button === 0 && !(e.ctrlKey || e.metaKey)) {
       e.preventDefault();
       this.context.router.history.push(`/accounts/${this.props.status.getIn(['account', 'id'])}`);
     }
@@ -51,7 +52,7 @@ export default class ReplyIndicator extends ImmutablePureComponent {
     return (
       <div className='reply-indicator'>
         <div className='reply-indicator__header'>
-          <div className='reply-indicator__cancel'><IconButton title={intl.formatMessage(messages.cancel)} icon='times' onClick={this.handleClick} /></div>
+          <div className='reply-indicator__cancel'><IconButton title={intl.formatMessage(messages.cancel)} icon='times' onClick={this.handleClick} inverted /></div>
 
           <a href={status.getIn(['account', 'url'])} onClick={this.handleAccountClick} className='reply-indicator__display-name'>
             <div className='reply-indicator__display-avatar'><Avatar account={status.get('account')} size={24} /></div>
@@ -60,6 +61,13 @@ export default class ReplyIndicator extends ImmutablePureComponent {
         </div>
 
         <div className='reply-indicator__content' style={style} dangerouslySetInnerHTML={content} />
+
+        {status.get('media_attachments').size > 0 && (
+          <AttachmentList
+            compact
+            media={status.get('media_attachments')}
+          />
+        )}
       </div>
     );
   }

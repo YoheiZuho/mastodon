@@ -3,7 +3,7 @@ require "rails_helper"
 feature "Log in" do
   given(:email)        { "test@examle.com" }
   given(:password)     { "password" }
-  given(:confirmed_at) { Time.now }
+  given(:confirmed_at) { Time.zone.now }
 
   background do
     Fabricate(:user, email: email, password: password, confirmed_at: confirmed_at)
@@ -31,12 +31,12 @@ feature "Log in" do
   context do
     given(:confirmed_at) { nil }
 
-    scenario "A unconfirmed user is not able to log in" do
+    scenario "A unconfirmed user is able to log in" do
       fill_in "user_email", with: email
       fill_in "user_password", with: password
       click_on I18n.t('auth.login')
 
-      is_expected.to have_css(".flash-message", text: failure_message("unconfirmed"))
+      is_expected.to have_css("div.admin-wrapper")
     end
   end
 

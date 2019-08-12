@@ -1,4 +1,5 @@
 import api, { getLinks } from '../api';
+import { importFetchedStatuses } from './importer';
 
 export const FAVOURITED_STATUSES_FETCH_REQUEST = 'FAVOURITED_STATUSES_FETCH_REQUEST';
 export const FAVOURITED_STATUSES_FETCH_SUCCESS = 'FAVOURITED_STATUSES_FETCH_SUCCESS';
@@ -18,6 +19,7 @@ export function fetchFavouritedStatuses() {
 
     api(getState).get('/api/v1/favourites').then(response => {
       const next = getLinks(response).refs.find(link => link.rel === 'next');
+      dispatch(importFetchedStatuses(response.data));
       dispatch(fetchFavouritedStatusesSuccess(response.data, next ? next.uri : null));
     }).catch(error => {
       dispatch(fetchFavouritedStatusesFail(error));
@@ -28,6 +30,7 @@ export function fetchFavouritedStatuses() {
 export function fetchFavouritedStatusesRequest() {
   return {
     type: FAVOURITED_STATUSES_FETCH_REQUEST,
+    skipLoading: true,
   };
 };
 
@@ -36,6 +39,7 @@ export function fetchFavouritedStatusesSuccess(statuses, next) {
     type: FAVOURITED_STATUSES_FETCH_SUCCESS,
     statuses,
     next,
+    skipLoading: true,
   };
 };
 
@@ -43,6 +47,7 @@ export function fetchFavouritedStatusesFail(error) {
   return {
     type: FAVOURITED_STATUSES_FETCH_FAIL,
     error,
+    skipLoading: true,
   };
 };
 
@@ -58,6 +63,7 @@ export function expandFavouritedStatuses() {
 
     api(getState).get(url).then(response => {
       const next = getLinks(response).refs.find(link => link.rel === 'next');
+      dispatch(importFetchedStatuses(response.data));
       dispatch(expandFavouritedStatusesSuccess(response.data, next ? next.uri : null));
     }).catch(error => {
       dispatch(expandFavouritedStatusesFail(error));

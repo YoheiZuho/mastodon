@@ -1,4 +1,4 @@
 Fabricator(:list) do
-  account nil
-  title   "MyString"
+  account
+  title "MyString"
 end
