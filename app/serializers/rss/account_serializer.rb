@@ -2,7 +2,7 @@
 
 class RSS::AccountSerializer
   include ActionView::Helpers::NumberHelper
-  include StreamEntriesHelper
+  include StatusesHelper
   include RoutingHelper
 
   def render(account, statuses)
@@ -10,8 +10,8 @@ class RSS::AccountSerializer
 
     builder.title("#{display_name(account)} (@#{account.local_username_and_domain})")
            .description(account_description(account))
-           .link(TagManager.instance.url_for(account))
-           .logo(full_asset_url(asset_pack_path('logo.svg')))
+           .link(ActivityPub::TagManager.instance.url_for(account))
+           .logo(full_pack_url('media/images/logo.svg'))
            .accent_color('2b90d9')
 
     builder.image(full_asset_url(account.avatar.url(:original))) if account.avatar?
@@ -20,9 +20,9 @@ class RSS::AccountSerializer
     statuses.each do |status|
       builder.item do |item|
         item.title(status.title)
-            .link(TagManager.instance.url_for(status))
+            .link(ActivityPub::TagManager.instance.url_for(status))
             .pub_date(status.created_at)
-            .description(status.spoiler_text.presence || Formatter.instance.format(status).to_str)
+            .description(status.spoiler_text.presence || Formatter.instance.format(status, inline_poll_options: true).to_str)
 
         status.media_attachments.each do |media|
           item.enclosure(full_asset_url(media.file.url(:original, false)), media.file.content_type, length: media.file.size)

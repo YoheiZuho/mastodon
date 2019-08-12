@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import StatusListContainer from '../ui/containers/status_list_container';
 import Column from '../../components/column';
+import ColumnBackButton from '../../components/column_back_button';
 import ColumnHeader from '../../components/column_header';
 import { addColumn, removeColumn, moveColumn } from '../../actions/columns';
 import { FormattedMessage, defineMessages, injectIntl } from 'react-intl';
@@ -13,6 +14,7 @@ import { fetchList, deleteList } from '../../actions/lists';
 import { openModal } from '../../actions/modal';
 import MissingIndicator from '../../components/missing_indicator';
 import LoadingIndicator from '../../components/loading_indicator';
+import Icon from 'mastodon/components/icon';
 
 const messages = defineMessages({
   deleteMessage: { id: 'confirmations.delete_list.message', defaultMessage: 'Are you sure you want to permanently delete this list?' },
@@ -24,9 +26,9 @@ const mapStateToProps = (state, props) => ({
   hasUnread: state.getIn(['timelines', `list:${props.params.id}`, 'unread']) > 0,
 });
 
-@connect(mapStateToProps)
+export default @connect(mapStateToProps)
 @injectIntl
-export default class ListTimeline extends React.PureComponent {
+class ListTimeline extends React.PureComponent {
 
   static contextTypes = {
     router: PropTypes.object,
@@ -35,6 +37,7 @@ export default class ListTimeline extends React.PureComponent {
   static propTypes = {
     params: PropTypes.object.isRequired,
     dispatch: PropTypes.func.isRequired,
+    shouldUpdateScroll: PropTypes.func,
     columnId: PropTypes.string,
     hasUnread: PropTypes.bool,
     multiColumn: PropTypes.bool,
@@ -70,6 +73,23 @@ export default class ListTimeline extends React.PureComponent {
     dispatch(expandListTimeline(id));
 
     this.disconnect = dispatch(connectListStream(id));
+  }
+
+  componentWillReceiveProps (nextProps) {
+    const { dispatch } = this.props;
+    const { id } = nextProps.params;
+
+    if (id !== this.props.params.id) {
+      if (this.disconnect) {
+        this.disconnect();
+        this.disconnect = null;
+      }
+
+      dispatch(fetchList(id));
+      dispatch(expandListTimeline(id));
+
+      this.disconnect = dispatch(connectListStream(id));
+    }
   }
 
   componentWillUnmount () {
@@ -112,7 +132,7 @@ export default class ListTimeline extends React.PureComponent {
   }
 
   render () {
-    const { hasUnread, columnId, multiColumn, list } = this.props;
+    const { shouldUpdateScroll, hasUnread, columnId, multiColumn, list } = this.props;
     const { id } = this.props.params;
     const pinned = !!columnId;
     const title  = list ? list.get('title') : id;
@@ -128,17 +148,16 @@ export default class ListTimeline extends React.PureComponent {
     } else if (list === false) {
       return (
         <Column>
-          <div className='scrollable'>
-            <MissingIndicator />
-          </div>
+          <ColumnBackButton multiColumn={multiColumn} />
+          <MissingIndicator />
         </Column>
       );
     }
 
     return (
-      <Column ref={this.setRef}>
+      <Column bindToDocument={!multiColumn} ref={this.setRef} label={title}>
         <ColumnHeader
-          icon='bars'
+          icon='list-ul'
           active={hasUnread}
           title={title}
           onPin={this.handlePin}
@@ -149,15 +168,13 @@ export default class ListTimeline extends React.PureComponent {
         >
           <div className='column-header__links'>
             <button className='text-btn column-header__setting-btn' tabIndex='0' onClick={this.handleEditClick}>
-              <i className='fa fa-pencil' /> <FormattedMessage id='lists.edit' defaultMessage='Edit list' />
+              <Icon id='pencil' /> <FormattedMessage id='lists.edit' defaultMessage='Edit list' />
             </button>
 
             <button className='text-btn column-header__setting-btn' tabIndex='0' onClick={this.handleDeleteClick}>
-              <i className='fa fa-trash' /> <FormattedMessage id='lists.delete' defaultMessage='Delete list' />
+              <Icon id='trash' /> <FormattedMessage id='lists.delete' defaultMessage='Delete list' />
             </button>
           </div>
-
-          <hr />
         </ColumnHeader>
 
         <StatusListContainer
@@ -166,6 +183,8 @@ export default class ListTimeline extends React.PureComponent {
           timelineId={`list:${id}`}
           onLoadMore={this.handleLoadMore}
           emptyMessage={<FormattedMessage id='empty_column.list' defaultMessage='There is nothing in this list yet. When members of this list post new statuses, they will appear here.' />}
+          shouldUpdateScroll={shouldUpdateScroll}
+          bindToDocument={!multiColumn}
         />
       </Column>
     );

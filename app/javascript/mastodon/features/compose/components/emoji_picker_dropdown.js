@@ -6,7 +6,7 @@ import Overlay from 'react-overlays/lib/Overlay';
 import classNames from 'classnames';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import detectPassiveEvents from 'detect-passive-events';
-import { buildCustomEmojis } from '../../emoji/emoji';
+import { buildCustomEmojis, categoriesFromEmojis } from '../../emoji/emoji';
 
 const messages = defineMessages({
   emoji: { id: 'emoji_button.label', defaultMessage: 'Insert emoji' },
@@ -28,21 +28,8 @@ const messages = defineMessages({
 const assetHost = process.env.CDN_HOST || '';
 let EmojiPicker, Emoji; // load asynchronously
 
-const backgroundImageFn = () => `${assetHost}/emoji/sheet.png`;
+const backgroundImageFn = () => `${assetHost}/emoji/sheet_10.png`;
 const listenerOptions = detectPassiveEvents.hasSupport ? { passive: true } : false;
-
-const categoriesSort = [
-  'recent',
-  'custom',
-  'people',
-  'nature',
-  'foods',
-  'activity',
-  'places',
-  'objects',
-  'symbols',
-  'flags',
-];
 
 class ModifierPickerMenu extends React.PureComponent {
 
@@ -241,7 +228,22 @@ class EmojiPickerMenu extends React.PureComponent {
     }
 
     const title = intl.formatMessage(messages.emoji);
+
     const { modifierOpen } = this.state;
+
+    const categoriesSort = [
+      'recent',
+      'people',
+      'nature',
+      'foods',
+      'activity',
+      'places',
+      'objects',
+      'symbols',
+      'flags',
+    ];
+
+    categoriesSort.splice(1, 0, ...Array.from(categoriesFromEmojis(custom_emojis)).sort());
 
     return (
       <div className={classNames('emoji-picker-dropdown__menu', { selecting: modifierOpen })} style={style} ref={this.setRef}>
@@ -261,6 +263,7 @@ class EmojiPickerMenu extends React.PureComponent {
           skin={skinTone}
           showPreview={false}
           backgroundImageFn={backgroundImageFn}
+          autoFocus
           emojiTooltip
         />
 
@@ -277,8 +280,8 @@ class EmojiPickerMenu extends React.PureComponent {
 
 }
 
-@injectIntl
-export default class EmojiPickerDropdown extends React.PureComponent {
+export default @injectIntl
+class EmojiPickerDropdown extends React.PureComponent {
 
   static propTypes = {
     custom_emojis: ImmutablePropTypes.list,

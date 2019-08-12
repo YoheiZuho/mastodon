@@ -2,19 +2,37 @@
 
 require 'ipaddr'
 require 'socket'
+require 'resolv'
+
+# Monkey-patch the HTTP.rb timeout class to avoid using a timeout block
+# around the Socket#open method, since we use our own timeout blocks inside
+# that method
+class HTTP::Timeout::PerOperation
+  def connect(socket_class, host, port, nodelay = false)
+    @socket = socket_class.open(host, port)
+    @socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1) if nodelay
+  end
+end
 
 class Request
   REQUEST_TARGET = '(request-target)'
+
+  # We enforce a 5s timeout on DNS resolving, 5s timeout on socket opening
+  # and 5s timeout on the TLS handshake, meaning the worst case should take
+  # about 15s in total
+  TIMEOUT = { connect: 5, read: 10, write: 10 }.freeze
 
   include RoutingHelper
 
   def initialize(verb, url, **options)
     raise ArgumentError if url.blank?
 
-    @verb    = verb
-    @url     = Addressable::URI.parse(url).normalize
-    @options = options.merge(use_proxy? ? Rails.configuration.x.http_client_proxy : { socket_class: Socket })
-    @headers = {}
+    @verb        = verb
+    @url         = Addressable::URI.parse(url).normalize
+    @http_client = options.delete(:http_client)
+    @options     = options.merge(socket_class: use_proxy? ? ProxySocket : Socket)
+    @options     = @options.merge(Rails.configuration.x.http_client_proxy) if use_proxy?
+    @headers     = {}
 
     raise Mastodon::HostValidationError, 'Instance does not support hidden service connections' if block_hidden_service?
 
@@ -22,10 +40,11 @@ class Request
     set_digest! if options.key?(:body)
   end
 
-  def on_behalf_of(account, key_id_format = :acct)
-    raise ArgumentError unless account.local?
+  def on_behalf_of(account, key_id_format = :uri, sign_with: nil)
+    raise ArgumentError, 'account must not be nil' if account.nil?
 
     @account       = account
+    @keypair       = sign_with.present? ? OpenSSL::PKey::RSA.new(sign_with) : @account.keypair
     @key_id_format = key_id_format
 
     self
@@ -38,20 +57,45 @@ class Request
 
   def perform
     begin
-      response = http_client.headers(headers).public_send(@verb, @url.to_s, @options)
+      response = http_client.public_send(@verb, @url.to_s, @options.merge(headers: headers))
     rescue => e
-      raise e.class, "#{e.message} on #{@url}", e.backtrace[0]
+      raise e.class, "#{e.message} on #{@url}", e.backtrace
     end
 
     begin
-      yield response.extend(ClientLimit)
+      response = response.extend(ClientLimit)
+
+      # If we are using a persistent connection, we have to
+      # read every response to be able to move forward at all.
+      # However, simply calling #to_s or #flush may not be safe,
+      # as the response body, if malicious, could be too big
+      # for our memory. So we use the #body_with_limit method
+      response.body_with_limit if http_client.persistent?
+
+      yield response if block_given?
     ensure
-      http_client.close
+      http_client.close unless http_client.persistent?
     end
   end
 
   def headers
     (@account ? @headers.merge('Signature' => signature) : @headers).without(REQUEST_TARGET)
+  end
+
+  class << self
+    def valid_url?(url)
+      begin
+        parsed_url = Addressable::URI.parse(url)
+      rescue Addressable::URI::InvalidURIError
+        return false
+      end
+
+      %w(http https).include?(parsed_url.scheme) && parsed_url.host.present?
+    end
+
+    def http_client
+      HTTP.use(:auto_inflate).timeout(:per_operation, TIMEOUT.dup).follow(max_hops: 2)
+    end
   end
 
   private
@@ -70,17 +114,17 @@ class Request
 
   def signature
     algorithm = 'rsa-sha256'
-    signature = Base64.strict_encode64(@account.keypair.sign(OpenSSL::Digest::SHA256.new, signed_string))
+    signature = Base64.strict_encode64(@keypair.sign(OpenSSL::Digest::SHA256.new, signed_string))
 
-    "keyId=\"#{key_id}\",algorithm=\"#{algorithm}\",headers=\"#{signed_headers}\",signature=\"#{signature}\""
+    "keyId=\"#{key_id}\",algorithm=\"#{algorithm}\",headers=\"#{signed_headers.keys.join(' ').downcase}\",signature=\"#{signature}\""
   end
 
   def signed_string
-    @headers.map { |key, value| "#{key.downcase}: #{value}" }.join("\n")
+    signed_headers.map { |key, value| "#{key.downcase}: #{value}" }.join("\n")
   end
 
   def signed_headers
-    @headers.keys.join(' ').downcase
+    @headers.without('User-Agent', 'Accept-Encoding')
   end
 
   def key_id
@@ -92,12 +136,8 @@ class Request
     end
   end
 
-  def timeout
-    { write: 10, connect: 10, read: 10 }
-  end
-
   def http_client
-    @http_client ||= HTTP.use(:auto_inflate).timeout(:per_operation, timeout).follow(max_hops: 2)
+    @http_client ||= Request.http_client
   end
 
   def use_proxy?
@@ -138,26 +178,76 @@ class Request
   class Socket < TCPSocket
     class << self
       def open(host, *args)
-        return super host, *args if thru_hidden_service? host
         outer_e = nil
-        Addrinfo.foreach(host, nil, nil, :SOCK_STREAM) do |address|
+        port    = args.first
+
+        addresses = []
+        begin
+          addresses = [IPAddr.new(host)]
+        rescue IPAddr::InvalidAddressError
+          Resolv::DNS.open do |dns|
+            dns.timeouts = 5
+            addresses = dns.getaddresses(host).take(2)
+          end
+        end
+
+        addresses.each do |address|
           begin
-            raise Mastodon::HostValidationError if PrivateAddressCheck.private_address? IPAddr.new(address.ip_address)
-            return super address.ip_address, *args
+            check_private_address(address)
+
+            sock     = ::Socket.new(address.is_a?(Resolv::IPv6) ? ::Socket::AF_INET6 : ::Socket::AF_INET, ::Socket::SOCK_STREAM, 0)
+            sockaddr = ::Socket.pack_sockaddr_in(port, address.to_s)
+
+            sock.setsockopt(::Socket::IPPROTO_TCP, ::Socket::TCP_NODELAY, 1)
+
+            begin
+              sock.connect_nonblock(sockaddr)
+            rescue IO::WaitWritable
+              if IO.select(nil, [sock], nil, Request::TIMEOUT[:connect])
+                begin
+                  sock.connect_nonblock(sockaddr)
+                rescue Errno::EISCONN
+                  # Yippee!
+                rescue
+                  sock.close
+                  raise
+                end
+              else
+                sock.close
+                raise HTTP::TimeoutError, "Connect timed out after #{Request::TIMEOUT[:connect]} seconds"
+              end
+            end
+
+            return sock
           rescue => e
             outer_e = e
           end
         end
-        raise outer_e if outer_e
+
+        if outer_e
+          raise outer_e
+        else
+          raise SocketError, "No address for #{host}"
+        end
       end
 
       alias new open
 
-      def thru_hidden_service?(host)
-        Rails.configuration.x.hidden_service_via_transparent_proxy && /\.(onion|i2p)$/.match(host)
+      def check_private_address(address)
+        raise Mastodon::HostValidationError if PrivateAddressCheck.private_address?(IPAddr.new(address.to_s))
       end
     end
   end
 
-  private_constant :ClientLimit, :Socket
+  class ProxySocket < Socket
+    class << self
+      def check_private_address(_address)
+        # Accept connections to private addresses as HTTP proxies will usually
+        # be on local addresses
+        nil
+      end
+    end
+  end
+
+  private_constant :ClientLimit, :Socket, :ProxySocket
 end

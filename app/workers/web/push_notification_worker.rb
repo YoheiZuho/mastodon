@@ -3,15 +3,15 @@
 class Web::PushNotificationWorker
   include Sidekiq::Worker
 
-  sidekiq_options backtrace: true
+  sidekiq_options backtrace: true, retry: 5
 
   def perform(subscription_id, notification_id)
     subscription = ::Web::PushSubscription.find(subscription_id)
     notification = Notification.find(notification_id)
 
     subscription.push(notification) unless notification.activity.nil?
-  rescue Webpush::InvalidSubscription, Webpush::ExpiredSubscription
-    subscription.destroy!
+  rescue Webpush::ResponseError => e
+    subscription.destroy! if (400..499).cover?(e.response.code.to_i)
   rescue ActiveRecord::RecordNotFound
     true
   end

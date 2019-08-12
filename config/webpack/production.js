@@ -1,63 +1,60 @@
 // Note: You must restart bin/webpack-dev-server for changes to take effect
 
-const webpack = require('webpack');
-const merge = require('webpack-merge');
-const CompressionPlugin = require('compression-webpack-plugin');
-const sharedConfig = require('./shared.js');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-const OfflinePlugin = require('offline-plugin');
-const { env, publicPath } = require('./configuration.js');
 const path = require('path');
+const { URL } = require('url');
+const merge = require('webpack-merge');
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+const OfflinePlugin = require('offline-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
+const CompressionPlugin = require('compression-webpack-plugin');
+const { output } = require('./configuration');
+const sharedConfig = require('./shared');
 
-let compressionAlgorithm;
-try {
-  const zopfli = require('node-zopfli');
-  compressionAlgorithm = (content, options, fn) => {
-    zopfli.gzip(content, options, fn);
-  };
-} catch (error) {
-  compressionAlgorithm = 'gzip';
+let attachmentHost;
+
+if (process.env.S3_ENABLED === 'true') {
+  if (process.env.S3_ALIAS_HOST || process.env.S3_CLOUDFRONT_HOST) {
+    attachmentHost = process.env.S3_ALIAS_HOST || process.env.S3_CLOUDFRONT_HOST;
+  } else {
+    attachmentHost = process.env.S3_HOSTNAME || `s3-${process.env.S3_REGION || 'us-east-1'}.amazonaws.com`;
+  }
+} else if (process.env.SWIFT_ENABLED === 'true') {
+  const { host } = new URL(process.env.SWIFT_OBJECT_URL);
+  attachmentHost = host;
+} else {
+  attachmentHost = null;
 }
 
 module.exports = merge(sharedConfig, {
-  output: {
-    filename: '[name]-[chunkhash].js',
-    chunkFilename: '[name]-[chunkhash].js',
+  mode: 'production',
+  devtool: 'source-map',
+  stats: 'normal',
+  bail: true,
+  optimization: {
+    minimize: true,
+    minimizer: [
+      new TerserPlugin({
+        cache: true,
+        parallel: true,
+        sourceMap: true,
+      }),
+    ],
   },
 
-  devtool: 'source-map', // separate sourcemap file, suitable for production
-  stats: 'normal',
-
   plugins: [
-    new webpack.optimize.UglifyJsPlugin({
-      sourceMap: true,
-      mangle: true,
-
-      compress: {
-        warnings: false,
-      },
-
-      output: {
-        comments: false,
-      },
-    }),
     new CompressionPlugin({
-      asset: '[path].gz[query]',
-      algorithm: compressionAlgorithm,
-      test: /\.(js|css|html|json|ico|svg|eot|otf|ttf)$/,
+      filename: '[path].gz[query]',
+      cache: true,
+      test: /\.(js|css|html|json|ico|svg|eot|otf|ttf|map)$/,
     }),
-    new BundleAnalyzerPlugin({ // generates report.html and stats.json
+    new BundleAnalyzerPlugin({ // generates report.html
       analyzerMode: 'static',
-      generateStatsFile: true,
-      statsOptions: {
-        // allows usage with http://chrisbateman.github.io/webpack-visualizer/
-        chunkModules: true,
-      },
       openAnalyzer: false,
       logLevel: 'silent', // do not bother Webpacker, who runs with --json and parses stdout
     }),
     new OfflinePlugin({
-      publicPath: publicPath, // sw.js must be served from the root to avoid scope issues
+      publicPath: output.publicPath, // sw.js must be served from the root to avoid scope issues
+      safeToUseOptionalCaches: true,
       caches: {
         main: [':rest:'],
         additional: [':externals:'],
@@ -76,7 +73,7 @@ module.exports = merge(sharedConfig, {
       },
       externals: [
         '/emoji/1f602.svg', // used for emoji picker dropdown
-        '/emoji/sheet.png', // used in emoji-mart
+        '/emoji/sheet_10.png', // used in emoji-mart
       ],
       excludes: [
         '**/*.gz',
@@ -90,7 +87,7 @@ module.exports = merge(sharedConfig, {
         '**/*.woff',
       ],
       ServiceWorker: {
-        entry: `imports-loader?process.env=>${encodeURIComponent(JSON.stringify(env))}!${encodeURI(path.join(__dirname, '../../app/javascript/mastodon/service_worker/entry.js'))}`,
+        entry: `imports-loader?ATTACHMENT_HOST=>${encodeURIComponent(JSON.stringify(attachmentHost))}!${encodeURI(path.join(__dirname, '../../app/javascript/mastodon/service_worker/entry.js'))}`,
         cacheName: 'mastodon',
         output: '../assets/sw.js',
         publicPath: '/sw.js',

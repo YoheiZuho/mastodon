@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class ReportService < BaseService
+  include Payloadable
+
   def call(source_account, target_account, options = {})
     @source_account = source_account
     @target_account = target_account
@@ -21,12 +23,16 @@ class ReportService < BaseService
     @report = @source_account.reports.create!(
       target_account: @target_account,
       status_ids: @status_ids,
-      comment: @comment
+      comment: @comment,
+      uri: @options[:uri]
     )
   end
 
   def notify_staff!
+    return if @report.unresolved_siblings?
+
     User.staff.includes(:account).each do |u|
+      next unless u.allows_report_emails?
       AdminMailer.new_report(u.account, @report).deliver_later
     end
   end
@@ -40,15 +46,10 @@ class ReportService < BaseService
   end
 
   def payload
-    Oj.dump(ActiveModelSerializers::SerializableResource.new(
-      @report,
-      serializer: ActivityPub::FlagSerializer,
-      adapter: ActivityPub::Adapter,
-      account: some_local_account
-    ).as_json)
+    Oj.dump(serialize_payload(@report, ActivityPub::FlagSerializer, account: some_local_account))
   end
 
   def some_local_account
-    @some_local_account ||= Account.local.where(suspended: false).first
+    @some_local_account ||= Account.representative
   end
 end

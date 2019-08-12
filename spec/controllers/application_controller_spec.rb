@@ -92,6 +92,39 @@ describe ApplicationController, type: :controller do
     end
   end
 
+  describe 'helper_method :current_theme' do
+    it 'returns "default" when theme wasn\'t changed in admin settings' do
+      allow(Setting).to receive(:default_settings).and_return({ 'theme' => 'default' })
+
+      expect(controller.view_context.current_theme).to eq 'default'
+    end
+
+    it 'returns instances\'s theme when user is not signed in' do
+      allow(Setting).to receive(:[]).with('theme').and_return 'contrast'
+
+      expect(controller.view_context.current_theme).to eq 'contrast'
+    end
+
+    it 'returns instances\'s default theme when user didn\'t set theme' do
+      current_user = Fabricate(:user)
+      sign_in current_user
+
+      allow(Setting).to receive(:[]).with('theme').and_return 'contrast'
+
+      expect(controller.view_context.current_theme).to eq 'contrast'
+    end
+
+    it 'returns user\'s theme when it is set' do
+      current_user = Fabricate(:user)
+      current_user.settings['theme'] = 'mastodon-light'
+      sign_in current_user
+
+      allow(Setting).to receive(:[]).with('theme').and_return 'contrast'
+
+      expect(controller.view_context.current_theme).to eq 'mastodon-light'
+    end
+  end
+
   context 'ActionController::RoutingError' do
     subject do
       routes.draw { get 'routing_error' => 'anonymous#routing_error' }
@@ -154,17 +187,17 @@ describe ApplicationController, type: :controller do
       expect(response).to have_http_status(200)
     end
 
-    it 'returns http 403 if user who signed in is suspended' do
+    it 'redirects to account status page' do
       sign_in(Fabricate(:user, account: Fabricate(:account, suspended: true)))
       get 'success'
-      expect(response).to have_http_status(403)
+      expect(response).to redirect_to(edit_user_registration_path)
     end
   end
 
   describe 'raise_not_found' do
     it 'raises error' do
       controller.params[:unmatched_route] = 'unmatched'
-      expect{ controller.raise_not_found }.to raise_error(ActionController::RoutingError, 'No route matches unmatched')
+      expect { controller.raise_not_found }.to raise_error(ActionController::RoutingError, 'No route matches unmatched')
     end
   end
 
@@ -326,10 +359,6 @@ describe ApplicationController, type: :controller do
 
     context 'Status' do
       include_examples 'cacheable', :status, Status
-    end
-
-    context 'StreamEntry' do
-      include_examples 'receives :with_includes', :stream_entry, StreamEntry
     end
   end
 end

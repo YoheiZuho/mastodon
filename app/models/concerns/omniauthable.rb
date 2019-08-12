@@ -7,6 +7,8 @@ module Omniauthable
   TEMP_EMAIL_REGEX = /\Achange@me/
 
   included do
+    devise :omniauthable
+
     def omniauth_providers
       Devise.omniauth_configs.keys
     end
@@ -26,7 +28,7 @@ module Omniauthable
       # to prevent the identity being locked with accidentally created accounts.
       # Note that this may leave zombie accounts (with no associated identity) which
       # can be cleaned up at a later date.
-      user = signed_in_resource ? signed_in_resource : identity.user
+      user = signed_in_resource || identity.user
       user = create_for_oauth(auth) if user.nil?
 
       if identity.user.nil?
@@ -41,7 +43,7 @@ module Omniauthable
       # Check if the user exists with provided email if the provider gives us a
       # verified email.  If no verified email was provided or the user already
       # exists, we assign a temporary email and ask the user to verify it on
-      # the next step via Auth::ConfirmationsController.finish_signup
+      # the next step via Auth::SetupController.show
 
       user = User.new(user_params_from_auth(auth))
       user.account.avatar_remote_url = auth.info.image if auth.info.image =~ /\A#{URI.regexp(%w(http https))}\z/
@@ -61,8 +63,10 @@ module Omniauthable
       display_name      = auth.info.full_name || [auth.info.first_name, auth.info.last_name].join(' ')
 
       {
-        email: email ? email : "#{TEMP_EMAIL_PREFIX}-#{auth.uid}-#{auth.provider}.com",
+        email: email || "#{TEMP_EMAIL_PREFIX}-#{auth.uid}-#{auth.provider}.com",
         password: Devise.friendly_token[0, 20],
+        agreement: true,
+        external: true,
         account_attributes: {
           username: ensure_unique_username(auth.uid),
           display_name: display_name,

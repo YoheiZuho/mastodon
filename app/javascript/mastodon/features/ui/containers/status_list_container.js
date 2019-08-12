@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import StatusList from '../../../components/status_list';
-import { scrollTopTimeline } from '../../../actions/timelines';
+import { scrollTopTimeline, loadPending } from '../../../actions/timelines';
 import { Map as ImmutableMap, List as ImmutableList } from 'immutable';
 import { createSelector } from 'reselect';
 import { debounce } from 'lodash';
@@ -11,15 +11,6 @@ const makeGetStatusIds = () => createSelector([
   (state, { type }) => state.getIn(['timelines', type, 'items'], ImmutableList()),
   (state)           => state.get('statuses'),
 ], (columnSettings, statusIds, statuses) => {
-  const rawRegex = columnSettings.getIn(['regex', 'body'], '').trim();
-  let regex      = null;
-
-  try {
-    regex = rawRegex && new RegExp(rawRegex, 'i');
-  } catch (e) {
-    // Bad regex, don't affect filters
-  }
-
   return statusIds.filter(id => {
     if (id === null) return true;
 
@@ -34,11 +25,6 @@ const makeGetStatusIds = () => createSelector([
       showStatus = showStatus && (statusForId.get('in_reply_to_id') === null || statusForId.get('in_reply_to_account_id') === me);
     }
 
-    if (showStatus && regex && statusForId.get('account') !== me) {
-      const searchIndex = statusForId.get('reblog') ? statuses.getIn([statusForId.get('reblog'), 'search_index']) : statusForId.get('search_index');
-      showStatus = !regex.test(searchIndex);
-    }
-
     return showStatus;
   });
 });
@@ -51,6 +37,7 @@ const makeMapStateToProps = () => {
     isLoading: state.getIn(['timelines', timelineId, 'isLoading'], true),
     isPartial: state.getIn(['timelines', timelineId, 'isPartial'], false),
     hasMore:   state.getIn(['timelines', timelineId, 'hasMore']),
+    numPending: state.getIn(['timelines', timelineId, 'pendingItems'], ImmutableList()).size,
   });
 
   return mapStateToProps;
@@ -65,6 +52,8 @@ const mapDispatchToProps = (dispatch, { timelineId }) => ({
   onScroll: debounce(() => {
     dispatch(scrollTopTimeline(timelineId, false));
   }, 100),
+
+  onLoadPending: () => dispatch(loadPending(timelineId)),
 
 });
 

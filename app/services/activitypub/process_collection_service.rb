@@ -8,9 +8,7 @@ class ActivityPub::ProcessCollectionService < BaseService
     @json    = Oj.load(body, mode: :strict)
     @options = options
 
-    return unless supported_context?
-    return if different_actor? && verify_account!.nil?
-    return if @account.suspended? || @account.local?
+    return if !supported_context? || (different_actor? && verify_account!.nil?) || @account.suspended? || @account.local?
 
     case @json['type']
     when 'Collection', 'CollectionPage'
@@ -27,7 +25,7 @@ class ActivityPub::ProcessCollectionService < BaseService
   private
 
   def different_actor?
-    @json['actor'].present? && value_or_id(@json['actor']) != @account.uri && @json['signature'].present?
+    @json['actor'].present? && value_or_id(@json['actor']) != @account.uri
   end
 
   def process_items(items)
@@ -44,6 +42,7 @@ class ActivityPub::ProcessCollectionService < BaseService
   end
 
   def verify_account!
+    @options[:relayed_through_account] = @account
     @account = ActivityPub::LinkedDataSignature.new(@json).verify_account!
   rescue JSON::LD::JsonLdError => e
     Rails.logger.debug "Could not verify LD-Signature for #{value_or_id(@json['actor'])}: #{e.message}"

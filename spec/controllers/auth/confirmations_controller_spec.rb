@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 describe Auth::ConfirmationsController, type: :controller do
+  render_views
+
   describe 'GET #new' do
     it 'returns http success' do
       @request.env['devise.mapping'] = Devise.mappings[:user]

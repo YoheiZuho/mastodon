@@ -11,7 +11,7 @@ class REST::AccountSerializer < ActiveModel::Serializer
   has_many :emojis, serializer: REST::CustomEmojiSerializer
 
   class FieldSerializer < ActiveModel::Serializer
-    attributes :name, :value
+    attributes :name, :value, :verified_at
 
     def value
       Formatter.instance.format_field(object.account, object.value)
@@ -25,11 +25,11 @@ class REST::AccountSerializer < ActiveModel::Serializer
   end
 
   def note
-    Formatter.instance.simplified_format(object, custom_emojify: true)
+    Formatter.instance.simplified_format(object)
   end
 
   def url
-    TagManager.instance.url_for(object)
+    ActivityPub::TagManager.instance.url_for(object)
   end
 
   def avatar

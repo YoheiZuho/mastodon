@@ -18,7 +18,7 @@ class Web::PushSubscription < ApplicationRecord
   belongs_to :user, optional: true
   belongs_to :access_token, class_name: 'Doorkeeper::AccessToken', optional: true
 
-  has_one :session_activation
+  has_one :session_activation, foreign_key: 'web_push_subscription_id', inverse_of: :web_push_subscription
 
   def push(notification)
     I18n.with_locale(associated_user&.locale || I18n.default_locale) do
@@ -68,6 +68,9 @@ class Web::PushSubscription < ApplicationRecord
       p256dh: key_p256dh,
       auth: key_auth,
       ttl: ttl,
+      ssl_timeout: 10,
+      open_timeout: 10,
+      read_timeout: 10,
       vapid: {
         subject: "mailto:#{::Setting.site_contact_email}",
         private_key: Rails.configuration.x.vapid_private_key,

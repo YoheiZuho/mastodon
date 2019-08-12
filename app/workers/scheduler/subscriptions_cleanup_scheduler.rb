@@ -3,7 +3,7 @@
 class Scheduler::SubscriptionsCleanupScheduler
   include Sidekiq::Worker
 
-  def perform
-    Subscription.expired.in_batches.delete_all
-  end
+  sidekiq_options unique: :until_executed, retry: 0
+
+  def perform; end
 end
