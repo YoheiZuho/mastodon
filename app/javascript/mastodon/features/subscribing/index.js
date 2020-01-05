@@ -55,7 +55,7 @@ class Subscribing extends ImmutablePureComponent {
   }
 
   handleLoadMore = debounce(() => {
-    this.props.dispatch(expandSubscribing());
+    this.props.dispatch(expandSubscribing(this.props.params.accountId));
   }, 300, { leading: true });
 
   render () {
