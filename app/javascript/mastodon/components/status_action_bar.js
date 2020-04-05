@@ -129,6 +129,14 @@ class StatusActionBar extends ImmutablePureComponent {
     }
   }
 
+  handleBookmarkClick = () => {
+    this.props.onBookmark(this.props.status);
+  }
+
+  handleReblogClick = (e) => {
+    this.props.onReblog(this.props.status, e);
+  }
+  
   _openInteractionDialog = type => {
     window.open(`/interact/${this.props.status.get('id')}?type=${type}`, 'mastodon-intent', 'width=445,height=600,resizable=no,menubar=no,status=no,scrollbars=yes');
   }
@@ -329,6 +337,7 @@ class StatusActionBar extends ImmutablePureComponent {
         <IconButton className='status__action-bar-button' disabled={!publicStatus} active={status.get('reblogged')} pressed={status.get('reblogged')} title={!publicStatus ? intl.formatMessage(messages.cannot_reblog) : intl.formatMessage(messages.reblog)} icon={reblogIcon} onClick={this.handleReblogClick} />
         <IconButton className='status__action-bar-button star-icon' animate active={status.get('favourited')} pressed={status.get('favourited')} title={intl.formatMessage(messages.favourite)} icon='star' onClick={this.handleFavouriteClick} />
         {shareButton}
+        <IconButton className='status__action-bar-button' disabled={anonymousAccess} active={status.get('bookmarked')} pressed={status.get('bookmarked')} title={intl.formatMessage(messages.bookmark)} icon='bookmark' onClick={this.handleBookmarkClick} />
 
         <div className='status__action-bar-dropdown'>
           <DropdownMenuContainer disabled={anonymousAccess} status={status} items={menu} icon='ellipsis-h' size={18} direction='right' title={intl.formatMessage(messages.more)} />

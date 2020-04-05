@@ -694,10 +694,29 @@
     justify-content: flex-end;
     min-width: 0;
     flex: 0 0 auto;
-
+    padding-top: 10px;
+    
     .compose-form__publish-button-wrapper {
       overflow: hidden;
-      padding-top: 10px;
+
+      button {
+        display: inline-block;
+        width: auto;
+
+        margin-right: 0.5em;
+      }
+
+      button:last-child {
+        margin-right: auto;
+      }
+    }
+  }
+
+  .compose-form__utilBtns {
+    padding-top: 10px;
+
+    * {
+      margin-bottom: 1em;
     }
   }
 }
@@ -1988,7 +2007,7 @@ a.account__display-name {
       }
 
       &__inner {
-        position: fixed;
+        position: static;
         width: 285px;
         pointer-events: auto;
         height: 100%;
@@ -2357,6 +2376,7 @@ a.account__display-name {
   }
 
   .getting-started__wrapper,
+  .getting-started__trends,
   .search {
     margin-bottom: 10px;
   }
@@ -2463,23 +2483,12 @@ a.account__display-name {
   margin-bottom: 10px;
   height: calc(100% - 20px);
   overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-
-  & > a {
-    flex: 0 0 auto;
-  }
 
   hr {
-    flex: 0 0 auto;
     border: 0;
     background: transparent;
     border-top: 1px solid lighten($ui-base-color, 4%);
     margin: 10px 0;
-  }
-
-  .flex-spacer {
-    background: transparent;
   }
 }
 
@@ -2871,10 +2880,8 @@ a.account__display-name {
   }
 
   &__trends {
+    background: $ui-base-color;
     flex: 0 1 auto;
-    opacity: 1;
-    animation: fade 150ms linear;
-    margin-top: 10px;
 
     h4 {
       font-size: 12px;
@@ -2900,15 +2907,11 @@ a.account__display-name {
     @media screen and (max-height: 670px) {
       display: none;
     }
+  }
 
-    .trends__item {
-      border-bottom: 0;
-      padding: 10px;
-
-      &__current {
-        color: $darker-text-color;
-      }
-    }
+  &__scrollable {
+    max-height: 100%;
+    overflow-y: auto;
   }
 }
 
@@ -6036,6 +6039,12 @@ noscript {
   }
 }
 
+.embed-modal__qrcode {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .account__moved-note {
   padding: 14px 10px;
   padding-bottom: 16px;
@@ -6535,7 +6544,7 @@ noscript {
       font-size: 24px;
       line-height: 36px;
       font-weight: 500;
-      text-align: right;
+      text-align: center;
       padding-right: 15px;
       margin-left: 5px;
       color: $secondary-text-color;
@@ -6545,12 +6554,7 @@ noscript {
       flex: 0 0 auto;
       width: 50px;
 
-      path:first-child {
-        fill: rgba($highlight-text-color, 0.25) !important;
-        fill-opacity: 1 !important;
-      }
-
-      path:last-child {
+      path {
         stroke: lighten($highlight-text-color, 6%) !important;
       }
     }
