@@ -1222,7 +1222,10 @@ ja:
     default: Mastodon (ダーク)
     mastodon-light: Mastodon (ライト)
     # 追加テーマ
-    mastodon-material: Material Dev (ライト)
+    material-v1-dark: Material v1 (ダーク)
+    material-v1-light: Material v1 (ライト)
+    material-v2-dark: Material v2 (ダーク)
+    material-v2-light: Material v2 (ライト)
   time:
     formats:
       default: "%Y年%m月%d日 %H:%M"

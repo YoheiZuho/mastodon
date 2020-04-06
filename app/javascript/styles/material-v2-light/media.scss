@@ -1,0 +1,38 @@
+@charset "UTF-8";
+@import 'config';
+@import 'mixins';
+
+
+.media-gallery { border-radius: $card-radius }
+
+.media-modal__close {
+    align-content: center;
+
+    &.icon-button {
+        background: transparent;
+        color: $media-icon-color;
+        text-align: center !important;
+        font-size: 24px !important;
+        width: 48px !important;
+        height: 48px !important;
+        border: 12px;
+
+        &:hover {
+            background: $media-icon-background-hover-color;
+            color: $media-icon-hover-color;
+        }
+
+        .fa-fw { width: 24px }
+    }
+}
+
+.icon-button.overlayed {
+    border-radius: 50%;
+    background: $media-icon-background-color;
+    color: $media-icon-color;
+
+    &:hover {
+        background: $media-icon-background-color;
+        color: $media-icon-hover-color;
+    }
+}
