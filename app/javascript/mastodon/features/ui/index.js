@@ -52,6 +52,7 @@ import {
   PinnedStatuses,
   Lists,
   Search,
+  GroupDirectory,
   Directory,
   FollowRecommendations,
 } from './util/async-components';
@@ -174,6 +175,7 @@ class SwitchingColumnsArea extends React.PureComponent {
 
           <WrappedRoute path='/start' component={FollowRecommendations} content={children} />
           <WrappedRoute path='/search' component={Search} content={children} />
+          <WrappedRoute path='/group_directory' component={GroupDirectory} content={children} componentParams={{ shouldUpdateScroll: this.shouldUpdateScroll }} />
           <WrappedRoute path='/directory' component={Directory} content={children} componentParams={{ shouldUpdateScroll: this.shouldUpdateScroll }} />
 
           <WrappedRoute path='/statuses/new' component={Compose} content={children} />
