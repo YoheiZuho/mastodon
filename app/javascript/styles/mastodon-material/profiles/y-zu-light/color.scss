@@ -1,15 +1,18 @@
 // Add your customization below
 
-$bg-color: #fafafa;
-
 $primary-color: #6D4C41;
 
-$icon-color: #92787D;
+$section-text-color: $primary-color;
 
+$icon-color: #92787D;
 $icon-hover-color: darken($icon-color, 10%);
 $top-bar-icon-color: $icon-color;
 $top-bar-icon-hover-color: darken($top-bar-icon-color, 10%);
 $top-bar-icon-active-color: darken($top-bar-icon-color, 18%);
+
+$control-border-color: $icon-color;
+$control-border-active-color: $primary-color;
+$control-border-hover-color: transparentize($control-border-active-color, 0.8);
 
 $icon-button-color: $icon-color;
 $icon-button-hover-color: $icon-hover-color;
@@ -21,6 +24,11 @@ $outlined-button-active-color: transparentize($outlined-button-color, 0.7);
 $text-button-color: $contained-button-color;
 $text-button-hover-color: transparentize($text-button-color, 0.8);
 $text-button-focus-color: transparentize($text-button-color, 0.7);
+
+$bg-color: #fafafa;
+
+$toggle-thumb-active-color: $primary-color;
+$toggle-track-active-color: lighten($toggle-thumb-active-color, 18%);
 
 $border-color: lighten($icon-color, 30%);
 $border-hover-color: darken($border-color, 30%);

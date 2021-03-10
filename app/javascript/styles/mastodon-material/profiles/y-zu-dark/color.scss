@@ -1,1 +1,39 @@
 // Add your customization below
+
+$primary-color: #8D6E63;
+
+$section-text-color: $primary-color;
+
+$icon-color: #D7CCC8;
+$icon-hover-color: #ffffff;
+$top-bar-icon-color: $icon-color;
+$top-bar-icon-hover-color: $icon-hover-color;
+$top-bar-icon-active-color: $primary-color;
+
+$control-border-color: $icon-color;
+$control-border-active-color: $primary-color;
+$control-border-hover-color: transparentize($control-border-active-color, 0.8);
+
+$icon-button-color: $icon-color;
+$icon-button-hover-color: $icon-hover-color;
+$icon-button-active-color: $primary-color;
+$icon-button-active-hover-color: lighten($icon-button-active-color, 10%);
+$contained-button-color: $primary-color;
+$contained-button-hover-color: lighten($contained-button-color, 10%);
+$outlined-button-color: $primary-color;
+$outlined-button-hover-color: transparentize($outlined-button-color, 0.8);
+$outlined-button-active-color: transparentize($outlined-button-color, 0.7);
+$text-button-color: $primary-color;
+$text-button-hover-color: transparentize($text-button-color, 0.8);
+$text-button-focus-color: transparentize($text-button-color, 0.7);
+$floating-action-button-icon-color: $primary-color;
+
+$toggle-thumb-active-color: #795548;
+$toggle-track-active-color: lighten($toggle-thumb-active-color, 18%);
+
+$tab-indicator-color: $top-bar-icon-color;
+$tab-indicator-active-color: $top-bar-icon-color;
+$tab-indicator-bg-hover-color: transparentize($tab-indicator-active-color, 0.9);
+$tab-indicator-bg-focus-color: transparentize($tab-indicator-active-color, 0.8);
+$icon-tab-indicator-active-color: $primary-color;
+$icon-tab-indicator-hover-color: $icon-hover-color;
