@@ -27,7 +27,7 @@ module Admin
           ips       = []
 
           Resolv::DNS.open do |dns|
-            dns.timeouts = 5
+            dns.timeouts = 1
 
             hostnames = dns.getresources(@email_domain_block.domain, Resolv::DNS::Resource::IN::MX).to_a.map { |e| e.exchange.to_s }
 

@@ -5,9 +5,12 @@ module Settings
     class RecoveryCodesController < BaseController
       include ChallengableConcern
 
-      skip_before_action :require_functional!
+      layout 'admin'
 
+      before_action :authenticate_user!
       before_action :require_challenge!, on: :create
+
+      skip_before_action :require_functional!
 
       def create
         @recovery_codes = current_user.generate_otp_backup_codes!

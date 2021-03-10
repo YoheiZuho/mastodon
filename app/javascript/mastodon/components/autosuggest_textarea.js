@@ -4,6 +4,7 @@ import AutosuggestEmoji from './autosuggest_emoji';
 import AutosuggestHashtag from './autosuggest_hashtag';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import PropTypes from 'prop-types';
+import { isRtl } from '../rtl';
 import ImmutablePureComponent from 'react-immutable-pure-component';
 import Textarea from 'react-textarea-autosize';
 import classNames from 'classnames';
@@ -194,6 +195,11 @@ export default class AutosuggestTextarea extends ImmutablePureComponent {
   render () {
     const { value, suggestions, disabled, placeholder, onKeyUp, autoFocus, children } = this.props;
     const { suggestionsHidden } = this.state;
+    const style = { direction: 'ltr' };
+
+    if (isRtl(value)) {
+      style.direction = 'rtl';
+    }
 
     return [
       <div className='compose-form__autosuggest-wrapper' key='autosuggest-wrapper'>
@@ -214,7 +220,7 @@ export default class AutosuggestTextarea extends ImmutablePureComponent {
               onFocus={this.onFocus}
               onBlur={this.onBlur}
               onPaste={this.onPaste}
-              dir='auto'
+              style={style}
               aria-autocomplete='list'
             />
           </label>

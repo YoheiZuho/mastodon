@@ -8,7 +8,6 @@ class Admin::AccountAction
   TYPES = %w(
     none
     disable
-    sensitive
     silence
     suspend
   ).freeze
@@ -65,8 +64,6 @@ class Admin::AccountAction
     case type
     when 'disable'
       handle_disable!
-    when 'sensitive'
-      handle_sensitive!
     when 'silence'
       handle_silence!
     when 'suspend'
@@ -112,12 +109,6 @@ class Admin::AccountAction
     target_account.user&.disable!
   end
 
-  def handle_sensitive!
-    authorize(target_account, :sensitive?)
-    log_action(:sensitive, target_account)
-    target_account.sensitize!
-  end
-
   def handle_silence!
     authorize(target_account, :silence?)
     log_action(:silence, target_account)
@@ -127,7 +118,7 @@ class Admin::AccountAction
   def handle_suspend!
     authorize(target_account, :suspend?)
     log_action(:suspend, target_account)
-    target_account.suspend!(origin: :local)
+    target_account.suspend!
   end
 
   def text_for_warning
@@ -143,7 +134,7 @@ class Admin::AccountAction
   end
 
   def process_email!
-    UserMailer.warning(target_account.user, warning, status_ids).deliver_later! if warnable?
+    UserMailer.warning(target_account.user, warning, status_ids).deliver_now! if warnable?
   end
 
   def warnable?

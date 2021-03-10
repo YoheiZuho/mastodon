@@ -70,16 +70,12 @@ class SessionActivation < ApplicationRecord
   end
 
   def assign_access_token
-    self.access_token = Doorkeeper::AccessToken.create!(access_token_attributes)
-  end
+    superapp = Doorkeeper::Application.find_by(superapp: true)
 
-  def access_token_attributes
-    {
-      application_id: Doorkeeper::Application.find_by(superapp: true)&.id,
-      resource_owner_id: user_id,
-      scopes: 'read write follow',
-      expires_in: Doorkeeper.configuration.access_token_expires_in,
-      use_refresh_token: Doorkeeper.configuration.refresh_token_enabled?,
-    }
+    self.access_token = Doorkeeper::AccessToken.create!(application_id: superapp&.id,
+                                                        resource_owner_id: user_id,
+                                                        scopes: 'read write follow',
+                                                        expires_in: Doorkeeper.configuration.access_token_expires_in,
+                                                        use_refresh_token: Doorkeeper.configuration.refresh_token_enabled?)
   end
 end

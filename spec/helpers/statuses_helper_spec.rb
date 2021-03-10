@@ -149,4 +149,22 @@ RSpec.describe StatusesHelper, type: :helper do
       expect(css_class).to eq 'h-cite'
     end
   end
+
+  describe '#rtl?' do
+    it 'is false if text is empty' do
+      expect(helper).not_to be_rtl ''
+    end
+
+    it 'is false if there are no right to left characters' do
+      expect(helper).not_to be_rtl 'hello world'
+    end
+
+    it 'is false if right to left characters are fewer than 1/3 of total text' do
+      expect(helper).not_to be_rtl 'hello ݟ world'
+    end
+
+    it 'is true if right to left characters are greater than 1/3 of total text' do
+      expect(helper).to be_rtl 'aaݟaaݟ'
+    end
+  end
 end

@@ -12,7 +12,6 @@
 
 class DomainAllow < ApplicationRecord
   include DomainNormalizable
-  include DomainMaterializable
 
   validates :domain, presence: true, uniqueness: true, domain: true
 

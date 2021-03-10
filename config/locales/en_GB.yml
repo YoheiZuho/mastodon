@@ -600,7 +600,7 @@ en_GB:
       limit: You have already featured the maximum amount of hashtags
   filters:
     contexts:
-      home: Home and lists
+      home: Home timeline
       notifications: Notifications
       public: Public timelines
       thread: Conversations

@@ -2,7 +2,7 @@
 
 module Settings
   module Exports
-    class BlockedDomainsController < BaseController
+    class BlockedDomainsController < ApplicationController
       include ExportControllerConcern
 
       def index

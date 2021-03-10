@@ -3,7 +3,7 @@ kab:
   activerecord:
     attributes:
       poll:
-        expires_at: Azemz n taggara
+        expires_at: Azemz n tagara
         options: Tifranin
     errors:
       models:

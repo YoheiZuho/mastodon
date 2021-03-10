@@ -8,8 +8,4 @@ class ActivityPub::BaseController < Api::BaseController
   def set_cache_headers
     response.headers['Vary'] = 'Signature' if authorized_fetch_mode?
   end
-
-  def skip_temporary_suspension_response?
-    false
-  end
 end

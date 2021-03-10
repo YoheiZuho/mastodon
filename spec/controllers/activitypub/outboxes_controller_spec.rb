@@ -10,7 +10,6 @@ RSpec.describe ActivityPub::OutboxesController, type: :controller do
     end
 
     it 'does not set sessions' do
-      response
       expect(session).to be_empty
     end
 
@@ -35,8 +34,9 @@ RSpec.describe ActivityPub::OutboxesController, type: :controller do
     context 'without signature' do
       let(:remote_account) { nil }
 
-      subject(:response) { get :show, params: { account_username: account.username, page: page } }
-      subject(:body) { body_as_json }
+      before do
+        get :show, params: { account_username: account.username, page: page }
+      end
 
       context 'with page not requested' do
         let(:page) { nil }
@@ -50,31 +50,11 @@ RSpec.describe ActivityPub::OutboxesController, type: :controller do
         end
 
         it 'returns totalItems' do
-          expect(body[:totalItems]).to eq 4
+          json = body_as_json
+          expect(json[:totalItems]).to eq 4
         end
 
         it_behaves_like 'cachable response'
-
-        context 'when account is permanently suspended' do
-          before do
-            account.suspend!
-            account.deletion_request.destroy
-          end
-
-          it 'returns http gone' do
-            expect(response).to have_http_status(410)
-          end
-        end
-
-        context 'when account is temporarily suspended' do
-          before do
-            account.suspend!
-          end
-
-          it 'returns http forbidden' do
-            expect(response).to have_http_status(403)
-          end
-        end
       end
 
       context 'with page requested' do
@@ -89,33 +69,13 @@ RSpec.describe ActivityPub::OutboxesController, type: :controller do
         end
 
         it 'returns orderedItems with public or unlisted statuses' do
-          expect(body[:orderedItems]).to be_an Array
-          expect(body[:orderedItems].size).to eq 2
-          expect(body[:orderedItems].all? { |item| item[:to].include?(ActivityPub::TagManager::COLLECTIONS[:public]) || item[:cc].include?(ActivityPub::TagManager::COLLECTIONS[:public]) }).to be true
+          json = body_as_json
+          expect(json[:orderedItems]).to be_an Array
+          expect(json[:orderedItems].size).to eq 2
+          expect(json[:orderedItems].all? { |item| item[:to].include?(ActivityPub::TagManager::COLLECTIONS[:public]) || item[:cc].include?(ActivityPub::TagManager::COLLECTIONS[:public]) }).to be true
         end
 
         it_behaves_like 'cachable response'
-
-        context 'when account is permanently suspended' do
-          before do
-            account.suspend!
-            account.deletion_request.destroy
-          end
-
-          it 'returns http gone' do
-            expect(response).to have_http_status(410)
-          end
-        end
-
-        context 'when account is temporarily suspended' do
-          before do
-            account.suspend!
-          end
-
-          it 'returns http forbidden' do
-            expect(response).to have_http_status(403)
-          end
-        end
       end
     end
 

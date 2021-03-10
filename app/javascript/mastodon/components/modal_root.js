@@ -1,21 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import 'wicg-inert';
-import { multiply } from 'color-blend';
 
 export default class ModalRoot extends React.PureComponent {
 
   static propTypes = {
     children: PropTypes.node,
     onClose: PropTypes.func.isRequired,
-    backgroundColor: PropTypes.shape({
-      r: PropTypes.number,
-      g: PropTypes.number,
-      b: PropTypes.number,
-    }),
   };
 
-  activeElement = this.props.children ? document.activeElement : null;
+  state = {
+    revealed: !!this.props.children,
+  };
+
+  activeElement = this.state.revealed ? document.activeElement : null;
 
   handleKeyUp = (e) => {
     if ((e.key === 'Escape' || e.key === 'Esc' || e.keyCode === 27)
@@ -55,6 +53,8 @@ export default class ModalRoot extends React.PureComponent {
       this.activeElement = document.activeElement;
 
       this.getSiblings().forEach(sibling => sibling.setAttribute('inert', true));
+    } else if (!nextProps.children) {
+      this.setState({ revealed: false });
     }
   }
 
@@ -68,7 +68,14 @@ export default class ModalRoot extends React.PureComponent {
       Promise.resolve().then(() => {
         this.activeElement.focus({ preventScroll: true });
         this.activeElement = null;
-      }).catch(console.error);
+      }).catch((error) => {
+        console.error(error);
+      });
+    }
+    if (this.props.children) {
+      requestAnimationFrame(() => {
+        this.setState({ revealed: true });
+      });
     }
   }
 
@@ -87,6 +94,7 @@ export default class ModalRoot extends React.PureComponent {
 
   render () {
     const { children, onClose } = this.props;
+    const { revealed } = this.state;
     const visible = !!children;
 
     if (!visible) {
@@ -95,16 +103,10 @@ export default class ModalRoot extends React.PureComponent {
       );
     }
 
-    let backgroundColor = null;
-
-    if (this.props.backgroundColor) {
-      backgroundColor = multiply({ ...this.props.backgroundColor, a: 1 }, { r: 0, g: 0, b: 0, a: 0.7 });
-    }
-
     return (
-      <div className='modal-root' ref={this.setRef}>
+      <div className='modal-root' ref={this.setRef} style={{ opacity: revealed ? 1 : 0 }}>
         <div style={{ pointerEvents: visible ? 'auto' : 'none' }}>
-          <div role='presentation' className='modal-root__overlay' onClick={onClose} style={{ backgroundColor: backgroundColor ? `rgba(${backgroundColor.r}, ${backgroundColor.g}, ${backgroundColor.b}, 0.7)` : null }} />
+          <div role='presentation' className='modal-root__overlay' onClick={onClose} />
           <div role='dialog' className='modal-root__container'>{children}</div>
         </div>
       </div>

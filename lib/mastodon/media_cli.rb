@@ -47,7 +47,6 @@ module Mastodon
 
     option :start_after
     option :prefix
-    option :fix_permissions, type: :boolean, default: false
     option :dry_run, type: :boolean, default: false
     desc 'remove-orphans', 'Scan storage and check for files that do not belong to existing media attachments'
     long_desc <<~LONG_DESC
@@ -67,7 +66,6 @@ module Mastodon
       when :s3
         paperclip_instance = MediaAttachment.new.file
         s3_interface       = paperclip_instance.s3_interface
-        s3_permissions     = Paperclip::Attachment.default_options[:s3_permissions]
         bucket             = s3_interface.bucket(Paperclip::Attachment.default_options[:s3_credentials][:bucket])
         last_key           = options[:start_after]
 
@@ -88,8 +86,6 @@ module Mastodon
           record_map = preload_records_from_mixed_objects(objects)
 
           objects.each do |object|
-            object.acl.put(acl: s3_permissions) if options[:fix_permissions] && !options[:dry_run]
-
             path_segments = object.key.split('/')
             path_segments.delete('cache')
 

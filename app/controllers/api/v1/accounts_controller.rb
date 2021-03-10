@@ -9,6 +9,7 @@ class Api::V1::AccountsController < Api::BaseController
 
   before_action :require_user!, except: [:show, :create]
   before_action :set_account, except: [:create]
+  before_action :check_account_suspension, only: [:show]
   before_action :check_enabled_registrations, only: [:create]
 
   skip_before_action :require_authenticated_user!, only: :create
@@ -20,7 +21,7 @@ class Api::V1::AccountsController < Api::BaseController
   end
 
   def create
-    token    = AppSignUpService.new.call(doorkeeper_token.application, request.remote_ip, account_params)
+    token    = AppSignUpService.new.call(doorkeeper_token.application, account_params)
     response = Doorkeeper::OAuth::TokenResponse.new(token)
 
     headers.merge!(response.headers)
@@ -30,8 +31,9 @@ class Api::V1::AccountsController < Api::BaseController
   end
 
   def follow
-    follow  = FollowService.new.call(current_user.account, @account, reblogs: params.key?(:reblogs) ? truthy_param?(:reblogs) : nil, notify: params.key?(:notify) ? truthy_param?(:notify) : nil, with_rate_limit: true)
-    options = @account.locked? || current_user.account.silenced? ? {} : { following_map: { @account.id => { reblogs: follow.show_reblogs?, notify: follow.notify? } }, requested_map: { @account.id => false } }
+    FollowService.new.call(current_user.account, @account, reblogs: truthy_param?(:reblogs), with_rate_limit: true)
+
+    options = @account.locked? || current_user.account.silenced? ? {} : { following_map: { @account.id => { reblogs: truthy_param?(:reblogs) } }, requested_map: { @account.id => false } }
 
     render json: @account, serializer: REST::RelationshipSerializer, relationships: relationships(options)
   end
@@ -42,7 +44,7 @@ class Api::V1::AccountsController < Api::BaseController
   end
 
   def mute
-    MuteService.new.call(current_user.account, @account, notifications: truthy_param?(:notifications), duration: (params[:duration] || 0))
+    MuteService.new.call(current_user.account, @account, notifications: truthy_param?(:notifications))
     render json: @account, serializer: REST::RelationshipSerializer, relationships: relationships
   end
 
@@ -69,6 +71,10 @@ class Api::V1::AccountsController < Api::BaseController
 
   def relationships(**options)
     AccountRelationshipsPresenter.new([@account.id], current_user.account_id, options)
+  end
+
+  def check_account_suspension
+    gone if @account.suspended?
   end
 
   def account_params

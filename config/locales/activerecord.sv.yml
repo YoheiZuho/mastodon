@@ -11,7 +11,3 @@ sv:
           attributes:
             username:
               invalid: endast bokstäver, siffror och understrykning
-        status:
-          attributes:
-            reblog:
-              taken: av status finns redan

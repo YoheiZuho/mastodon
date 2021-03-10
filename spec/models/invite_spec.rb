@@ -29,7 +29,7 @@ RSpec.describe Invite, type: :model do
 
     it 'returns false when invite creator has been disabled' do
       invite = Fabricate(:invite, max_uses: nil, expires_at: nil)
-      invite.user.account.suspend!
+      SuspendAccountService.new.call(invite.user.account)
       expect(invite.valid_for_use?).to be false
     end
   end

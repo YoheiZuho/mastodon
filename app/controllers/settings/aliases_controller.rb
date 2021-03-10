@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 class Settings::AliasesController < Settings::BaseController
-  skip_before_action :require_functional!
+  layout 'admin'
 
-  before_action :require_not_suspended!
+  before_action :authenticate_user!
   before_action :set_aliases, except: :destroy
   before_action :set_alias, only: :destroy
 
