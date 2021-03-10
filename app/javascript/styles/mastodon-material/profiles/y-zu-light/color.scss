@@ -1,0 +1,32 @@
+// Add your customization below
+
+$bg-color: #fafafa;
+
+$primary-color: #6D4C41;
+
+$icon-color: #92787D;
+
+$icon-hover-color: darken($icon-color, 10%);
+$top-bar-icon-color: $icon-color;
+$top-bar-icon-hover-color: darken($top-bar-icon-color, 10%);
+$top-bar-icon-active-color: darken($top-bar-icon-color, 18%);
+
+$icon-button-color: $icon-color;
+$icon-button-hover-color: $icon-hover-color;
+$contained-button-color: $primary-color;
+$contained-button-hover-color: lighten($contained-button-color, 10%);
+$outlined-button-color: $contained-button-color;
+$outlined-button-hover-color: transparentize($outlined-button-color, 0.8);
+$outlined-button-active-color: transparentize($outlined-button-color, 0.7);
+$text-button-color: $contained-button-color;
+$text-button-hover-color: transparentize($text-button-color, 0.8);
+$text-button-focus-color: transparentize($text-button-color, 0.7);
+
+$border-color: lighten($icon-color, 30%);
+$border-hover-color: darken($border-color, 30%);
+$border-active-color: $primary-color;
+
+$tab-indicator-color: $top-bar-icon-color;
+$tab-indicator-active-color: $top-bar-icon-color;
+$icon-tab-indicator-active-color: $top-bar-icon-color;
+$icon-tab-indicator-hover-color: $top-bar-icon-hover-color;
