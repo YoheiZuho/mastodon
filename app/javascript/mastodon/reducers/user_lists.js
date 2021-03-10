@@ -53,20 +53,14 @@ import {
 } from 'mastodon/actions/directory';
 import { Map as ImmutableMap, List as ImmutableList } from 'immutable';
 
-const initialListState = ImmutableMap({
-  next: null,
-  isLoading: false,
-  items: ImmutableList(),
-});
-
 const initialState = ImmutableMap({
-  followers: initialListState,
-  following: initialListState,
-  reblogged_by: initialListState,
-  favourited_by: initialListState,
-  follow_requests: initialListState,
-  blocks: initialListState,
-  mutes: initialListState,
+  followers: ImmutableMap(),
+  following: ImmutableMap(),
+  reblogged_by: ImmutableMap(),
+  favourited_by: ImmutableMap(),
+  follow_requests: ImmutableMap(),
+  blocks: ImmutableMap(),
+  mutes: ImmutableMap(),
 });
 
 const normalizeList = (state, path, accounts, next) => {

@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 class NotifyService < BaseService
-  def call(recipient, type, activity)
+  def call(recipient, activity)
     @recipient    = recipient
     @activity     = activity
-    @notification = Notification.new(account: @recipient, type: type, activity: @activity)
+    @notification = Notification.new(account: @recipient, activity: @activity)
 
     return if recipient.user.nil? || blocked?
 
@@ -13,17 +13,13 @@ class NotifyService < BaseService
     push_to_conversation! if direct_message?
     send_email! if email_enabled?
   rescue ActiveRecord::RecordInvalid
-    nil
+    return
   end
 
   private
 
   def blocked_mention?
-    FeedManager.instance.filter?(:mentions, @notification.mention.status, @recipient)
-  end
-
-  def blocked_status?
-    false
+    FeedManager.instance.filter?(:mentions, @notification.mention.status, @recipient.id)
   end
 
   def blocked_favourite?

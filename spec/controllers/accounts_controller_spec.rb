@@ -48,17 +48,10 @@ RSpec.describe AccountsController, type: :controller do
           expect(response).to have_http_status(404)
         end
       end
-    end
 
-    context 'as HTML' do
-      let(:format) { 'html' }
-
-      it_behaves_like 'preliminary checks'
-
-      context 'when account is permanently suspended' do
+      context 'when account is suspended' do
         before do
           account.suspend!
-          account.deletion_request.destroy
         end
 
         it 'returns http gone' do
@@ -66,17 +59,12 @@ RSpec.describe AccountsController, type: :controller do
           expect(response).to have_http_status(410)
         end
       end
+    end
 
-      context 'when account is temporarily suspended' do
-        before do
-          account.suspend!
-        end
+    context 'as HTML' do
+      let(:format) { 'html' }
 
-        it 'returns http forbidden' do
-          get :show, params: { username: account.username, format: format }
-          expect(response).to have_http_status(403)
-        end
-      end
+      it_behaves_like 'preliminary checks'
 
       shared_examples 'common response characteristics' do
         it 'returns http success' do
@@ -337,29 +325,6 @@ RSpec.describe AccountsController, type: :controller do
 
       it_behaves_like 'preliminary checks'
 
-      context 'when account is suspended permanently' do
-        before do
-          account.suspend!
-          account.deletion_request.destroy
-        end
-
-        it 'returns http gone' do
-          get :show, params: { username: account.username, format: format }
-          expect(response).to have_http_status(410)
-        end
-      end
-
-      context 'when account is suspended temporarily' do
-        before do
-          account.suspend!
-        end
-
-        it 'returns http success' do
-          get :show, params: { username: account.username, format: format }
-          expect(response).to have_http_status(200)
-        end
-      end
-
       context do
         before do
           get :show, params: { username: account.username, format: format }
@@ -469,29 +434,6 @@ RSpec.describe AccountsController, type: :controller do
       let(:format) { 'rss' }
 
       it_behaves_like 'preliminary checks'
-
-      context 'when account is permanently suspended' do
-        before do
-          account.suspend!
-          account.deletion_request.destroy
-        end
-
-        it 'returns http gone' do
-          get :show, params: { username: account.username, format: format }
-          expect(response).to have_http_status(410)
-        end
-      end
-
-      context 'when account is temporarily suspended' do
-        before do
-          account.suspend!
-        end
-
-        it 'returns http forbidden' do
-          get :show, params: { username: account.username, format: format }
-          expect(response).to have_http_status(403)
-        end
-      end
 
       shared_examples 'common response characteristics' do
         it 'returns http success' do

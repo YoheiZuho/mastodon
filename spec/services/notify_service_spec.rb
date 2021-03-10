@@ -2,14 +2,13 @@ require 'rails_helper'
 
 RSpec.describe NotifyService, type: :service do
   subject do
-    -> { described_class.new.call(recipient, type, activity) }
+    -> { described_class.new.call(recipient, activity) }
   end
 
   let(:user) { Fabricate(:user) }
   let(:recipient) { user.account }
   let(:sender) { Fabricate(:account, domain: 'example.com') }
   let(:activity) { Fabricate(:follow, account: sender, target_account: recipient) }
-  let(:type) { :follow }
 
   it { is_expected.to change(Notification, :count).by(1) }
 
@@ -51,7 +50,6 @@ RSpec.describe NotifyService, type: :service do
 
   context 'for direct messages' do
     let(:activity) { Fabricate(:mention, account: recipient, status: Fabricate(:status, account: sender, visibility: :direct)) }
-    let(:type)     { :mention }
 
     before do
       user.settings.interactions = user.settings.interactions.merge('must_be_following_dm' => enabled)
@@ -95,7 +93,6 @@ RSpec.describe NotifyService, type: :service do
   describe 'reblogs' do
     let(:status)   { Fabricate(:status, account: Fabricate(:account)) }
     let(:activity) { Fabricate(:status, account: sender, reblog: status) }
-    let(:type)     { :reblog }
 
     it 'shows reblogs by default' do
       recipient.follow!(sender)
@@ -117,7 +114,6 @@ RSpec.describe NotifyService, type: :service do
     let(:asshole)  { Fabricate(:account, username: 'asshole') }
     let(:reply_to) { Fabricate(:status, account: asshole) }
     let(:activity) { Fabricate(:mention, account: recipient, status: Fabricate(:status, account: sender, thread: reply_to)) }
-    let(:type)     { :mention }
 
     it 'does not notify when conversation is muted' do
       recipient.mute_conversation!(activity.status.conversation)

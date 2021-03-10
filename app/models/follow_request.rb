@@ -10,14 +10,12 @@
 #  target_account_id :bigint(8)        not null
 #  show_reblogs      :boolean          default(TRUE), not null
 #  uri               :string
-#  notify            :boolean          default(FALSE), not null
 #
 
 class FollowRequest < ApplicationRecord
   include Paginable
   include RelationshipCacheable
   include RateLimitable
-  include FollowLimitable
 
   rate_limit by: :account, family: :follows
 
@@ -27,9 +25,10 @@ class FollowRequest < ApplicationRecord
   has_one :notification, as: :activity, dependent: :destroy
 
   validates :account_id, uniqueness: { scope: :target_account_id }
+  validates_with FollowLimitValidator, on: :create
 
   def authorize!
-    account.follow!(target_account, reblogs: show_reblogs, notify: notify, uri: uri)
+    account.follow!(target_account, reblogs: show_reblogs, uri: uri)
     MergeWorker.perform_async(target_account.id, account.id) if account.local?
     destroy!
   end

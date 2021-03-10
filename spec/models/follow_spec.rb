@@ -5,7 +5,7 @@ RSpec.describe Follow, type: :model do
   let(:bob)   { Fabricate(:account, username: 'bob') }
 
   describe 'validations' do
-    subject { Follow.new(account: alice, target_account: bob, rate_limit: true) }
+    subject { Follow.new(account: alice, target_account: bob) }
 
     it 'has a valid fabricator' do
       follow = Fabricate.build(:follow)

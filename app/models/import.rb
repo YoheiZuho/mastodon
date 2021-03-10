@@ -24,10 +24,9 @@ class Import < ApplicationRecord
 
   belongs_to :account
 
-  enum type: [:following, :blocking, :muting, :domain_blocking, :bookmarks]
+  enum type: [:following, :blocking, :muting, :domain_blocking]
 
   validates :type, presence: true
-  validates_with ImportValidator, on: :create
 
   has_attached_file :data
   validates_attachment_content_type :data, content_type: FILE_TYPES

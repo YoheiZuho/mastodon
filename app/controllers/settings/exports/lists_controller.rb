@@ -2,7 +2,7 @@
 
 module Settings
   module Exports
-    class ListsController < BaseController
+    class ListsController < ApplicationController
       include ExportControllerConcern
 
       def index

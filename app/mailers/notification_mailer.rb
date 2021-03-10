@@ -10,7 +10,7 @@ class NotificationMailer < ApplicationMailer
     @me     = recipient
     @status = notification.target_status
 
-    return unless @me.user.functional? && @status.present?
+    return if @me.user.disabled? || @status.nil?
 
     locale_for_account(@me) do
       thread_by_conversation(@status.conversation)
@@ -22,7 +22,7 @@ class NotificationMailer < ApplicationMailer
     @me      = recipient
     @account = notification.from_account
 
-    return unless @me.user.functional?
+    return if @me.user.disabled?
 
     locale_for_account(@me) do
       mail to: @me.user.email, subject: I18n.t('notification_mailer.follow.subject', name: @account.acct)
@@ -34,7 +34,7 @@ class NotificationMailer < ApplicationMailer
     @account = notification.from_account
     @status  = notification.target_status
 
-    return unless @me.user.functional? && @status.present?
+    return if @me.user.disabled? || @status.nil?
 
     locale_for_account(@me) do
       thread_by_conversation(@status.conversation)
@@ -47,7 +47,7 @@ class NotificationMailer < ApplicationMailer
     @account = notification.from_account
     @status  = notification.target_status
 
-    return unless @me.user.functional? && @status.present?
+    return if @me.user.disabled? || @status.nil?
 
     locale_for_account(@me) do
       thread_by_conversation(@status.conversation)
@@ -59,7 +59,7 @@ class NotificationMailer < ApplicationMailer
     @me      = recipient
     @account = notification.from_account
 
-    return unless @me.user.functional?
+    return if @me.user.disabled?
 
     locale_for_account(@me) do
       mail to: @me.user.email, subject: I18n.t('notification_mailer.follow_request.subject', name: @account.acct)
@@ -67,7 +67,7 @@ class NotificationMailer < ApplicationMailer
   end
 
   def digest(recipient, **opts)
-    return unless recipient.user.functional?
+    return if recipient.user.disabled?
 
     @me                  = recipient
     @since               = opts[:since] || [@me.user.last_emailed_at, (@me.user.current_sign_in_at + 1.day)].compact.max
@@ -88,10 +88,8 @@ class NotificationMailer < ApplicationMailer
 
   def thread_by_conversation(conversation)
     return if conversation.nil?
-
     msg_id = "<conversation-#{conversation.id}.#{conversation.created_at.strftime('%Y-%m-%d')}@#{Rails.configuration.x.local_domain}>"
-
     headers['In-Reply-To'] = msg_id
-    headers['References']  = msg_id
+    headers['References'] = msg_id
   end
 end

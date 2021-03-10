@@ -5,9 +5,8 @@ import { EmojiPicker as EmojiPickerAsync } from '../../ui/util/async-components'
 import Overlay from 'react-overlays/lib/Overlay';
 import classNames from 'classnames';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import { supportsPassiveEvents } from 'detect-passive-events';
+import detectPassiveEvents from 'detect-passive-events';
 import { buildCustomEmojis, categoriesFromEmojis } from '../../emoji/emoji';
-import { assetHost } from 'mastodon/utils/config';
 
 const messages = defineMessages({
   emoji: { id: 'emoji_button.label', defaultMessage: 'Insert emoji' },
@@ -26,10 +25,11 @@ const messages = defineMessages({
   flags: { id: 'emoji_button.flags', defaultMessage: 'Flags' },
 });
 
+const assetHost = process.env.CDN_HOST || '';
 let EmojiPicker, Emoji; // load asynchronously
 
 const backgroundImageFn = () => `${assetHost}/emoji/sheet_10.png`;
-const listenerOptions = supportsPassiveEvents ? { passive: true } : false;
+const listenerOptions = detectPassiveEvents.hasSupport ? { passive: true } : false;
 
 class ModifierPickerMenu extends React.PureComponent {
 

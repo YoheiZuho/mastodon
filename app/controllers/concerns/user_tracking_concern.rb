@@ -6,13 +6,14 @@ module UserTrackingConcern
   UPDATE_SIGN_IN_HOURS = 24
 
   included do
-    before_action :update_user_sign_in
+    before_action :set_user_activity
   end
 
   private
 
-  def update_user_sign_in
-    current_user.update_sign_in!(request) if user_needs_sign_in_update?
+  def set_user_activity
+    return unless user_needs_sign_in_update?
+    current_user.update_tracked_fields!(request)
   end
 
   def user_needs_sign_in_update?

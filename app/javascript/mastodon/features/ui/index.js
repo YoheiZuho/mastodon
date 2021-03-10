@@ -8,20 +8,19 @@ import PropTypes from 'prop-types';
 import NotificationsContainer from './containers/notifications_container';
 import LoadingBarContainer from './containers/loading_bar_container';
 import ModalContainer from './containers/modal_container';
-import { layoutFromWindow } from 'mastodon/is_mobile';
+import { isMobile } from '../../is_mobile';
 import { debounce } from 'lodash';
 import { uploadCompose, resetCompose, changeComposeSpoilerness } from '../../actions/compose';
 import { expandHomeTimeline } from '../../actions/timelines';
 import { expandNotifications } from '../../actions/notifications';
 import { fetchFilters } from '../../actions/filters';
 import { clearHeight } from '../../actions/height_cache';
-import { focusApp, unfocusApp, changeLayout } from 'mastodon/actions/app';
-import { synchronouslySubmitMarkers, submitMarkers, fetchMarkers } from 'mastodon/actions/markers';
+import { focusApp, unfocusApp } from 'mastodon/actions/app';
+import { synchronouslySubmitMarkers } from 'mastodon/actions/markers';
 import { WrappedSwitch, WrappedRoute } from './util/react_router_helpers';
 import UploadArea from './components/upload_area';
 import ColumnsAreaContainer from './containers/columns_area_container';
 import DocumentTitle from './components/document_title';
-import PictureInPicture from 'mastodon/features/picture_in_picture';
 import {
   Compose,
   Status,
@@ -52,7 +51,7 @@ import {
   Search,
   Directory,
 } from './util/async-components';
-import { me } from '../../initial_state';
+import { me, forceSingleColumn } from '../../initial_state';
 import { previewState as previewMediaState } from './components/media_modal';
 import { previewState as previewVideoState } from './components/video_modal';
 
@@ -65,7 +64,6 @@ const messages = defineMessages({
 });
 
 const mapStateToProps = state => ({
-  layout: state.getIn(['meta', 'layout']),
   isComposing: state.getIn(['compose', 'is_composing']),
   hasComposingText: state.getIn(['compose', 'text']).trim().length !== 0,
   hasMediaAttachments: state.getIn(['compose', 'media_attachments']).size > 0,
@@ -111,11 +109,17 @@ class SwitchingColumnsArea extends React.PureComponent {
   static propTypes = {
     children: PropTypes.node,
     location: PropTypes.object,
-    mobile: PropTypes.bool,
+    onLayoutChange: PropTypes.func.isRequired,
+  };
+
+  state = {
+    mobile: isMobile(window.innerWidth),
   };
 
   componentWillMount () {
-    if (this.props.mobile) {
+    window.addEventListener('resize', this.handleResize, { passive: true });
+
+    if (this.state.mobile || forceSingleColumn) {
       document.body.classList.toggle('layout-single-column', true);
       document.body.classList.toggle('layout-multiple-columns', false);
     } else {
@@ -124,19 +128,42 @@ class SwitchingColumnsArea extends React.PureComponent {
     }
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate (prevProps, prevState) {
     if (![this.props.location.pathname, '/'].includes(prevProps.location.pathname)) {
       this.node.handleChildrenContentChange();
     }
 
-    if (prevProps.mobile !== this.props.mobile) {
-      document.body.classList.toggle('layout-single-column', this.props.mobile);
-      document.body.classList.toggle('layout-multiple-columns', !this.props.mobile);
+    if (prevState.mobile !== this.state.mobile && !forceSingleColumn) {
+      document.body.classList.toggle('layout-single-column', this.state.mobile);
+      document.body.classList.toggle('layout-multiple-columns', !this.state.mobile);
     }
+  }
+
+  componentWillUnmount () {
+    window.removeEventListener('resize', this.handleResize);
   }
 
   shouldUpdateScroll (_, { location }) {
     return location.state !== previewMediaState && location.state !== previewVideoState;
+  }
+
+  handleLayoutChange = debounce(() => {
+    // The cached heights are no longer accurate, invalidate
+    this.props.onLayoutChange();
+  }, 500, {
+    trailing: true,
+  })
+
+  handleResize = () => {
+    const mobile = isMobile(window.innerWidth);
+
+    if (mobile !== this.state.mobile) {
+      this.handleLayoutChange.cancel();
+      this.props.onLayoutChange();
+      this.setState({ mobile });
+    } else {
+      this.handleLayoutChange();
+    }
   }
 
   setRef = c => {
@@ -146,11 +173,13 @@ class SwitchingColumnsArea extends React.PureComponent {
   }
 
   render () {
-    const { children, mobile } = this.props;
-    const redirect = mobile ? <Redirect from='/' to='/timelines/home' exact /> : <Redirect from='/' to='/getting-started' exact />;
+    const { children } = this.props;
+    const { mobile } = this.state;
+    const singleColumn = forceSingleColumn || mobile;
+    const redirect = singleColumn ? <Redirect from='/' to='/timelines/home' exact /> : <Redirect from='/' to='/getting-started' exact />;
 
     return (
-      <ColumnsAreaContainer ref={this.setRef} singleColumn={mobile}>
+      <ColumnsAreaContainer ref={this.setRef} singleColumn={singleColumn}>
         <WrappedSwitch>
           {redirect}
           <WrappedRoute path='/getting-started' component={GettingStarted} content={children} />
@@ -214,7 +243,6 @@ class UI extends React.PureComponent {
     location: PropTypes.object,
     intl: PropTypes.object.isRequired,
     dropdownMenuIsOpen: PropTypes.bool,
-    layout: PropTypes.string.isRequired,
   };
 
   state = {
@@ -237,11 +265,15 @@ class UI extends React.PureComponent {
 
   handleWindowFocus = () => {
     this.props.dispatch(focusApp());
-    this.props.dispatch(submitMarkers({ immediate: true }));
   }
 
   handleWindowBlur = () => {
     this.props.dispatch(unfocusApp());
+  }
+
+  handleLayoutChange = () => {
+    // The cached heights are no longer accurate, invalidate
+    this.props.dispatch(clearHeight());
   }
 
   handleDragEnter = (e) => {
@@ -317,28 +349,10 @@ class UI extends React.PureComponent {
     }
   }
 
-  handleLayoutChange = debounce(() => {
-    this.props.dispatch(clearHeight()); // The cached heights are no longer accurate, invalidate
-  }, 500, {
-    trailing: true,
-  });
-
-  handleResize = () => {
-    const layout = layoutFromWindow();
-
-    if (layout !== this.props.layout) {
-      this.handleLayoutChange.cancel();
-      this.props.dispatch(changeLayout(layout));
-    } else {
-      this.handleLayoutChange();
-    }
-  }
-
-  componentDidMount () {
+  componentWillMount () {
     window.addEventListener('focus', this.handleWindowFocus, false);
     window.addEventListener('blur', this.handleWindowBlur, false);
     window.addEventListener('beforeunload', this.handleBeforeUnload, false);
-    window.addEventListener('resize', this.handleResize, { passive: true });
 
     document.addEventListener('dragenter', this.handleDragEnter, false);
     document.addEventListener('dragover', this.handleDragOver, false);
@@ -350,14 +364,19 @@ class UI extends React.PureComponent {
       navigator.serviceWorker.addEventListener('message', this.handleServiceWorkerPostMessage);
     }
 
-    this.props.dispatch(fetchMarkers());
+    if (typeof window.Notification !== 'undefined' && Notification.permission === 'default') {
+      window.setTimeout(() => Notification.requestPermission(), 120 * 1000);
+    }
+
     this.props.dispatch(expandHomeTimeline());
     this.props.dispatch(expandNotifications());
 
     setTimeout(() => this.props.dispatch(fetchFilters()), 500);
+  }
 
+  componentDidMount () {
     this.hotkeys.__mousetrap__.stopCallback = (e, element) => {
-      return ['TEXTAREA', 'SELECT', 'INPUT'].includes(element.tagName);
+      return ['TEXTAREA', 'SELECT', 'INPUT'].includes(element.tagName) && !e.altKey;
     };
   }
 
@@ -365,7 +384,6 @@ class UI extends React.PureComponent {
     window.removeEventListener('focus', this.handleWindowFocus);
     window.removeEventListener('blur', this.handleWindowBlur);
     window.removeEventListener('beforeunload', this.handleBeforeUnload);
-    window.removeEventListener('resize', this.handleResize);
 
     document.removeEventListener('dragenter', this.handleDragEnter);
     document.removeEventListener('dragover', this.handleDragOver);
@@ -496,7 +514,7 @@ class UI extends React.PureComponent {
 
   render () {
     const { draggingOver } = this.state;
-    const { children, isComposing, location, dropdownMenuIsOpen, layout } = this.props;
+    const { children, isComposing, location, dropdownMenuIsOpen } = this.props;
 
     const handlers = {
       help: this.handleHotkeyToggleHelp,
@@ -523,11 +541,10 @@ class UI extends React.PureComponent {
     return (
       <HotKeys keyMap={keyMap} handlers={handlers} ref={this.setHotkeysRef} attach={window} focused>
         <div className={classNames('ui', { 'is-composing': isComposing })} ref={this.setRef} style={{ pointerEvents: dropdownMenuIsOpen ? 'none' : null }}>
-          <SwitchingColumnsArea location={location} mobile={layout === 'mobile' || layout === 'single-column'}>
+          <SwitchingColumnsArea location={location} onLayoutChange={this.handleLayoutChange}>
             {children}
           </SwitchingColumnsArea>
 
-          {layout !== 'mobile' && <PictureInPicture />}
           <NotificationsContainer />
           <LoadingBarContainer className='loading-bar' />
           <ModalContainer />

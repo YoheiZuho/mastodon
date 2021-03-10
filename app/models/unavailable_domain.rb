@@ -12,8 +12,6 @@
 class UnavailableDomain < ApplicationRecord
   include DomainNormalizable
 
-  validates :domain, presence: true, uniqueness: true
-
   after_commit :reset_cache!
 
   private

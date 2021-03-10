@@ -1,10 +1,8 @@
 import api from '../api';
 import { debounce } from 'lodash';
 import compareId from '../compare_id';
+import { showAlertForError } from './alerts';
 
-export const MARKERS_FETCH_REQUEST = 'MARKERS_FETCH_REQUEST';
-export const MARKERS_FETCH_SUCCESS = 'MARKERS_FETCH_SUCCESS';
-export const MARKERS_FETCH_FAIL    = 'MARKERS_FETCH_FAIL';
 export const MARKERS_SUBMIT_SUCCESS = 'MARKERS_SUBMIT_SUCCESS';
 
 export const synchronouslySubmitMarkers = () => (dispatch, getState) => {
@@ -28,19 +26,15 @@ export const synchronouslySubmitMarkers = () => (dispatch, getState) => {
       },
       body: JSON.stringify(params),
     });
-
     return;
   } else if (navigator && navigator.sendBeacon) {
     // Failing that, we can use sendBeacon, but we have to encode the data as
     // FormData for DoorKeeper to recognize the token.
     const formData = new FormData();
-
     formData.append('bearer_token', accessToken);
-
     for (const [id, value] of Object.entries(params)) {
       formData.append(`${id}[last_read_id]`, value.last_read_id);
     }
-
     if (navigator.sendBeacon('/api/v1/markers', formData)) {
       return;
     }
@@ -63,8 +57,8 @@ export const synchronouslySubmitMarkers = () => (dispatch, getState) => {
 const _buildParams = (state) => {
   const params = {};
 
-  const lastHomeId         = state.getIn(['timelines', 'home', 'items']).find(item => item !== null);
-  const lastNotificationId = state.getIn(['notifications', 'lastReadId']);
+  const lastHomeId         = state.getIn(['timelines', 'home', 'items', 0]);
+  const lastNotificationId = state.getIn(['notifications', 'items', 0, 'id']);
 
   if (lastHomeId && compareId(lastHomeId, state.getIn(['markers', 'home'])) > 0) {
     params.home = {
@@ -88,9 +82,11 @@ const debouncedSubmitMarkers = debounce((dispatch, getState) => {
     return;
   }
 
-  api(getState).post('/api/v1/markers', params).then(() => {
+  api().post('/api/v1/markers', params).then(() => {
     dispatch(submitMarkersSuccess(params));
-  }).catch(() => {});
+  }).catch(error => {
+    dispatch(showAlertForError(error));
+  });
 }, 300000, { leading: true, trailing: true });
 
 export function submitMarkersSuccess({ home, notifications }) {
@@ -101,48 +97,6 @@ export function submitMarkersSuccess({ home, notifications }) {
   };
 };
 
-export function submitMarkers(params = {}) {
-  const result = (dispatch, getState) => debouncedSubmitMarkers(dispatch, getState);
-
-  if (params.immediate === true) {
-    debouncedSubmitMarkers.flush();
-  }
-
-  return result;
-};
-
-export const fetchMarkers = () => (dispatch, getState) => {
-  const params = { timeline: ['notifications'] };
-
-  dispatch(fetchMarkersRequest());
-
-  api(getState).get('/api/v1/markers', { params }).then(response => {
-    dispatch(fetchMarkersSuccess(response.data));
-  }).catch(error => {
-    dispatch(fetchMarkersFail(error));
-  });
-};
-
-export function fetchMarkersRequest() {
-  return {
-    type: MARKERS_FETCH_REQUEST,
-    skipLoading: true,
-  };
-};
-
-export function fetchMarkersSuccess(markers) {
-  return {
-    type: MARKERS_FETCH_SUCCESS,
-    markers,
-    skipLoading: true,
-  };
-};
-
-export function fetchMarkersFail(error) {
-  return {
-    type: MARKERS_FETCH_FAIL,
-    error,
-    skipLoading: true,
-    skipAlert: true,
-  };
+export function submitMarkers() {
+  return (dispatch, getState) => debouncedSubmitMarkers(dispatch, getState);
 };

@@ -95,10 +95,6 @@ class ActivityPub::NoteSerializer < ActivityPub::Serializer
     ActivityPub::TagManager.instance.cc(object)
   end
 
-  def sensitive
-    object.account.sensitized? || object.sensitive
-  end
-
   def virtual_tags
     object.active_mentions.to_a.sort_by(&:id) + object.tags + object.emojis
   end

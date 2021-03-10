@@ -35,7 +35,7 @@ module WellKnown
     end
 
     def check_account_suspension
-      expires_in(3.minutes, public: true) && gone if @account.suspended_permanently?
+      expires_in(3.minutes, public: true) && gone if @account.suspended?
     end
 
     def bad_request

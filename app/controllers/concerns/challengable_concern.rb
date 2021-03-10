@@ -32,6 +32,7 @@ module ChallengableConcern
     if params.key?(:form_challenge)
       if challenge_passed?
         session[:challenge_passed_at] = Time.now.utc
+        return
       else
         flash.now[:alert] = I18n.t('challenge.invalid_password')
         render_challenge

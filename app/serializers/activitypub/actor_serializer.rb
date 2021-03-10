@@ -7,10 +7,10 @@ class ActivityPub::ActorSerializer < ActivityPub::Serializer
 
   context_extensions :manually_approves_followers, :featured, :also_known_as,
                      :moved_to, :property_value, :identity_proof,
-                     :discoverable, :olm, :suspended
+                     :discoverable, :olm
 
   attributes :id, :type, :following, :followers,
-             :inbox, :outbox, :featured, :featured_tags,
+             :inbox, :outbox, :featured,
              :preferred_username, :name, :summary,
              :url, :manually_approves_followers,
              :discoverable
@@ -23,7 +23,6 @@ class ActivityPub::ActorSerializer < ActivityPub::Serializer
   attribute :devices, unless: :instance_actor?
   attribute :moved_to, if: :moved?
   attribute :also_known_as, if: :also_known_as?
-  attribute :suspended, if: :suspended?
 
   class EndpointsSerializer < ActivityPub::Serializer
     include RoutingHelper
@@ -40,7 +39,7 @@ class ActivityPub::ActorSerializer < ActivityPub::Serializer
   has_one :icon,  serializer: ActivityPub::ImageSerializer, if: :avatar_exists?
   has_one :image, serializer: ActivityPub::ImageSerializer, if: :header_exists?
 
-  delegate :suspended?, :instance_actor?, to: :object
+  delegate :moved?, :instance_actor?, to: :object
 
   def id
     object.instance_actor? ? instance_actor_url : account_url(object)
@@ -75,15 +74,11 @@ class ActivityPub::ActorSerializer < ActivityPub::Serializer
   end
 
   def outbox
-    object.instance_actor? ? instance_actor_outbox_url : account_outbox_url(object)
+    account_outbox_url(object)
   end
 
   def featured
     account_collection_url(object, :featured)
-  end
-
-  def featured_tags
-    account_collection_url(object, :tags)
   end
 
   def endpoints
@@ -94,16 +89,12 @@ class ActivityPub::ActorSerializer < ActivityPub::Serializer
     object.username
   end
 
-  def discoverable
-    object.suspended? ? false : (object.discoverable || false)
-  end
-
   def name
-    object.suspended? ? '' : object.display_name
+    object.display_name
   end
 
   def summary
-    object.suspended? ? '' : Formatter.instance.simplified_format(object)
+    Formatter.instance.simplified_format(object)
   end
 
   def icon
@@ -118,44 +109,36 @@ class ActivityPub::ActorSerializer < ActivityPub::Serializer
     object
   end
 
-  def suspended
-    object.suspended?
-  end
-
   def url
     object.instance_actor? ? about_more_url(instance_actor: true) : short_account_url(object)
   end
 
   def avatar_exists?
-    !object.suspended? && object.avatar?
+    object.avatar?
   end
 
   def header_exists?
-    !object.suspended? && object.header?
+    object.header?
   end
 
   def manually_approves_followers
-    object.suspended? ? false : object.locked
+    object.locked
   end
 
   def virtual_tags
-    object.suspended? ? [] : (object.emojis + object.tags)
+    object.emojis + object.tags
   end
 
   def virtual_attachments
-    object.suspended? ? [] : (object.fields + object.identity_proofs.active)
+    object.fields + object.identity_proofs.active
   end
 
   def moved_to
     ActivityPub::TagManager.instance.uri_for(object.moved_to_account)
   end
 
-  def moved?
-    !object.suspended? && object.moved?
-  end
-
   def also_known_as?
-    !object.suspended? && !object.also_known_as.empty?
+    !object.also_known_as.empty?
   end
 
   class CustomEmojiSerializer < ActivityPub::EmojiSerializer
