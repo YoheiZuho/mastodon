@@ -1247,6 +1247,8 @@ ja:
     mastodon-material-light: Mastodon Material (ライト)
     mastodon-material-auto: Mastodon Material (自動)
     plus: Plus
+    y-zu-dark: Y-zu (ダーク)
+    y-zu-light: Y-zu (ライト)
   time:
     formats:
       default: "%Y年%m月%d日 %H:%M"
