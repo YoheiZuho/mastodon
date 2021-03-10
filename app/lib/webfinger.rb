@@ -4,7 +4,6 @@ class Webfinger
   class Error < StandardError; end
   class GoneError < Error; end
   class RedirectError < StandardError; end
-
   class Response
     def initialize(body)
       @json = Oj.load(body, mode: :strict)

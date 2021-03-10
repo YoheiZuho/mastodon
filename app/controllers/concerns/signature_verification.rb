@@ -163,6 +163,8 @@ module SignatureVerification
         raise SignatureVerificationError, 'Pseudo-header (expires) used but corresponding argument missing' if signature_params['expires'].blank?
 
         "(expires): #{signature_params['expires']}"
+      elsif signed_header == 'digest'
+        "digest: #{body_digest}"
       else
         "#{signed_header}: #{request.headers[to_header_name(signed_header)]}"
       end
