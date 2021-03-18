@@ -395,7 +395,7 @@ GEM
       av (~> 0.9.0)
       paperclip (>= 2.5.2)
     parallel (1.20.1)
-    parallel_tests (3.4.0)
+    parallel_tests (3.5.2)
       parallel
     parser (2.7.2.0)
       ast (~> 2.4.1)
@@ -481,8 +481,8 @@ GEM
       link_header (~> 0.0, >= 0.0.8)
     rdf-normalize (0.4.0)
       rdf (~> 3.1)
-    redis (4.2.5)
     redcarpet (3.4.0)
+    redis (4.2.5)
     redis-actionpack (5.2.0)
       actionpack (>= 5, < 7)
       redis-rack (>= 2.1.0, < 3)
@@ -754,7 +754,7 @@ DEPENDENCIES
   paperclip (~> 6.0)
   paperclip-av-transcoder (~> 0.6)
   parallel (~> 1.20)
-  parallel_tests (~> 3.4)
+  parallel_tests (~> 3.5)
   parslet
   pg (~> 1.2)
   pghero (~> 2.7)
