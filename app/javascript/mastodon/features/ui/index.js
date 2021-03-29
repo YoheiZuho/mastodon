@@ -58,6 +58,7 @@ import {
   Directory,
   FollowRecommendations,
   Trends,
+  Suggestions,
 } from './util/async-components';
 import { me } from '../../initial_state';
 import { previewState as previewMediaState } from './components/media_modal';
@@ -181,6 +182,7 @@ class SwitchingColumnsArea extends React.PureComponent {
           <WrappedRoute path='/group_directory' component={GroupDirectory} content={children} componentParams={{ shouldUpdateScroll: this.shouldUpdateScroll }} />
           <WrappedRoute path='/directory' component={Directory} content={children} componentParams={{ shouldUpdateScroll: this.shouldUpdateScroll }} />
           <WrappedRoute path='/trends' component={Trends} content={children} componentParams={{ shouldUpdateScroll: this.shouldUpdateScroll }} />
+          <WrappedRoute path='/suggestions' component={Suggestions} content={children} componentParams={{ shouldUpdateScroll: this.shouldUpdateScroll }} />
 
           <WrappedRoute path='/statuses/new' component={Compose} content={children} />
           <WrappedRoute path='/statuses/:statusId' exact component={Status} content={children} componentParams={{ shouldUpdateScroll: this.shouldUpdateScroll }} />
