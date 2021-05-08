@@ -4,6 +4,8 @@ $primary-color: #7e5f66;
 
 $section-text-color: lighten($primary-color, 10%);
 
+$unread-bg-color: transparentize($primary-color, 0.8);
+
 $icon-color: #d2d2d2;
 $icon-hover-color: #ffffff;
 $top-bar-icon-color: $icon-color;
