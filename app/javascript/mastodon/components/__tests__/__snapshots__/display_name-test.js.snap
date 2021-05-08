@@ -3,8 +3,6 @@
 exports[`<DisplayName /> renders display name + account name 1`] = `
 <span
   className="display-name"
-  onMouseEnter={[Function]}
-  onMouseLeave={[Function]}
 >
   <bdi>
     <strong

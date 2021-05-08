@@ -2,11 +2,12 @@
 
 class HomeFeed < Feed
   def initialize(account)
+    @type    = :home
+    @id      = account.id
     @account = account
-    super(:home, account.id)
   end
 
   def regenerating?
-    redis.exists?("account:#{@account.id}:regeneration")
+    redis.exists?("account:#{@id}:regeneration")
   end
 end

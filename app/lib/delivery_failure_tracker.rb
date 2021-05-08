@@ -17,10 +17,6 @@ class DeliveryFailureTracker
     UnavailableDomain.find_by(domain: @host)&.destroy
   end
 
-  def clear_failures!
-    Redis.current.del(exhausted_deliveries_key)
-  end
-
   def days
     Redis.current.scard(exhausted_deliveries_key) || 0
   end
@@ -29,15 +25,11 @@ class DeliveryFailureTracker
     !UnavailableDomain.where(domain: @host).exists?
   end
 
-  def exhausted_deliveries_days
-    Redis.current.smembers(exhausted_deliveries_key).sort.map { |date| Date.new(date.slice(0, 4).to_i, date.slice(4, 2).to_i, date.slice(6, 2).to_i) }
-  end
-
   alias reset! track_success!
 
   class << self
     def without_unavailable(urls)
-      unavailable_domains_map = Rails.cache.fetch('unavailable_domains') { UnavailableDomain.pluck(:domain).index_with(true) }
+      unavailable_domains_map = Rails.cache.fetch('unavailable_domains') { UnavailableDomain.pluck(:domain).each_with_object({}) { |domain, hash| hash[domain] = true } }
 
       urls.reject do |url|
         host = Addressable::URI.parse(url).normalized_host
@@ -51,24 +43,6 @@ class DeliveryFailureTracker
 
     def reset!(url)
       new(url).reset!
-    end
-
-    def warning_domains
-      domains = Redis.current.keys(exhausted_deliveries_key_by('*')).map do |key|
-        key.delete_prefix(exhausted_deliveries_key_by(''))
-      end
-
-      domains - UnavailableDomain.all.pluck(:domain)
-    end
-
-    def warning_domains_map
-      warning_domains.index_with { |domain| Redis.current.scard(exhausted_deliveries_key_by(domain)) }
-    end
-
-    private
-
-    def exhausted_deliveries_key_by(host)
-      "exhausted_deliveries:#{host}"
     end
   end
 

@@ -72,12 +72,10 @@ bundle install
 yarn install
 
 # Build Mastodon
-export RAILS_ENV=development 
 export $(cat ".env.vagrant" | xargs)
 bundle exec rails db:setup
 
 # Configure automatic loading of environment variable
-echo 'export RAILS_ENV=development' >> ~/.bash_profile
 echo 'export $(cat "/vagrant/.env.vagrant" | xargs)' >> ~/.bash_profile
 
 SCRIPT

@@ -17,7 +17,7 @@ class Api::V1::Crypto::Keys::QueriesController < Api::BaseController
   end
 
   def set_query_results
-    @query_results = @accounts.filter_map { |account| ::Keys::QueryService.new.call(account) }
+    @query_results = @accounts.map { |account| ::Keys::QueryService.new.call(account) }.compact
   end
 
   def account_ids

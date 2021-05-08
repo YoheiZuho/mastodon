@@ -21,7 +21,7 @@ module Admin::ActionLogsHelper
       record.shortcode
     when 'Report'
       link_to "##{record.id}", admin_report_path(record)
-    when 'DomainBlock', 'DomainAllow', 'EmailDomainBlock', 'UnavailableDomain'
+    when 'DomainBlock', 'DomainAllow', 'EmailDomainBlock'
       link_to record.domain, "https://#{record.domain}"
     when 'Status'
       link_to record.account.acct, ActivityPub::TagManager.instance.url_for(record)
@@ -38,7 +38,7 @@ module Admin::ActionLogsHelper
     case type
     when 'CustomEmoji'
       attributes['shortcode']
-    when 'DomainBlock', 'DomainAllow', 'EmailDomainBlock', 'UnavailableDomain'
+    when 'DomainBlock', 'DomainAllow', 'EmailDomainBlock'
       link_to attributes['domain'], "https://#{attributes['domain']}"
     when 'Status'
       tmp_status = Status.new(attributes.except('reblogs_count', 'favourites_count'))

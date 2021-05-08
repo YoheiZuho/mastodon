@@ -4,7 +4,6 @@ require 'sidekiq/api'
 module Admin
   class DashboardController < BaseController
     def index
-      @system_checks         = Admin::SystemCheck.perform
       @users_count           = User.count
       @pending_users_count   = User.pending.count
       @registrations_week    = Redis.current.get("activity:accounts:local:#{current_week}") || 0
@@ -35,6 +34,7 @@ module Admin
       @whitelist_enabled     = whitelist_mode?
       @profile_directory     = Setting.profile_directory
       @timeline_preview      = Setting.timeline_preview
+      @spam_check_enabled    = Setting.spam_check_enabled
       @trends_enabled        = Setting.trends
     end
 

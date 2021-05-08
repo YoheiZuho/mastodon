@@ -112,9 +112,7 @@ else
   )
 end
 
-Rails.application.reloader.to_prepare do
-  Paperclip.options[:content_type_mappings] = { csv: Import::FILE_TYPES }
-end
+Paperclip.options[:content_type_mappings] = { csv: Import::FILE_TYPES }
 
 # In some places in the code, we rescue this exception, but we don't always
 # load the S3 library, so it may be an undefined constant:

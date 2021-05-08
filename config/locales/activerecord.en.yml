@@ -5,28 +5,13 @@ en:
       poll:
         expires_at: Deadline
         options: Choices
-      user:
-        agreement: Service agreement
-        email: E-mail address
-        locale: Locale
-        password: Password
-      user/account:
-        username: Username
-      user/invite_request:
-        text: Reason
     errors:
       models:
         account:
           attributes:
             username:
-              invalid: must contain only letters, numbers and underscores
-              reserved: is reserved
+              invalid: only letters, numbers and underscores
         status:
           attributes:
             reblog:
               taken: of status already exists
-        user:
-          attributes:
-            email:
-              blocked: uses a disallowed e-mail provider
-              unreachable: does not seem to exist

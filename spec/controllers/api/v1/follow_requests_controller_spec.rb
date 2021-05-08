@@ -8,7 +8,7 @@ RSpec.describe Api::V1::FollowRequestsController, type: :controller do
   let(:follower) { Fabricate(:account, username: 'bob') }
 
   before do
-    FollowService.new.call(follower, user.account)
+    FollowService.new.call(follower, user.account.acct)
     allow(controller).to receive(:doorkeeper_token) { token }
   end
 

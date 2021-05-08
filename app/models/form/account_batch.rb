@@ -21,10 +21,6 @@ class Form::AccountBatch
       approve!
     when 'reject'
       reject!
-    when 'suppress_follow_recommendation'
-      suppress_follow_recommendation!
-    when 'unsuppress_follow_recommendation'
-      unsuppress_follow_recommendation!
     end
   end
 
@@ -82,19 +78,5 @@ class Form::AccountBatch
 
     records.each { |account| authorize(account.user, :reject?) }
            .each { |account| DeleteAccountService.new.call(account, reserve_email: false, reserve_username: false) }
-  end
-
-  def suppress_follow_recommendation!
-    authorize(:follow_recommendation, :suppress?)
-
-    accounts.each do |account|
-      FollowRecommendationSuppression.create(account: account)
-    end
-  end
-
-  def unsuppress_follow_recommendation!
-    authorize(:follow_recommendation, :unsuppress?)
-
-    FollowRecommendationSuppression.where(account_id: account_ids).destroy_all
   end
 end

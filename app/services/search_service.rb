@@ -72,7 +72,7 @@ class SearchService < BaseService
   end
 
   def url_query?
-    @resolve && /\Ahttps?:\/\//.match?(@query)
+    @resolve && @query =~ /\Ahttps?:\/\//
   end
 
   def url_resource_results
