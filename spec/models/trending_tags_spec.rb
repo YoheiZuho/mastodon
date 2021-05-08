@@ -7,9 +7,9 @@ RSpec.describe TrendingTags do
 
   describe '.update!' do
     let!(:at_time) { Time.now.utc }
-    let!(:tag1) { Fabricate(:tag, name: 'Catstodon', trendable: true) }
-    let!(:tag2) { Fabricate(:tag, name: 'DogsOfMastodon', trendable: true) }
-    let!(:tag3) { Fabricate(:tag, name: 'OCs', trendable: true) }
+    let!(:tag1) { Fabricate(:tag, name: 'Catstodon') }
+    let!(:tag2) { Fabricate(:tag, name: 'DogsOfMastodon') }
+    let!(:tag3) { Fabricate(:tag, name: 'OCs') }
 
     before do
       allow(Redis.current).to receive(:pfcount) do |key|

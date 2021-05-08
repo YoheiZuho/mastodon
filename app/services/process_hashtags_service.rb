@@ -8,7 +8,8 @@ class ProcessHashtagsService < BaseService
     Tag.find_or_create_by_names(tags) do |tag|
       status.tags << tag
       records << tag
-      tag.use!(status.account, status: status, at_time: status.created_at) if status.public_visibility?
+
+      TrendingTags.record_use!(tag, status.account, status.created_at) if status.public_visibility?
     end
 
     return unless status.distributable?

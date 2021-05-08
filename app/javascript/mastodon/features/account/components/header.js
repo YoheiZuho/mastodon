@@ -96,30 +96,45 @@ class Header extends ImmutablePureComponent {
     return !location.pathname.match(/\/(followers|following)\/?$/);
   }
 
-  handleMouseEnter = ({ currentTarget }) => {
-    if (autoPlayGif) {
+  _updateEmojis () {
+    const node = this.node;
+
+    if (!node || autoPlayGif) {
       return;
     }
 
-    const emojis = currentTarget.querySelectorAll('.custom-emoji');
+    const emojis = node.querySelectorAll('.custom-emoji');
 
     for (var i = 0; i < emojis.length; i++) {
       let emoji = emojis[i];
-      emoji.src = emoji.getAttribute('data-original');
+      if (emoji.classList.contains('status-emoji')) {
+        continue;
+      }
+      emoji.classList.add('status-emoji');
+
+      emoji.addEventListener('mouseenter', this.handleEmojiMouseEnter, false);
+      emoji.addEventListener('mouseleave', this.handleEmojiMouseLeave, false);
     }
   }
 
-  handleMouseLeave = ({ currentTarget }) => {
-    if (autoPlayGif) {
-      return;
-    }
+  componentDidMount () {
+    this._updateEmojis();
+  }
 
-    const emojis = currentTarget.querySelectorAll('.custom-emoji');
+  componentDidUpdate () {
+    this._updateEmojis();
+  }
 
-    for (var i = 0; i < emojis.length; i++) {
-      let emoji = emojis[i];
-      emoji.src = emoji.getAttribute('data-static');
-    }
+  handleEmojiMouseEnter = ({ target }) => {
+    target.src = target.getAttribute('data-original');
+  }
+
+  handleEmojiMouseLeave = ({ target }) => {
+    target.src = target.getAttribute('data-static');
+  }
+
+  setRef = (c) => {
+    this.node = c;
   }
 
   render () {
@@ -261,7 +276,7 @@ class Header extends ImmutablePureComponent {
     }
 
     return (
-      <div className={classNames('account__header', { inactive: !!account.get('moved') })} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}>
+      <div className={classNames('account__header', { inactive: !!account.get('moved') })} ref={this.setRef}>
         <div className='account__header__image'>
           <div className='account__header__info'>
             {!suspended && info}
@@ -313,9 +328,9 @@ class Header extends ImmutablePureComponent {
                   ))}
                   {fields.map((pair, i) => (
                     <dl key={i}>
-                      <dt dangerouslySetInnerHTML={{ __html: pair.get('name_emojified') }} title={pair.get('name')} className='translate' />
+                      <dt dangerouslySetInnerHTML={{ __html: pair.get('name_emojified') }} title={pair.get('name')} />
 
-                      <dd className={`${pair.get('verified_at') ? 'verified' : ''} translate`} title={pair.get('value_plain')}>
+                      <dd className={pair.get('verified_at') && 'verified'} title={pair.get('value_plain')}>
                         {pair.get('verified_at') && <span title={intl.formatMessage(messages.linkVerifiedOn, { date: intl.formatDate(pair.get('verified_at'), dateFormatOptions) })}><Icon id='check' className='verified__mark' /></span>} <span dangerouslySetInnerHTML={{ __html: pair.get('value_emojified') }} />
                       </dd>
                     </dl>
@@ -325,9 +340,7 @@ class Header extends ImmutablePureComponent {
 
               {account.get('id') !== me && !suspended && <AccountNoteContainer account={account} />}
 
-              {account.get('note').length > 0 && account.get('note') !== '<p></p>' && <div className='account__header__content translate' dangerouslySetInnerHTML={content} />}
-
-              <div className='account__header__joined'><FormattedMessage id='account.joined' defaultMessage='Joined {date}' values={{ date: intl.formatDate(account.get('created_at'), { year: 'numeric', month: 'short', day: '2-digit' }) }} /></div>
+              {account.get('note').length > 0 && account.get('note') !== '<p></p>' && <div className='account__header__content' dangerouslySetInnerHTML={content} />}
             </div>
 
             {!suspended && (

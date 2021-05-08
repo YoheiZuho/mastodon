@@ -59,7 +59,7 @@ class MediaAttachment < ApplicationRecord
 
   IMAGE_STYLES = {
     original: {
-      pixels: 2_073_600, # 1920x1080px
+      pixels: 1_638_400, # 1280x1280px
       file_geometry_parser: FastGeometryParser,
     }.freeze,
 
@@ -287,7 +287,7 @@ class MediaAttachment < ApplicationRecord
       if instance.file_content_type == 'image/gif'
         [:gif_transcoder, :blurhash_transcoder]
       elsif VIDEO_MIME_TYPES.include?(instance.file_content_type)
-        [:transcoder, :blurhash_transcoder, :type_corrector]
+        [:video_transcoder, :blurhash_transcoder, :type_corrector]
       elsif AUDIO_MIME_TYPES.include?(instance.file_content_type)
         [:image_extractor, :transcoder, :type_corrector]
       else
@@ -388,7 +388,7 @@ class MediaAttachment < ApplicationRecord
   # paths but ultimately the same file, so it makes sense to memoize the
   # result while disregarding the path
   def ffmpeg_data(path = nil)
-    @ffmpeg_data ||= VideoMetadataExtractor.new(path)
+    @ffmpeg_data ||= FFMPEG::Movie.new(path)
   end
 
   def enqueue_processing

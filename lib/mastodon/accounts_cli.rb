@@ -402,7 +402,7 @@ module Mastodon
         exit(1)
       end
 
-      processed, = parallelize_with_progress(target_account.followers.local) do |account|
+      parallelize_with_progress(target_account.followers.local) do |account|
         UnfollowService.new.call(account, target_account)
       end
 

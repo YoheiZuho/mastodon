@@ -21,7 +21,7 @@ class Webfinger
     private
 
     def links
-      @links ||= @json['links'].index_by { |link| link['rel'] }
+      @links ||= @json['links'].map { |link| [link['rel'], link] }.to_h
     end
   end
 
@@ -88,18 +88,10 @@ class Webfinger
   end
 
   def standard_url
-    if @domain.end_with? ".onion"
-      "http://#{@domain}/.well-known/webfinger?resource=#{@uri}"
-    else
-      "https://#{@domain}/.well-known/webfinger?resource=#{@uri}"
-    end
+    "https://#{@domain}/.well-known/webfinger?resource=#{@uri}"
   end
 
   def host_meta_url
-    if @domain.end_with? ".onion"
-      "http://#{@domain}/.well-known/host-meta"
-    else
-      "https://#{@domain}/.well-known/host-meta"
-    end
+    "https://#{@domain}/.well-known/host-meta"
   end
 end

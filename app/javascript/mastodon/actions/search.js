@@ -32,7 +32,6 @@ export function submitSearch() {
     const value = getState().getIn(['search', 'value']);
 
     if (value.length === 0) {
-      dispatch(fetchSearchSuccess({ accounts: [], statuses: [], hashtags: [] }, ''));
       return;
     }
 

@@ -2,13 +2,12 @@
 
 class FetchLinkCardService < BaseService
   URL_PATTERN = %r{
-    (#{Twitter::TwitterText::Regex[:valid_url_preceding_chars]})                                                                #   $1 preceeding chars
-    (                                                                                                                           #   $2 URL
-      (https?:\/\/)                                                                                                             #   $3 Protocol (required)
-      (#{Twitter::TwitterText::Regex[:valid_domain]})                                                                           #   $4 Domain(s)
-      (?::(#{Twitter::TwitterText::Regex[:valid_port_number]}))?                                                                #   $5 Port number (optional)
-      (/#{Twitter::TwitterText::Regex[:valid_url_path]}*)?                                                                      #   $6 URL Path and anchor
-      (\?#{Twitter::TwitterText::Regex[:valid_url_query_chars]}*#{Twitter::TwitterText::Regex[:valid_url_query_ending_chars]})? #   $7 Query String
+    (                                                                                                 #   $1 URL
+      (https?:\/\/)                                                                                   #   $2 Protocol (required)
+      (#{Twitter::Regex[:valid_domain]})                                                              #   $3 Domain(s)
+      (?::(#{Twitter::Regex[:valid_port_number]}))?                                                   #   $4 Port number (optional)
+      (/#{Twitter::Regex[:valid_url_path]}*)?                                                         #   $5 URL Path and anchor
+      (\?#{Twitter::Regex[:valid_url_query_chars]}*#{Twitter::Regex[:valid_url_query_ending_chars]})? #   $6 Query String
     )
   }iox
 
@@ -48,11 +47,11 @@ class FetchLinkCardService < BaseService
 
     Request.new(:get, @url).add_headers('Accept' => 'text/html', 'User-Agent' => Mastodon::Version.user_agent + ' Bot').perform do |res|
       if res.code == 200 && res.mime_type == 'text/html'
-        @html_charset = res.charset
         @html = res.body_with_limit
+        @html_charset = res.charset
       else
-        @html_charset = nil
         @html = nil
+        @html_charset = nil
       end
     end
   end
@@ -64,11 +63,11 @@ class FetchLinkCardService < BaseService
 
   def parse_urls
     if @status.local?
-      urls = @status.text.scan(URL_PATTERN).map { |array| Addressable::URI.parse(array[1]).normalize }
+      urls = @status.text.scan(URL_PATTERN).map { |array| Addressable::URI.parse(array[0]).normalize }
     else
       html  = Nokogiri::HTML(@status.text)
       links = html.css('a')
-      urls  = links.filter_map { |a| Addressable::URI.parse(a['href']) unless skip_link?(a) }.filter_map(&:normalize)
+      urls  = links.map { |a| Addressable::URI.parse(a['href']) unless skip_link?(a) }.compact.map(&:normalize).compact
     end
 
     urls.reject { |uri| bad_url?(uri) }.first

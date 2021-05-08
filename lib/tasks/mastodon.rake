@@ -371,20 +371,18 @@ namespace :mastodon do
           end
         end
 
-        unless using_docker
-          prompt.say "\n"
-          prompt.say 'The final step is compiling CSS/JS assets.'
-          prompt.say 'This may take a while and consume a lot of RAM.'
+        prompt.say "\n"
+        prompt.say 'The final step is compiling CSS/JS assets.'
+        prompt.say 'This may take a while and consume a lot of RAM.'
 
-          if prompt.yes?('Compile the assets now?')
-            prompt.say 'Running `RAILS_ENV=production rails assets:precompile` ...'
-            prompt.say "\n\n"
+        if prompt.yes?('Compile the assets now?')
+          prompt.say 'Running `RAILS_ENV=production rails assets:precompile` ...'
+          prompt.say "\n\n"
 
-            if !system(env.transform_values(&:to_s).merge({ 'RAILS_ENV' => 'production' }), 'rails assets:precompile')
-              prompt.error 'That failed! Maybe you need swap space?'
-            else
-              prompt.say 'Done!'
-            end
+          if !system(env.transform_values(&:to_s).merge({ 'RAILS_ENV' => 'production' }), 'rails assets:precompile')
+            prompt.error 'That failed! Maybe you need swap space?'
+          else
+            prompt.say 'Done!'
           end
         end
 

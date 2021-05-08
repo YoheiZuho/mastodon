@@ -42,7 +42,6 @@ import {
 } from '../../actions/domain_blocks';
 import { initMuteModal } from '../../actions/mutes';
 import { initBlockModal } from '../../actions/blocks';
-import { initBoostModal } from '../../actions/boosts';
 import { initReport } from '../../actions/reports';
 import { makeGetStatus, makeGetPictureInPicture } from '../../selectors';
 import { ScrollContainer } from 'react-router-scroll-4';
@@ -235,8 +234,8 @@ class Status extends ImmutablePureComponent {
     }
   }
 
-  handleModalReblog = (status, privacy) => {
-    this.props.dispatch(reblog(status, privacy));
+  handleModalReblog = (status) => {
+    this.props.dispatch(reblog(status));
   }
 
   handleReblogClick = (status, e) => {
@@ -246,7 +245,7 @@ class Status extends ImmutablePureComponent {
       if ((e && e.shiftKey) || !boostModal) {
         this.handleModalReblog(status);
       } else {
-        this.props.dispatch(initBoostModal({ status, onReblog: this.handleModalReblog }));
+        this.props.dispatch(openModal('BOOST', { status, onReblog: this.handleModalReblog }));
       }
     }
   }

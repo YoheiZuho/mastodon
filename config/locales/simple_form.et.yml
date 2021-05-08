@@ -185,5 +185,6 @@ et:
     'no': Ei
     recommended: Soovituslik
     required:
+      mark: "*"
       text: kohustuslik
     'yes': Jah

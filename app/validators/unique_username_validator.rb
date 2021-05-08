@@ -4,7 +4,7 @@
 
 class UniqueUsernameValidator < ActiveModel::Validator
   def validate(account)
-    return if account.username.blank?
+    return if account.username.nil?
 
     normalized_username = account.username.downcase
     normalized_domain = account.domain&.downcase

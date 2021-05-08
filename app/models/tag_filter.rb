@@ -33,6 +33,8 @@ class TagFilter
 
   def scope_for(key, value)
     case key.to_s
+    when 'directory'
+      Tag.discoverable
     when 'reviewed'
       Tag.reviewed.order(reviewed_at: :desc)
     when 'unreviewed'
