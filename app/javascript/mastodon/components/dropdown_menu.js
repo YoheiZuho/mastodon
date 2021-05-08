@@ -177,6 +177,7 @@ export default class Dropdown extends React.PureComponent {
     disabled: PropTypes.bool,
     status: ImmutablePropTypes.map,
     isUserTouching: PropTypes.func,
+    isModalOpen: PropTypes.bool.isRequired,
     onOpen: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
     dropdownPlacement: PropTypes.string,

@@ -13,4 +13,3 @@ vendor/bundle
 postgres
 redis
 elasticsearch
-chart

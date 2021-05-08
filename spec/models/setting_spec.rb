@@ -99,12 +99,11 @@ RSpec.describe Setting, type: :model do
         end
 
         it 'does not query the database' do
-          callback = double
-          allow(callback).to receive(:call)
-          ActiveSupport::Notifications.subscribed callback, 'sql.active_record' do
-            described_class[key]
-          end
-          expect(callback).not_to have_received(:call)
+          expect do |callback|
+            ActiveSupport::Notifications.subscribed callback, 'sql.active_record' do
+              described_class[key]
+            end
+          end.not_to yield_control
         end
 
         it 'returns the cached value' do

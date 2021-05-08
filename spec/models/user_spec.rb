@@ -175,7 +175,7 @@ RSpec.describe User, type: :model do
       user = Fabricate(:user)
       ActiveJob::Base.queue_adapter = :test
 
-      expect { user.send_confirmation_instructions }.to have_enqueued_job(ActionMailer::MailDeliveryJob)
+      expect { user.send_confirmation_instructions }.to have_enqueued_job(ActionMailer::DeliveryJob)
     end
   end
 
@@ -206,7 +206,7 @@ RSpec.describe User, type: :model do
 
   describe 'whitelist' do
     around(:each) do |example|
-      old_whitelist = Rails.configuration.x.email_domains_whitelist
+      old_whitelist = Rails.configuration.x.email_whitelist
 
       Rails.configuration.x.email_domains_whitelist = 'mastodon.space'
 

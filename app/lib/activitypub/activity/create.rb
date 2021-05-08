@@ -45,15 +45,19 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
   def create_status
     return reject_payload! if unsupported_object_type? || invalid_origin?(object_uri) || tombstone_exists? || !related_to_local_activity?
 
-    lock_or_fail("create:#{object_uri}") do
-      return if delete_arrived_first?(object_uri) || poll_vote? # rubocop:disable Lint/NonLocalExitFromIterator
+    RedisLock.acquire(lock_options) do |lock|
+      if lock.acquired?
+        return if delete_arrived_first?(object_uri) || poll_vote? # rubocop:disable Lint/NonLocalExitFromIterator
 
-      @status = find_existing_status
+        @status = find_existing_status
 
-      if @status.nil?
-        process_status
-      elsif @options[:delivered_to_account_id].present?
-        postprocess_audience_and_deliver
+        if @status.nil?
+          process_status
+        elsif @options[:delivered_to_account_id].present?
+          postprocess_audience_and_deliver
+        end
+      else
+        raise Mastodon::RaceConditionError
       end
     end
 
@@ -84,6 +88,7 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
 
     resolve_thread(@status)
     fetch_replies(@status)
+    check_for_spam
     distribute(@status)
     forward_for_reply
   end
@@ -118,7 +123,7 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
 
   def process_audience
     (audience_to + audience_cc).uniq.each do |audience|
-      next if ActivityPub::TagManager.instance.public_collection?(audience)
+      next if audience == ActivityPub::TagManager::COLLECTIONS[:public]
 
       # Unlike with tags, there is no point in resolving accounts we don't already
       # know here, because silent mentions would only be used for local access
@@ -164,7 +169,7 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
   def attach_tags(status)
     @tags.each do |tag|
       status.tags << tag
-      tag.use!(@account, status: status, at_time: status.created_at) if status.public_visibility?
+      TrendingTags.record_use!(tag, status.account, status.created_at) if status.public_visibility?
     end
 
     @mentions.each do |mention|
@@ -309,9 +314,13 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
     poll = replied_to_status.preloadable_poll
     already_voted = true
 
-    lock_or_fail("vote:#{replied_to_status.poll_id}:#{@account.id}") do
-      already_voted = poll.votes.where(account: @account).exists?
-      poll.votes.create!(account: @account, choice: poll.options.index(@object['name']), uri: object_uri)
+    RedisLock.acquire(poll_lock_options) do |lock|
+      if lock.acquired?
+        already_voted = poll.votes.where(account: @account).exists?
+        poll.votes.create!(account: @account, choice: poll.options.index(@object['name']), uri: object_uri)
+      else
+        raise Mastodon::RaceConditionError
+      end
     end
 
     increment_voters_count! unless already_voted
@@ -347,9 +356,9 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
   end
 
   def visibility_from_audience
-    if audience_to.any? { |to| ActivityPub::TagManager.instance.public_collection?(to) }
+    if audience_to.include?(ActivityPub::TagManager::COLLECTIONS[:public])
       :public
-    elsif audience_cc.any? { |cc| ActivityPub::TagManager.instance.public_collection?(cc) }
+    elsif audience_cc.include?(ActivityPub::TagManager::COLLECTIONS[:public])
       :unlisted
     elsif audience_to.include?(@account.followers_url)
       :private
@@ -483,6 +492,10 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
     Tombstone.exists?(uri: object_uri)
   end
 
+  def check_for_spam
+    SpamCheck.perform(@status)
+  end
+
   def forward_for_reply
     return unless @status.distributable? && @json['signature'].present? && reply_to_local?
 
@@ -499,5 +512,13 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
   rescue ActiveRecord::StaleObjectError
     poll.reload
     retry
+  end
+
+  def lock_options
+    { redis: Redis.current, key: "create:#{object_uri}" }
+  end
+
+  def poll_lock_options
+    { redis: Redis.current, key: "vote:#{replied_to_status.poll_id}:#{@account.id}" }
   end
 end

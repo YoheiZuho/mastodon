@@ -2,7 +2,7 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import illustration from 'mastodon/../images/elephant_ui_working.svg';
 
-const RegenerationIndicator = () => (
+const MissingIndicator = () => (
   <div className='regeneration-indicator'>
     <div className='regeneration-indicator__figure'>
       <img src={illustration} alt='' />
@@ -15,4 +15,4 @@ const RegenerationIndicator = () => (
   </div>
 );
 
-export default RegenerationIndicator;
+export default MissingIndicator;

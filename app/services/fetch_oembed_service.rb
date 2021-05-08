@@ -38,17 +38,7 @@ class FetchOEmbedService
 
     return if @endpoint_url.blank?
 
-    @endpoint_url = begin
-      base_url = Addressable::URI.parse(@url)
-
-      # If the OEmbed endpoint is given as http but the URL we opened
-      # was served over https, we can assume OEmbed will be available
-      # through https as well
-
-      (base_url + @endpoint_url).tap do |absolute_url|
-        absolute_url.scheme = base_url.scheme if base_url.scheme == 'https'
-      end.to_s
-    end
+    @endpoint_url = (Addressable::URI.parse(@url) + @endpoint_url).to_s
 
     cache_endpoint!
   rescue Addressable::URI::InvalidURIError

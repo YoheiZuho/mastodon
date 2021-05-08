@@ -4,19 +4,16 @@ require 'resolv'
 
 class EmailMxValidator < ActiveModel::Validator
   def validate(user)
-    return if user.email.blank?
-
     domain = get_domain(user.email)
 
-    if domain.blank?
-      user.errors.add(:email, :invalid)
-    elsif !on_allowlist?(domain)
+    if domain.nil?
+      user.errors.add(:email, I18n.t('users.invalid_email'))
+    else
       ips, hostnames = resolve_mx(domain)
-
       if ips.empty?
-        user.errors.add(:email, :unreachable)
+        user.errors.add(:email, I18n.t('users.invalid_email_mx'))
       elsif on_blacklist?(hostnames + ips)
-        user.errors.add(:email, :blocked)
+        user.errors.add(:email, I18n.t('users.blocked_email_provider'))
       end
     end
   end
@@ -31,12 +28,6 @@ class EmailMxValidator < ActiveModel::Validator
     TagManager.instance.normalize_domain(domain)
   rescue Addressable::URI::InvalidURIError
     nil
-  end
-
-  def on_allowlist?(domain)
-    return false if Rails.configuration.x.email_domains_whitelist.blank?
-
-    Rails.configuration.x.email_domains_whitelist.include?(domain)
   end
 
   def resolve_mx(domain)

@@ -11,30 +11,45 @@ export default class DisplayName extends React.PureComponent {
     localDomain: PropTypes.string,
   };
 
-  handleMouseEnter = ({ currentTarget }) => {
-    if (autoPlayGif) {
+  _updateEmojis () {
+    const node = this.node;
+
+    if (!node || autoPlayGif) {
       return;
     }
 
-    const emojis = currentTarget.querySelectorAll('.custom-emoji');
+    const emojis = node.querySelectorAll('.custom-emoji');
 
     for (var i = 0; i < emojis.length; i++) {
       let emoji = emojis[i];
-      emoji.src = emoji.getAttribute('data-original');
+      if (emoji.classList.contains('status-emoji')) {
+        continue;
+      }
+      emoji.classList.add('status-emoji');
+
+      emoji.addEventListener('mouseenter', this.handleEmojiMouseEnter, false);
+      emoji.addEventListener('mouseleave', this.handleEmojiMouseLeave, false);
     }
   }
 
-  handleMouseLeave = ({ currentTarget }) => {
-    if (autoPlayGif) {
-      return;
-    }
+  componentDidMount () {
+    this._updateEmojis();
+  }
 
-    const emojis = currentTarget.querySelectorAll('.custom-emoji');
+  componentDidUpdate () {
+    this._updateEmojis();
+  }
 
-    for (var i = 0; i < emojis.length; i++) {
-      let emoji = emojis[i];
-      emoji.src = emoji.getAttribute('data-static');
-    }
+  handleEmojiMouseEnter = ({ target }) => {
+    target.src = target.getAttribute('data-original');
+  }
+
+  handleEmojiMouseLeave = ({ target }) => {
+    target.src = target.getAttribute('data-static');
+  }
+
+  setRef = (c) => {
+    this.node = c;
   }
 
   render () {
@@ -66,7 +81,7 @@ export default class DisplayName extends React.PureComponent {
     }
 
     return (
-      <span className='display-name' onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}>
+      <span className='display-name' ref={this.setRef}>
         {displayName} {suffix}
       </span>
     );

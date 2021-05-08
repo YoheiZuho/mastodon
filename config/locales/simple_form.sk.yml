@@ -172,5 +172,6 @@ sk:
     'no': Nie
     recommended: Odporúčané
     required:
+      mark: "*"
       text: povinné
     'yes': Áno

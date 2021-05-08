@@ -67,7 +67,7 @@ module JsonLdHelper
     unless id
       json = fetch_resource_without_id_validation(uri, on_behalf_of)
 
-      return if !json.is_a?(Hash) || unsupported_uri_scheme?(json['id'])
+      return unless json
 
       uri = json['id']
     end
