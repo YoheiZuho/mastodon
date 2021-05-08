@@ -1344,6 +1344,18 @@ ja:
     contrast: Mastodon (ハイコントラスト)
     default: Mastodon (ダーク)
     mastodon-light: Mastodon (ライト)
+    mastodon-auto: Mastodon (自動)
+    # 追加テーマ
+    material-black: Material (黒)
+    material-dark: Material (ダーク)
+    material-light: Material (ライト)
+    material-auto: Material (自動)
+    mastodon-material-dark: Mastodon Material (ダーク)
+    mastodon-material-light: Mastodon Material (ライト)
+    mastodon-material-auto: Mastodon Material (自動)
+    plus: Plus
+    y-zu-dark: Y-zu (ダーク)
+    y-zu-light: Y-zu (ライト)
   time:
     formats:
       default: "%Y年%m月%d日 %H:%M"

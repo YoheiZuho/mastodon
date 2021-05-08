@@ -17,6 +17,7 @@ import elephantUIPlane from '../../../images/elephant_ui_plane.svg';
 import { mascot } from '../../initial_state';
 import Icon from 'mastodon/components/icon';
 import { logOut } from 'mastodon/utils/log_out';
+import AnnouncementsContainer from './containers/announcements_container';
 
 const messages = defineMessages({
   start: { id: 'getting_started.heading', defaultMessage: 'Getting started' },
@@ -127,6 +128,7 @@ class Compose extends React.PureComponent {
             <NavigationContainer onClose={this.onBlur} />
 
             <ComposeFormContainer />
+            <AnnouncementsContainer />
 
             <div className='drawer__inner__mastodon'>
               <img alt='' draggable='false' src={mascot || elephantUIPlane} />

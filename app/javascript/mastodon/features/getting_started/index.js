@@ -18,6 +18,7 @@ import TrendsContainer from './containers/trends_container';
 const messages = defineMessages({
   home_timeline: { id: 'tabs_bar.home', defaultMessage: 'Home' },
   notifications: { id: 'tabs_bar.notifications', defaultMessage: 'Notifications' },
+  admin_notifications: { id: 'tabs_bar.admin_notifications', defaultMessage: 'Admin Notifications' },
   public_timeline: { id: 'navigation_bar.public_timeline', defaultMessage: 'Federated timeline' },
   settings_subheading: { id: 'column_subheading.settings', defaultMessage: 'Settings' },
   community_timeline: { id: 'navigation_bar.community_timeline', defaultMessage: 'Local timeline' },
@@ -107,9 +108,10 @@ class GettingStarted extends ImmutablePureComponent {
       if (profile_directory) {
         navItems.push(
           <ColumnLink key='directory' icon='address-book' text={intl.formatMessage(messages.profile_directory)} to='/directory' />,
+          <ColumnLink key='infomation' icon='bullhorn' text={intl.formatMessage(messages.admin_notifications)} to='/timelines/tag/Yづinfo' />,
         );
 
-        height += 48;
+        height += 48*2;
       }
 
       navItems.push(
@@ -120,9 +122,10 @@ class GettingStarted extends ImmutablePureComponent {
     } else if (profile_directory) {
       navItems.push(
         <ColumnLink key='directory' icon='address-book' text={intl.formatMessage(messages.profile_directory)} to='/directory' />,
+        <ColumnLink key='infomation' icon='bullhorn' text={intl.formatMessage(messages.admin_notifications)} to='/timelines/tag/Yづinfo' />,
       );
 
-      height += 48;
+      height += 48*2;
     }
 
     if (multiColumn && !columns.find(item => item.get('id') === 'HOME')) {

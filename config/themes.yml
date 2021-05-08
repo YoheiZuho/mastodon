@@ -1,3 +1,16 @@
 default: styles/application.scss
 contrast: styles/contrast.scss
 mastodon-light: styles/mastodon-light.scss
+mastodon-auto: styles/mastodon-auto.scss
+
+# 追加テーマ
+material-black: styles/material-black.scss
+material-dark: styles/material-dark.scss
+material-light: styles/material-light.scss
+material-auto: styles/material-auto.scss
+mastodon-material-dark: styles/mastodon-material-dark.scss
+mastodon-material-light: styles/mastodon-material-light.scss
+mastodon-material-auto: styles/mastodon-material-auto.scss
+plus: styles/plus.scss
+y-zu-dark: styles/y-zu-dark.scss
+y-zu-light: styles/y-zu-light.scss

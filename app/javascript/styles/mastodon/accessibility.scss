@@ -7,7 +7,7 @@ $emojis-requiring-inversion: 'back' 'copyright' 'curly_loop' 'currency_exchange'
 .emojione {
   @each $emoji in $emojis-requiring-inversion {
     &[title=':#{$emoji}:'] {
-      @extend %emoji-color-inversion;
+      filter: invert(1);
     }
   }
 }
