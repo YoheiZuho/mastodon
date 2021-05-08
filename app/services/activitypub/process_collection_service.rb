@@ -37,7 +37,7 @@ class ActivityPub::ProcessCollectionService < BaseService
   end
 
   def process_items(items)
-    items.reverse_each.filter_map { |item| process_item(item) }
+    items.reverse_each.map { |item| process_item(item) }.compact
   end
 
   def supported_context?

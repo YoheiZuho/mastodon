@@ -9,9 +9,9 @@ const redis = require('redis');
 const pg = require('pg');
 const log = require('npmlog');
 const url = require('url');
+const { WebSocketServer } = require('@clusterws/cws');
 const uuid = require('uuid');
 const fs = require('fs');
-const WebSocket = require('ws');
 
 const env = process.env.NODE_ENV || 'development';
 const alwaysRequireAuth = process.env.LIMITED_FEDERATION_MODE === 'true' || process.env.WHITELIST_MODE === 'true' || process.env.AUTHORIZED_FETCH === 'true';
@@ -99,11 +99,11 @@ const startMaster = () => {
     log.warn('UNIX domain socket is now supported by using SOCKET. Please migrate from PORT hack.');
   }
 
-  log.warn(`Starting streaming API server master with ${numWorkers} workers`);
+  log.info(`Starting streaming API server master with ${numWorkers} workers`);
 };
 
 const startWorker = (workerId) => {
-  log.warn(`Starting worker ${workerId}`);
+  log.info(`Starting worker ${workerId}`);
 
   const pgConfigs = {
     development: {
@@ -766,7 +766,7 @@ const startWorker = (workerId) => {
     });
   });
 
-  const wss = new WebSocket.Server({ server, verifyClient: wsVerifyClient });
+  const wss = new WebSocketServer({ server, verifyClient: wsVerifyClient });
 
   /**
    * @typedef StreamParams
@@ -999,12 +999,6 @@ const startWorker = (workerId) => {
     req.requestId     = uuid.v4();
     req.remoteAddress = ws._socket.remoteAddress;
 
-    ws.isAlive = true;
-
-    ws.on('pong', () => {
-      ws.isAlive = true;
-    });
-
     /**
      * @type {WebSocketSession}
      */
@@ -1054,24 +1048,14 @@ const startWorker = (workerId) => {
     }
   });
 
-  setInterval(() => {
-    wss.clients.forEach(ws => {
-      if (ws.isAlive === false) {
-        ws.terminate();
-        return;
-      }
-
-      ws.isAlive = false;
-      ws.ping('', false);
-    });
-  }, 30000);
+  wss.startAutoPing(30000);
 
   attachServerWithConfig(server, address => {
-    log.warn(`Worker ${workerId} now listening on ${address}`);
+    log.info(`Worker ${workerId} now listening on ${address}`);
   });
 
   const onExit = () => {
-    log.warn(`Worker ${workerId} exiting`);
+    log.info(`Worker ${workerId} exiting, bye bye`);
     server.close();
     process.exit(0);
   };

@@ -102,31 +102,42 @@ class AccountCard extends ImmutablePureComponent {
     onMute: PropTypes.func.isRequired,
   };
 
-  handleMouseEnter = ({ currentTarget }) => {
-    if (autoPlayGif) {
+  _updateEmojis() {
+    const node = this.node;
+
+    if (!node || autoPlayGif) {
       return;
     }
 
-    const emojis = currentTarget.querySelectorAll('.custom-emoji');
+    const emojis = node.querySelectorAll('.custom-emoji');
 
     for (var i = 0; i < emojis.length; i++) {
       let emoji = emojis[i];
-      emoji.src = emoji.getAttribute('data-original');
+      if (emoji.classList.contains('status-emoji')) {
+        continue;
+      }
+      emoji.classList.add('status-emoji');
+
+      emoji.addEventListener('mouseenter', this.handleEmojiMouseEnter, false);
+      emoji.addEventListener('mouseleave', this.handleEmojiMouseLeave, false);
     }
   }
 
-  handleMouseLeave = ({ currentTarget }) => {
-    if (autoPlayGif) {
-      return;
-    }
-
-    const emojis = currentTarget.querySelectorAll('.custom-emoji');
-
-    for (var i = 0; i < emojis.length; i++) {
-      let emoji = emojis[i];
-      emoji.src = emoji.getAttribute('data-static');
-    }
+  componentDidMount() {
+    this._updateEmojis();
   }
+
+  componentDidUpdate() {
+    this._updateEmojis();
+  }
+
+  handleEmojiMouseEnter = ({ target }) => {
+    target.src = target.getAttribute('data-original');
+  };
+
+  handleEmojiMouseLeave = ({ target }) => {
+    target.src = target.getAttribute('data-static');
+  };
 
   handleFollow = () => {
     this.props.onFollow(this.props.account);
@@ -138,6 +149,10 @@ class AccountCard extends ImmutablePureComponent {
 
   handleMute = () => {
     this.props.onMute(this.props.account);
+  };
+
+  setRef = (c) => {
+    this.node = c;
   };
 
   render() {
@@ -224,9 +239,9 @@ class AccountCard extends ImmutablePureComponent {
           </div>
         </div>
 
-        <div className='directory__card__extra' onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}>
+        <div className='directory__card__extra' ref={this.setRef}>
           <div
-            className='account__header__content translate'
+            className='account__header__content'
             dangerouslySetInnerHTML={{ __html: account.get('note_emojified') }}
           />
         </div>

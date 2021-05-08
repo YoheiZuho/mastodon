@@ -144,7 +144,7 @@ class ActivityPub::Activity
   end
 
   def delete_later!(uri)
-    redis.setex("delete_upon_arrival:#{@account.id}:#{uri}", 6.hours.seconds, true)
+    redis.setex("delete_upon_arrival:#{@account.id}:#{uri}", 6.hours.seconds, uri)
   end
 
   def status_from_object
@@ -210,20 +210,10 @@ class ActivityPub::Activity
     end
   end
 
-  def lock_or_return(key, expire_after = 2.hours.seconds)
+  def lock_or_return(key, expire_after = 7.days.seconds)
     yield if redis.set(key, true, nx: true, ex: expire_after)
   ensure
     redis.del(key)
-  end
-
-  def lock_or_fail(key)
-    RedisLock.acquire({ redis: Redis.current, key: key }) do |lock|
-      if lock.acquired?
-        yield
-      else
-        raise Mastodon::RaceConditionError
-      end
-    end
   end
 
   def fetch?

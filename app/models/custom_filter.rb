@@ -46,7 +46,7 @@ class CustomFilter < ApplicationRecord
   private
 
   def clean_up_contexts
-    self.context = Array(context).map(&:strip).filter_map(&:presence)
+    self.context = Array(context).map(&:strip).map(&:presence).compact
   end
 
   def remove_cache

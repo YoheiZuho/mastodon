@@ -153,7 +153,7 @@ class Poll extends ImmutablePureComponent {
           </span>}
 
           <span
-            className='poll__option__text translate'
+            className='poll__option__text'
             dangerouslySetInnerHTML={{ __html: titleEmojified }}
           />
 

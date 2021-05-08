@@ -39,10 +39,35 @@ class Content extends ImmutablePureComponent {
 
   componentDidMount () {
     this._updateLinks();
+    this._updateEmojis();
   }
 
   componentDidUpdate () {
     this._updateLinks();
+    this._updateEmojis();
+  }
+
+  _updateEmojis () {
+    const node = this.node;
+
+    if (!node || autoPlayGif) {
+      return;
+    }
+
+    const emojis = node.querySelectorAll('.custom-emoji');
+
+    for (var i = 0; i < emojis.length; i++) {
+      let emoji = emojis[i];
+
+      if (emoji.classList.contains('status-emoji')) {
+        continue;
+      }
+
+      emoji.classList.add('status-emoji');
+
+      emoji.addEventListener('mouseenter', this.handleEmojiMouseEnter, false);
+      emoji.addEventListener('mouseleave', this.handleEmojiMouseLeave, false);
+    }
   }
 
   _updateLinks () {
@@ -107,30 +132,12 @@ class Content extends ImmutablePureComponent {
     }
   }
 
-  handleMouseEnter = ({ currentTarget }) => {
-    if (autoPlayGif) {
-      return;
-    }
-
-    const emojis = currentTarget.querySelectorAll('.custom-emoji');
-
-    for (var i = 0; i < emojis.length; i++) {
-      let emoji = emojis[i];
-      emoji.src = emoji.getAttribute('data-original');
-    }
+  handleEmojiMouseEnter = ({ target }) => {
+    target.src = target.getAttribute('data-original');
   }
 
-  handleMouseLeave = ({ currentTarget }) => {
-    if (autoPlayGif) {
-      return;
-    }
-
-    const emojis = currentTarget.querySelectorAll('.custom-emoji');
-
-    for (var i = 0; i < emojis.length; i++) {
-      let emoji = emojis[i];
-      emoji.src = emoji.getAttribute('data-static');
-    }
+  handleEmojiMouseLeave = ({ target }) => {
+    target.src = target.getAttribute('data-static');
   }
 
   render () {
@@ -138,11 +145,9 @@ class Content extends ImmutablePureComponent {
 
     return (
       <div
-        className='announcements__item__content translate'
+        className='announcements__item__content'
         ref={this.setRef}
         dangerouslySetInnerHTML={{ __html: announcement.get('contentHtml') }}
-        onMouseEnter={this.handleMouseEnter}
-        onMouseLeave={this.handleMouseLeave}
       />
     );
   }

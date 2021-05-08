@@ -23,7 +23,6 @@ import {
 } from '../../../actions/statuses';
 import { initMuteModal } from '../../../actions/mutes';
 import { initBlockModal } from '../../../actions/blocks';
-import { initBoostModal } from '../../../actions/boosts';
 import { initReport } from '../../../actions/reports';
 import { openModal } from '../../../actions/modal';
 import { defineMessages, injectIntl } from 'react-intl';
@@ -69,8 +68,8 @@ const mapDispatchToProps = (dispatch, { intl }) => ({
     });
   },
 
-  onModalReblog (status, privacy) {
-    dispatch(reblog(status, privacy));
+  onModalReblog (status) {
+    dispatch(reblog(status));
   },
 
   onReblog (status, e) {
@@ -80,7 +79,7 @@ const mapDispatchToProps = (dispatch, { intl }) => ({
       if (e.shiftKey || !boostModal) {
         this.onModalReblog(status);
       } else {
-        dispatch(initBoostModal({ status, onReblog: this.onModalReblog }));
+        dispatch(openModal('BOOST', { status, onReblog: this.onModalReblog }));
       }
     }
   },

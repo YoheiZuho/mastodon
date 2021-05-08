@@ -36,4 +36,6 @@ zgh:
       tag:
         name: ⵀⴰⵛⵟⴰⴳ
     'no': ⵓⵀⵓ
+    required:
+      mark: "*"
     'yes': ⵢⴰⵀ

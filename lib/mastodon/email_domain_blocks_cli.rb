@@ -113,7 +113,7 @@ module Mastodon
         result = entry.destroy
 
         if result
-          processed += children_count + 1
+          processed += 1 + children_count
         else
           say("#{domain} could not be unblocked.", :red)
           failed += 1

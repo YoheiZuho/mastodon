@@ -9,36 +9,23 @@ RSpec.describe BlacklistedEmailValidator, type: :validator do
 
     before do
       allow(user).to receive(:valid_invitation?) { false }
-      allow_any_instance_of(described_class).to receive(:blocked_email_provider?) { blocked_email }
+      allow_any_instance_of(described_class).to receive(:blocked_email?) { blocked_email }
+      described_class.new.validate(user)
     end
 
-    subject { described_class.new.validate(user); errors }
-
-    context 'when e-mail provider is blocked' do
+    context 'blocked_email?' do
       let(:blocked_email) { true }
 
-      it 'adds error' do
-        expect(subject).to have_received(:add).with(:email, :blocked)
+      it 'calls errors.add' do
+        expect(errors).to have_received(:add).with(:email, I18n.t('users.blocked_email_provider'))
       end
     end
 
-    context 'when e-mail provider is not blocked' do
+    context '!blocked_email?' do
       let(:blocked_email) { false }
 
-      it 'does not add errors' do
-        expect(subject).not_to have_received(:add).with(:email, :blocked)
-      end
-
-      context 'when canonical e-mail is blocked' do
-        let(:other_user) { Fabricate(:user, email: 'i.n.f.o@mail.com') }
-
-        before do
-          other_user.account.suspend!
-        end
-
-        it 'adds error' do
-          expect(subject).to have_received(:add).with(:email, :taken)
-        end
+      it 'not calls errors.add' do
+        expect(errors).not_to have_received(:add).with(:email, I18n.t('users.blocked_email_provider'))
       end
     end
   end
