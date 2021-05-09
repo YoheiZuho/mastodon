@@ -2,7 +2,6 @@
 
 require 'singleton'
 require_relative './formatter_markdown'
-require_relative './sanitize_config'
 
 class Formatter
   include Singleton
@@ -37,7 +36,7 @@ class Formatter
 
     html = raw_content
 
-    mdFormatter = Formatter_Markdown.new(html)
+    mdFormatter = FormatterMarkdown.new(html)
     html = mdFormatter.formatted
 
     html = "RT @#{prepend_reblog} #{html}" if prepend_reblog
