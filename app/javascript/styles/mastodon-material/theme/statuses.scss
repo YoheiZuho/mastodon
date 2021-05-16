@@ -39,14 +39,18 @@
 
         &__spoiler-link {
             border: 0;
-            margin: 0 4px;
+            font-size: 15px;
+            height: 36px;
+            padding: 0 16px;
+            margin: 8px;
             color: $text-button-color;
         }
 
         &__read-more-button {
             @include button-type($button-on-status);
-            padding: 4px 6px;
-            margin: 4px;
+            height: 36px;
+            padding: 0 16px;
+            margin: 8px 0;
 
             &:hover { text-decoration: none }
         }
@@ -153,6 +157,11 @@
         }
 
         a { bottom: auto }
+    }
+
+    &__host {
+        margin-top: 6px;
+        color: $secondary-text-color;
     }
 
     &.compact {

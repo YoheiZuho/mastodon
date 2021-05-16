@@ -43,12 +43,9 @@ $scroll-bar-thumb-color: lighten($icon-color, 30%);
 $scroll-bar-thumb-hover-color: darken($scroll-bar-thumb-color, 10%);
 $scroll-bar-thumb-active-color: darken($scroll-bar-thumb-color, 18%);
 
-$tab-indicator-color: $top-bar-icon-color;
-$tab-indicator-active-color: $top-bar-icon-color;
-$text-tab-indicator-color: lighten($top-bar-icon-color, 10%);
-$text-tab-indicator-active-color: $top-bar-icon-color;
-$icon-tab-indicator-active-color: $top-bar-icon-color;
-$icon-tab-indicator-hover-color: $top-bar-icon-hover-color;
+$tab-item-active-color: $primary-color;
+$tab-bg-hover-color: transparentize($tab-item-active-color, 0.9);
+$tab-bg-focus-color: transparentize($tab-item-active-color, 0.8);
 
 $progress-indicator-color: $primary-color;
 $progress-indicator-track-color: lighten($progress-indicator-color, 30%);
