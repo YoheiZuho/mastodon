@@ -5,8 +5,9 @@ import IconButton from '../../../components/icon_button';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import DropdownMenuContainer from '../../../containers/dropdown_menu_container';
 import { defineMessages, injectIntl } from 'react-intl';
-import { me, isStaff } from '../../../initial_state';
+import { me, isStaff, show_quote_button, enableReaction } from '../../../initial_state';
 import classNames from 'classnames';
+import ReactionPickerDropdown from 'mastodon/containers/reaction_picker_dropdown_container';
 
 const messages = defineMessages({
   delete: { id: 'status.delete', defaultMessage: 'Delete' },
@@ -75,6 +76,8 @@ class ActionBar extends React.PureComponent {
     onPin: PropTypes.func,
     onEmbed: PropTypes.func,
     intl: PropTypes.object.isRequired,
+    addEmojiReaction: PropTypes.func.isRequired,
+    removeEmojiReaction: PropTypes.func.isRequired,
   };
 
   handleReplyClick = () => {
@@ -191,6 +194,16 @@ class ActionBar extends React.PureComponent {
     }
   }
 
+  handleEmojiPick = data => {
+    const { addEmojiReaction, status } = this.props;
+    addEmojiReaction(status, data.native.replace(/:/g, ''), null, null, null);
+  }
+
+  handleEmojiRemove = () => {
+    const { removeEmojiReaction, status } = this.props;
+    removeEmojiReaction(status);
+  }
+
   render () {
     const { status, relationship, intl } = this.props;
 
@@ -284,7 +297,8 @@ class ActionBar extends React.PureComponent {
         <div className='detailed-status__button'><IconButton title={intl.formatMessage(messages.reply)} icon={status.get('in_reply_to_account_id') === status.getIn(['account', 'id']) ? 'reply' : replyIcon} onClick={this.handleReplyClick} /></div>
         <div className='detailed-status__button' ><IconButton className={classNames({ reblogPrivate })} disabled={!publicStatus && !reblogPrivate} active={status.get('reblogged')} title={reblogTitle} icon='retweet' onClick={this.handleReblogClick} /></div>
         <div className='detailed-status__button'><IconButton className='star-icon' animate active={status.get('favourited')} title={intl.formatMessage(messages.favourite)} icon='star' onClick={this.handleFavouriteClick} /></div>
-        <div className='detailed-status__button'><IconButton disabled={!publicStatus} title={!publicStatus ? intl.formatMessage(messages.cannot_quote) : intl.formatMessage(messages.quote)} icon='quote-right' onClick={this.handleQuoteClick} /></div>
+        {show_quote_button && <div className='detailed-status__button'><IconButton disabled={!publicStatus || expired} title={!publicStatus ? intl.formatMessage(messages.cannot_quote) : intl.formatMessage(messages.quote)} icon='quote-right' onClick={this.handleQuoteClick} /></div>}
+        {enableReaction && <div className='detailed-status__button'><ReactionPickerDropdown disabled={expired} active={status.get('emoji_reactioned')} pressed={status.get('emoji_reactioned')} iconButtonClass='detailed-status__action-bar-button' onPickEmoji={this.handleEmojiPick} onRemoveEmoji={this.handleEmojiRemove} /></div>}
         {shareButton}
         <div className='detailed-status__button'><IconButton className='bookmark-icon' active={status.get('bookmarked')} title={intl.formatMessage(messages.bookmark)} icon='bookmark' onClick={this.handleBookmarkClick} /></div>
 

@@ -28,5 +28,7 @@ export const cropImages = getMeta('crop_images');
 export const disableSwiping = getMeta('disable_swiping');
 export const place_tab_bar_at_bottom = getMeta('place_tab_bar_at_bottom');
 export const show_tab_bar_label = getMeta('show_tab_bar_label');
+export const enable_limited_timeline = getMeta('enable_limited_timeline');
+export const enableReaction = getMeta('enable_reaction');
 
 export default initialState;

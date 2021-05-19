@@ -10,6 +10,7 @@ import {
 } from './timelines';
 import { updateNotifications, expandNotifications } from './notifications';
 import { updateConversations } from './conversations';
+import { updateEmojiReaction } from './interactions';
 import {
   fetchAnnouncements,
   updateAnnouncements,
@@ -86,6 +87,9 @@ export const connectTimelineStream = (timelineId, channelName, params = {}, opti
           break;
         case 'filters_changed':
           dispatch(fetchFilters());
+          break;
+        case 'emoji_reaction':
+          dispatch(updateEmojiReaction(JSON.parse(data.payload)));
           break;
         case 'announcement':
           dispatch(updateAnnouncements(JSON.parse(data.payload)));

@@ -74,6 +74,27 @@ class REST::InstanceSerializer < ActiveModel::Serializer
     true
   end
 
+  def fedibird_capabilities
+    [
+      :favourite_hashtag,
+      :favourite_domain,
+      :status_expire,
+      :follow_no_delivery,
+      :follow_hashtag,
+      :subscribe_account,
+      :subscribe_domain,
+      :subscribe_keyword,
+      :timeline_home_visibility,
+      :timeline_no_local,
+      :timeline_domain,
+      :timeline_group,
+      :timeline_group_directory,
+      :visibility_mutual,
+      :visibility_limited,
+      :emoji_reaction,
+    ]
+  end
+
   private
 
   def instance_presenter

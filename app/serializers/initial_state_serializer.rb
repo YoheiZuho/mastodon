@@ -42,6 +42,8 @@ class InitialStateSerializer < ActiveModel::Serializer
       store[:crop_images]       = object.current_account.user.setting_crop_images
       store[:place_tab_bar_at_bottom]           = object.current_account.user.setting_place_tab_bar_at_bottom
       store[:show_tab_bar_label]                = object.current_account.user.setting_show_tab_bar_label
+      store[:enable_limited_timeline]           = object.current_account.user.setting_enable_limited_timeline
+      store[:enable_reaction]                   = object.current_account.user.setting_enable_reaction
     else
       store[:auto_play_gif] = Setting.auto_play_gif
       store[:display_media] = Setting.display_media

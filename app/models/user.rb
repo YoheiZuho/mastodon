@@ -125,7 +125,10 @@ class User < ApplicationRecord
            :expand_spoilers, :default_language, :aggregate_reblogs, :show_application,
            :advanced_layout, :use_blurhash, :use_pending_items, :trends, :crop_images,
            :disable_swiping,
-           :place_tab_bar_at_bottom,:show_tab_bar_label,
+           :show_follow_button_on_timeline, :show_subscribe_button_on_timeline, :show_target,
+           :show_follow_button_on_timeline, :show_subscribe_button_on_timeline, :show_followed_by, :show_target,
+           :follow_button_to_list_adder, :show_navigation_panel, :show_quote_button, :show_bookmark_button,
+           :place_tab_bar_at_bottom,:show_tab_bar_label, :enable_limited_timeline, :enable_reaction,
 
            to: :settings, prefix: :setting, allow_nil: false
 

@@ -41,6 +41,11 @@ class UserSettingsDecorator
     user.settings['crop_images']         = crop_images_preference if change?('setting_crop_images')
     user.settings['place_tab_bar_at_bottom']           = place_tab_bar_at_bottom_preference if change?('setting_place_tab_bar_at_bottom')
     user.settings['show_tab_bar_label']                = show_tab_bar_label_preference if change?('setting_show_tab_bar_label')
+<<<<<<< HEAD
+=======
+    user.settings['enable_limited_timeline']           = enable_limited_timeline_preference if change?('setting_enable_limited_timeline')
+    user.settings['enable_reaction']                   = enable_reaction_preference if change?('setting_enable_reaction')
+>>>>>>> 23c712e51... Add emoji reaction
   end
 
   def merged_notification_emails
@@ -145,6 +150,14 @@ class UserSettingsDecorator
 
   def show_tab_bar_label_preference
     boolean_cast_setting 'setting_show_tab_bar_label'
+  end
+
+  def enable_limited_timeline_preference
+    boolean_cast_setting 'setting_enable_limited_timeline'
+  end
+
+  def enable_reaction_preference
+    boolean_cast_setting 'setting_enable_reaction'
   end
 
   def boolean_cast_setting(key)
