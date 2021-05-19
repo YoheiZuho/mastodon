@@ -39,6 +39,7 @@ import {
   Subscribing,
   Reblogs,
   Favourites,
+  EmojiReactions,
   Mentions,
   DirectTimeline,
   LimitedTimeline,
@@ -48,6 +49,7 @@ import {
   GenericNotFound,
   FavouritedStatuses,
   BookmarkedStatuses,
+  EmojiReactionedStatuses,
   ListTimeline,
   Blocks,
   DomainBlocks,
@@ -108,6 +110,7 @@ const keyMap = {
   goToDirect: 'g d',
   goToStart: 'g s',
   goToFavourites: 'g f',
+  goToEmojiReactions: 'g e',
   goToPinned: 'g p',
   goToProfile: 'g u',
   goToBlocked: 'g b',
@@ -179,6 +182,7 @@ class SwitchingColumnsArea extends React.PureComponent {
           <WrappedRoute path='/notifications' component={Notifications} content={children} componentParams={{ shouldUpdateScroll: this.shouldUpdateScroll }} />
           <WrappedRoute path='/favourites' component={FavouritedStatuses} content={children} componentParams={{ shouldUpdateScroll: this.shouldUpdateScroll }} />
           <WrappedRoute path='/bookmarks' component={BookmarkedStatuses} content={children} />
+          <WrappedRoute path='/emoji_reactions' component={EmojiReactionedStatuses} content={children} componentParams={{ shouldUpdateScroll: this.shouldUpdateScroll }} />
           <WrappedRoute path='/pinned' component={PinnedStatuses} content={children} componentParams={{ shouldUpdateScroll: this.shouldUpdateScroll }} />
 
           <WrappedRoute path='/start' component={FollowRecommendations} content={children} />
@@ -192,6 +196,7 @@ class SwitchingColumnsArea extends React.PureComponent {
           <WrappedRoute path='/statuses/:statusId' exact component={Status} content={children} componentParams={{ shouldUpdateScroll: this.shouldUpdateScroll }} />
           <WrappedRoute path='/statuses/:statusId/reblogs' component={Reblogs} content={children} componentParams={{ shouldUpdateScroll: this.shouldUpdateScroll }} />
           <WrappedRoute path='/statuses/:statusId/favourites' component={Favourites} content={children} componentParams={{ shouldUpdateScroll: this.shouldUpdateScroll }} />
+          <WrappedRoute path='/statuses/:statusId/emoji_reactions' component={EmojiReactions} content={children} componentParams={{ shouldUpdateScroll: this.shouldUpdateScroll }} />
           <WrappedRoute path='/statuses/:statusId/mentions' component={Mentions} content={children} componentParams={{ shouldUpdateScroll: this.shouldUpdateScroll }} />
 
           <WrappedRoute path='/accounts/:accountId' exact component={AccountTimeline} content={children} componentParams={{ shouldUpdateScroll: this.shouldUpdateScroll }} />
@@ -500,6 +505,10 @@ class UI extends React.PureComponent {
     this.context.router.history.push('/favourites');
   }
 
+  handleHotkeyGoToEmojiReactions = () => {
+    this.context.router.history.push('/emoji_reactions');
+  }
+
   handleHotkeyGoToPinned = () => {
     this.context.router.history.push('/pinned');
   }
@@ -538,6 +547,7 @@ class UI extends React.PureComponent {
       goToDirect: this.handleHotkeyGoToDirect,
       goToStart: this.handleHotkeyGoToStart,
       goToFavourites: this.handleHotkeyGoToFavourites,
+      goToEmojiReactions: this.handleHotkeyGoToEmojiReactions,
       goToPinned: this.handleHotkeyGoToPinned,
       goToProfile: this.handleHotkeyGoToProfile,
       goToBlocked: this.handleHotkeyGoToBlocked,
