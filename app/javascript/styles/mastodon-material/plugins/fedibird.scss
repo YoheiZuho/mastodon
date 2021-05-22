@@ -13,6 +13,7 @@
     @include shadow-4dp;
     
     .tabs-bar {
+        &__link,
         &__link.active { border-bottom: none }
     }
 
