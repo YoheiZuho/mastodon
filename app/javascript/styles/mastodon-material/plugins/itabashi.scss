@@ -1,0 +1,32 @@
+.quote-indicator {
+    @include card-elevation(false);
+    margin-bottom: 16px;
+    padding: 16px;
+
+    &__header { margin-bottom: 4px }
+
+    &__display-avatar { margin-right: 8px }
+
+    &__content { padding-top: 0 }
+}
+
+.quote-status {
+    @include card-elevation(false);
+    padding: 16px;
+
+    .detailed-status__display-avatar,
+    .status__avatar {
+        height: 32px;
+        width: 232px;
+        top: 16px !important;
+        left: 16px !important;
+
+        &>div {
+            width: 32px !important;
+            height: 32px !important;
+            background-size: 32px !important;
+        }
+    }
+
+    .display-name { padding-left: 40px }
+}
